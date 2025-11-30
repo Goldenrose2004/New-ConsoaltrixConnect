@@ -155,6 +155,23 @@
       padding-left: 1.25rem;
     }
 
+    .college-section-content .w-full > div:not(:first-child) p,
+    .college-section-content .w-full > div:not(:first-child) li,
+    .college-section-content .w-full > div:not(:first-child) li span,
+    .college-section-content .w-full > div:not(:first-child) .text-content {
+      font-size: 0.8125rem !important;
+      line-height: 1.55 !important;
+      text-align: justify !important;
+      text-align-last: left;
+      text-justify: inter-word;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+      -ms-hyphens: auto;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+
     .no-justify {
       text-align: center !important;
       text-align-last: center !important;
@@ -165,6 +182,24 @@
       display: flex;
       justify-content: center;
       width: 100%;
+    }
+
+    .section-one-college p,
+    .section-one-college li,
+    .section-one-college li span,
+    .section-one-college .text-content,
+    .section-one-college .section-one-text {
+      font-size: 0.7rem !important;
+      line-height: 1.45 !important;
+      text-align: justify !important;
+      text-align-last: left;
+      text-justify: inter-word;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+      -ms-hyphens: auto;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
 
     .mobile-no-bottom-margin {

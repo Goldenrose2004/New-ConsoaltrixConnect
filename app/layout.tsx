@@ -3,6 +3,8 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
+import { ServiceWorkerRegister } from "@/components/service-worker-register"
+import { OfflineDetector } from "@/components/offline-detector"
 import "./globals.css"
 
 const geist = Geist({ subsets: ["latin"] })
@@ -26,6 +28,19 @@ export const metadata: Metadata = {
     ],
     apple: "/images/logo-icon.png",
   },
+  manifest: "/manifest.json",
+  themeColor: "#041A44",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ConsolatrixConnect",
+  },
 }
 
 export default function RootLayout({
@@ -39,6 +54,8 @@ export default function RootLayout({
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
       </head>
       <body className={`${geist.className} font-sans antialiased`}>
+        <ServiceWorkerRegister />
+        <OfflineDetector />
         {children}
         <Analytics />
       </body>

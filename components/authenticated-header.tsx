@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { Menu, X, Home, Info, FileText, MessageSquare, User, LogOut } from "lucide-react"
 import Image from "next/image"
@@ -29,7 +29,7 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
   usePresence()
 
   // Fetch notifications
-  const fetchNotifications = async (currentUserId: string) => {
+  const fetchNotifications = useCallback(async (currentUserId: string) => {
     try {
       const response = await fetch(`/api/notifications?userId=${currentUserId}`)
       const data = await response.json()
@@ -39,7 +39,7 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
     } catch (error) {
       console.error("Error fetching notifications:", error)
     }
-  }
+  }, [])
 
   useEffect(() => {
     try {
@@ -108,7 +108,7 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
       window.removeEventListener("storage", handleStorageChange)
       window.removeEventListener("profilePictureUpdated", handleStorageChange)
     }
-  }, [])
+  }, [fetchNotifications])
 
   // Poll for new notifications every 5 seconds
   useEffect(() => {
@@ -131,7 +131,29 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
       window.removeEventListener("notificationUpdate", handleNotificationUpdate)
       window.removeEventListener("announcementCreated", handleNotificationUpdate)
     }
-  }, [userId])
+  }, [userId, fetchNotifications])
+
+  useEffect(() => {
+    if (!userId) return
+
+    const handleStorageNotification = (event: StorageEvent) => {
+      if (event.key === "notificationUpdateBroadcast" && event.newValue) {
+        try {
+          const payload = JSON.parse(event.newValue)
+          if (payload?.userId === userId) {
+            fetchNotifications(userId)
+          }
+        } catch (error) {
+          console.error("Failed to parse notification broadcast payload:", error)
+        }
+      }
+    }
+
+    window.addEventListener("storage", handleStorageNotification)
+    return () => {
+      window.removeEventListener("storage", handleStorageNotification)
+    }
+  }, [userId, fetchNotifications])
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser")
@@ -141,16 +163,19 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
 
   return (
     <header className="sticky top-0 z-50 w-full" style={{ backgroundColor: "#041A44" }}>
-      <div className="w-full px-4 sm:px-6 lg:px-12">
-        <div className={`${useLandingPageStyling ? 'h-16 sm:h-[4.5rem] md:h-20' : 'h-16 md:h-20'} flex items-center justify-between relative`} {...(useLandingPageStyling && { suppressHydrationWarning: true })}>
+      <div className="mx-auto w-full max-w-[1920px] px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-16">
+        <div
+          className={`${useLandingPageStyling ? 'h-16 sm:h-[4.5rem] lg:h-20' : 'h-16 lg:h-20'} flex w-full items-center justify-between gap-3 sm:gap-4 lg:gap-6`}
+          {...(useLandingPageStyling && { suppressHydrationWarning: true })}
+        >
           {/* Logo and Brand */}
           <div 
-            className={`flex items-center ${
+            className={`flex items-center flex-shrink-0 gap-2 sm:gap-3 whitespace-nowrap ${
               useLandingPageStyling 
-                ? 'gap-0 ml-0 sm:ml-2 md:ml-12 lg:ml-32 xl:ml-40 md:gap-1 min-w-0 flex-1' 
+                ? 'max-w-[320px]' 
                 : useLandingPageStylingMobileOnly
-                ? 'gap-0 sm:gap-1 ml-0 sm:ml-2 md:ml-12 lg:ml-32 xl:ml-40 min-w-0 flex-1 sm:cursor-default sm:select-none'
-                : 'gap-1 ml-2 md:ml-12 lg:ml-32 xl:ml-40 md:gap-1 cursor-default select-none'
+                ? 'max-w-[280px] sm:cursor-default sm:select-none'
+                : 'max-w-[260px] cursor-default select-none'
             }`}
             suppressHydrationWarning
           >
@@ -159,21 +184,21 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
               alt="ConsolatrixConnect"
               width={115}
               height={115}
-              className={`flex-shrink-0 ${
+              className={`flex-shrink-0 object-contain ${
                 useLandingPageStyling 
-                  ? 'w-[72px] h-[72px] sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-24 xl:h-24 object-contain' 
+                  ? 'w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20' 
                   : useLandingPageStylingMobileOnly
-                  ? 'w-[72px] h-[72px] sm:w-10 sm:h-10 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-24 xl:h-24 object-contain sm:pointer-events-none'
-                  : 'pointer-events-none w-10 h-10 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-24 xl:h-24 md:object-contain'
+                  ? 'w-12 h-12 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 sm:pointer-events-none'
+                  : 'pointer-events-none w-10 h-10 md:w-16 md:h-16 lg:w-20 lg:h-20'
               }`}
             />
             <span 
-              className={`text-white font-bold whitespace-nowrap truncate ${
+              className={`text-white font-bold whitespace-nowrap ${
                 useLandingPageStyling 
-                  ? 'text-base sm:text-base md:text-xl lg:text-2xl -ml-1 sm:-ml-1.5 md:-ml-2' 
+                  ? 'text-base sm:text-lg md:text-xl lg:text-2xl' 
                   : useLandingPageStylingMobileOnly
-                  ? 'text-base sm:text-lg md:text-xl lg:text-2xl -ml-1 sm:-ml-0 sm:hidden md:inline md:-ml-2'
-                  : 'text-sm sm:text-lg md:text-xl lg:text-2xl hidden sm:inline md:-ml-2'
+                  ? 'text-base sm:text-lg md:text-xl lg:text-2xl sm:hidden md:inline'
+                  : 'text-sm sm:text-lg md:text-xl lg:text-2xl hidden sm:inline'
               }`}
               style={{ fontFamily: "'Inter', sans-serif" }}
               suppressHydrationWarning
@@ -181,23 +206,23 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
           </div>
 
           {/* Desktop Navigation - Centered */}
-          <nav className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center gap-12">
-            <Link href={homeHref} className="text-white hover:text-blue-300 transition text-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <nav className="hidden flex-1 items-center justify-center gap-4 lg:gap-8 xl:gap-10 2xl:gap-14 whitespace-nowrap md:flex">
+            <Link href={homeHref} className="text-white hover:text-blue-300 transition text-sm lg:text-base 2xl:text-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
               Home
             </Link>
-            <Link href="/about-us" className="text-white hover:text-blue-300 transition text-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
+            <Link href="/about-us" className="text-white hover:text-blue-300 transition text-sm lg:text-base 2xl:text-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
               About us
             </Link>
-            <Link href="/records" className="text-white hover:text-blue-300 transition text-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
+            <Link href="/records" className="text-white hover:text-blue-300 transition text-sm lg:text-base 2xl:text-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
               Records
             </Link>
-            <Link href="/chats" className="text-white hover:text-blue-300 transition text-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
+            <Link href="/chats" className="text-white hover:text-blue-300 transition text-sm lg:text-base 2xl:text-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
               Chats
             </Link>
           </nav>
 
           {/* User Actions */}
-          <div className="hidden md:flex items-center gap-3 ml-auto mr-12 md:mr-32 lg:mr-40">
+          <div className="hidden flex-shrink-0 items-center gap-3 lg:gap-4 whitespace-nowrap md:flex">
             <NotificationMenu notifications={notifications} align="end" userId={userId} onNotificationUpdate={() => userId && fetchNotifications(userId)} />
             <Link
               href="/profile"

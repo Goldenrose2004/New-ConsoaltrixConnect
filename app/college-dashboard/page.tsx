@@ -194,29 +194,44 @@ export default function CollegeDashboardPage() {
   }, [])
 
   useEffect(() => {
-    // Check if user is logged in
+    // Check if user is logged in (online or offline)
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
       return
     }
 
-    const userData = JSON.parse(currentUser)
-    setUser(userData)
-    setIsLoading(false)
+    try {
+      const userData = JSON.parse(currentUser)
+      setUser(userData)
+      setIsLoading(false)
 
-    // Fetch announcement count immediately
-    fetchAnnouncementCount()
+      // Only fetch announcement count if online
+      if (navigator.onLine) {
+        fetchAnnouncementCount()
+      }
+    } catch (error) {
+      console.error("Error parsing user data:", error)
+      router.push("/login")
+    }
   }, [router, fetchAnnouncementCount])
 
-  // Poll for new announcement notifications every 5 seconds
+  // Poll for new announcement notifications every 5 seconds (only when online)
   useEffect(() => {
+    if (!navigator.onLine) return
+
     const interval = setInterval(() => {
-      fetchAnnouncementCount()
+      if (navigator.onLine) {
+        fetchAnnouncementCount()
+      }
     }, 5000)
 
     // Listen for custom events
-    const handleAnnouncementChange = () => fetchAnnouncementCount()
+    const handleAnnouncementChange = () => {
+      if (navigator.onLine) {
+        fetchAnnouncementCount()
+      }
+    }
 
     window.addEventListener("announcementCreated", handleAnnouncementChange)
     window.addEventListener("announcementUpdated", handleAnnouncementChange)
@@ -238,7 +253,7 @@ export default function CollegeDashboardPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <AuthenticatedHeader userName={user?.firstName} userInitials={userInitials} useLandingPageStyling={true} />
+      <AuthenticatedHeader userName={user?.firstName} userInitials={userInitials} useLandingPageStylingMobileOnly={true} />
 
       {/* Main Content */}
       <main className="flex-1">

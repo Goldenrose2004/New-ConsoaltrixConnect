@@ -61,7 +61,7 @@ export default function CoreValuesPage() {
         <div className="rounded-lg shadow-xl overflow-hidden" style={{ backgroundColor: "#001E4D" }}>
           {/* Title Section */}
           <div className="text-white text-center py-4 md:py-8" style={{ backgroundColor: "#001E4D" }}>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-wide px-2 md:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>ARSC CORE VALUES</h1>
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide px-2 md:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>ARSC CORE VALUES</h1>
             <div className="mt-2 h-1 mx-auto w-20 sm:w-24" style={{ backgroundColor: "#60A5FA" }}></div>
           </div>
 
@@ -70,7 +70,7 @@ export default function CoreValuesPage() {
             {/* Augustinian Recollect Core Values Section */}
             <div className="mb-4 md:mb-6" style={{ backgroundColor: "#1A355F" }}>
                 <h2 className="text-base sm:text-lg md:text-xl font-bold text-white text-center mb-3 md:mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>AUGUSTINIAN RECOLLECT CORE VALUES:</h2>
-                <p className="text-white text-sm sm:text-base text-center mobile-no-bottom-margin" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <p className="text-white text-xs sm:text-base text-center mobile-no-bottom-margin" style={{ fontFamily: "'Inter', sans-serif" }}>
                 Christ-centered, Augustinian Recollect Steward (CARS)
               </p>
             </div>
@@ -78,7 +78,7 @@ export default function CoreValuesPage() {
             {/* Graduate Attributes Section */}
             <div style={{ backgroundColor: "#1A355F" }}>
               <h2 className="text-base sm:text-lg md:text-xl font-bold text-white text-center mb-4 md:mb-6" style={{ fontFamily: "'Inter', sans-serif" }}>A.R./CONSOLATRICIANS GRADUATE ATTRIBUTES</h2>
-              <div className="text-white text-sm sm:text-base leading-relaxed space-y-2 md:space-y-3" style={{ textAlign: "justify" }}>
+              <div className="text-white text-xs sm:text-base leading-relaxed space-y-2 md:space-y-3" style={{ textAlign: "justify" }}>
                 <div className="flex items-start space-x-2 md:space-x-3">
                   <div className="text-white font-bold mt-1 flex-shrink-0">*</div>
                   <div style={{ fontFamily: "'Inter', sans-serif" }}>Christ-centered</div>

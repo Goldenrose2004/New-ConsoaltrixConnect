@@ -48,6 +48,7 @@ export default function ChatsPage() {
   const [filePreviews, setFilePreviews] = useState<Array<{ file: File; preview: string }>>([])
   const [longPressMessageId, setLongPressMessageId] = useState<string | null>(null)
   const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null)
+  const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null)
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
   const messageMenuRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -363,6 +364,22 @@ export default function ChatsPage() {
     }
   }
 
+  const scrollToMessage = (messageId: string) => {
+    const messageElement = document.getElementById(`message-${messageId}`)
+    if (messageElement && messagesContainerRef.current) {
+      // Highlight the message
+      setHighlightedMessageId(messageId)
+      
+      // Scroll to the message
+      messageElement.scrollIntoView({ behavior: "smooth", block: "center" })
+      
+      // Remove highlight after 2 seconds
+      setTimeout(() => {
+        setHighlightedMessageId(null)
+      }, 2000)
+    }
+  }
+
   const handleEditMessage = async (messageId: string) => {
     if (!editMessageText.trim() || !user) return
 
@@ -606,7 +623,7 @@ export default function ChatsPage() {
           <div 
             ref={messagesContainerRef}
             onScroll={handleScroll}
-            className="flex-1 overflow-y-auto px-2.5 sm:px-3 md:px-6 py-3 sm:py-4 md:py-6 bg-gray-50" 
+            className="flex-1 overflow-y-auto px-1.5 sm:px-3 md:px-6 py-2 sm:py-4 md:py-6 bg-gray-50" 
             id="messages-container"
             style={{ minHeight: 0 }}
           >
@@ -617,19 +634,16 @@ export default function ChatsPage() {
               </div>
             ) : (
               /* Messages list */
-              <div className="space-y-2.5 sm:space-y-3 md:space-y-4">
+              <div className="space-y-1.5 sm:space-y-3 md:space-y-4">
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`group flex gap-1.5 sm:gap-2 md:gap-3 items-start ${msg.isOutgoing ? "justify-end" : "justify-start"}`}
+                    id={`message-${msg.id}`}
+                    className={`group flex gap-1 sm:gap-2 md:gap-3 items-start transition-all duration-300 ${msg.isOutgoing ? "justify-end" : "justify-start"} ${highlightedMessageId === msg.id ? "bg-yellow-100 dark:bg-yellow-900 rounded-lg p-1 sm:p-2 -m-1 sm:-m-2" : ""}`}
                   >
                     {!msg.isOutgoing && (
-                      <div 
-                        className="flex h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 items-center justify-center rounded-full bg-blue-100 text-[#041A44] text-[9px] sm:text-[10px] md:text-xs font-semibold flex-shrink-0 overflow-hidden" 
-                        style={{ 
-                          marginTop: msg.repliedTo ? '3.5rem' : '1.25rem',
-                          backgroundColor: msg.senderProfilePicture ? "transparent" : "#DBEAFE"
-                        }}
+                      <div
+                        className={`self-start ${msg.repliedTo ? "mt-[3rem] sm:mt-[3.25rem] md:mt-[3.5rem]" : "mt-1.5"} flex h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 items-center justify-center rounded-full text-[#041A44] text-[9px] sm:text-[10px] md:text-xs font-semibold flex-shrink-0 overflow-hidden ${msg.senderProfilePicture ? "" : "bg-blue-100"}`}
                       >
                         {msg.senderProfilePicture ? (
                           <Image
@@ -648,14 +662,19 @@ export default function ChatsPage() {
                       {msg.repliedTo && !msg.deleted && (() => {
                         const repliedMessage = messages.find(m => m.id === msg.repliedTo)
                         return repliedMessage ? (
-                          <div className={`mb-1 ${msg.isOutgoing ? 'items-end flex flex-col' : 'inline-block'}`}>
-                            <p className={`text-[9px] sm:text-[10px] md:text-xs text-gray-500 mb-1 px-1 ${msg.isOutgoing ? 'text-right' : 'text-left'}`} style={{ fontFamily: "'Inter', sans-serif" }}>
+                          <div className={`mb-0.5 sm:mb-1 ${msg.isOutgoing ? 'items-end flex flex-col' : 'inline-block'}`}>
+                            <p className={`text-[9px] sm:text-[10px] md:text-xs text-gray-500 mb-0.5 sm:mb-1 px-1 ${msg.isOutgoing ? 'text-right' : 'text-left'}`} style={{ fontFamily: "'Inter', sans-serif" }}>
                               {msg.isOutgoing 
                                 ? `You replied to ${repliedMessage.senderName}`
                                 : `${msg.senderName} replied to ${repliedMessage.senderName}`}
                             </p>
-                            <div className="rounded-xl px-2 py-1 sm:py-1.5 md:px-3 md:py-2 max-w-[65%] sm:max-w-[60%] bg-gray-100 border border-gray-200 inline-block">
-                              <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-600 truncate" style={{ fontFamily: "'Inter', sans-serif" }}>{repliedMessage.text}</p>
+                            <div 
+                              className="rounded-xl px-2 py-1 sm:py-1.5 md:px-3 md:py-2 max-w-[65%] sm:max-w-[60%] bg-gray-100 border border-gray-200 inline-block cursor-pointer hover:bg-gray-200 transition-colors"
+                              onClick={() => scrollToMessage(msg.repliedTo!)}
+                            >
+                              <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-600 truncate" style={{ fontFamily: "'Inter', sans-serif" }}>
+                                {repliedMessage.text.length > 50 ? repliedMessage.text.substring(0, 50) + '...' : repliedMessage.text}
+                              </p>
                             </div>
                           </div>
                         ) : null
@@ -702,7 +721,7 @@ export default function ChatsPage() {
                           <>
                             <div className="relative">
                               <div
-                                className={`rounded-2xl px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-3 max-w-full ${
+                                className={`rounded-2xl px-2 sm:px-3 md:px-4 py-1 sm:py-2 md:py-3 max-w-full ${
                                   msg.isOutgoing
                                     ? msg.deleted 
                                       ? "bg-gray-100 text-gray-500 border border-gray-200"
@@ -775,7 +794,7 @@ export default function ChatsPage() {
                                       </div>
                                     )}
                                     {msg.text && (
-                                      <p className="text-[11px] sm:text-xs md:text-sm whitespace-pre-wrap break-words text-justify md:text-left" style={{ fontFamily: "'Inter', sans-serif", wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{msg.text}</p>
+                                      <p className="text-[11px] sm:text-xs md:text-sm whitespace-pre-wrap break-words text-justify md:text-left" style={{ fontFamily: "'Inter', sans-serif", wordBreak: 'break-word', overflowWrap: 'break-word', textJustify: 'inter-word', hyphens: 'auto', WebkitHyphens: 'auto', MozHyphens: 'auto', lineHeight: '1.5' }}>{msg.text}</p>
                                     )}
                                   </>
                                 )}
@@ -1093,7 +1112,7 @@ export default function ChatsPage() {
                           </>
                         )}
                       </div>
-                      <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mt-1 px-1">{msg.timestamp}</p>
+                      <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mt-0.5 sm:mt-1 px-1">{msg.timestamp}</p>
                     </div>
                   </div>
                 ))}
@@ -1108,9 +1127,14 @@ export default function ChatsPage() {
               const repliedMessage = messages.find(m => m.id === replyingToMessageId)
               return repliedMessage ? (
                 <div className="mb-2.5 sm:mb-3 flex items-start justify-between bg-white rounded-lg px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 md:py-2.5 border-l-[4px] border-[#041A44] shadow-sm">
-                  <div className="flex-1 min-w-0 pr-1.5 sm:pr-2">
+                  <div 
+                    className="flex-1 min-w-0 pr-1.5 sm:pr-2 cursor-pointer hover:bg-gray-50 rounded transition-colors -mx-2 px-2 py-1"
+                    onClick={() => scrollToMessage(replyingToMessageId!)}
+                  >
                     <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mb-0.5 sm:mb-1">Replying to {repliedMessage.senderName}</p>
-                    <p className="text-[9px] sm:text-[10px] md:text-sm text-gray-700 break-words line-clamp-2 text-justify md:text-left">{repliedMessage.text || "No text content"}</p>
+                    <p className="text-[9px] sm:text-[10px] md:text-sm text-gray-700 break-words line-clamp-2 text-justify md:text-left" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', textJustify: 'inter-word', hyphens: 'auto', WebkitHyphens: 'auto', MozHyphens: 'auto', lineHeight: '1.5' }}>
+                      {repliedMessage.text && repliedMessage.text.length > 80 ? repliedMessage.text.substring(0, 80) + '...' : (repliedMessage.text || "No text content")}
+                    </p>
                   </div>
                   <button
                     type="button"

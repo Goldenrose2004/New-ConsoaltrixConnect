@@ -69,6 +69,11 @@ export default function LoginPage() {
               department: data.user?.department,
               yearLevel: data.user?.yearLevel,
               role: data.user?.role ?? "user",
+              section: data.user?.section || null,
+              strand: data.user?.strand || null,
+              course: data.user?.course || null,
+              profilePicture: data.user?.profilePicture || null,
+              profilePictureName: data.user?.profilePictureName || null,
             }
 
       if (!userData) {
@@ -82,7 +87,19 @@ export default function LoginPage() {
       } else {
         localStorage.removeItem("rememberMe")
       }
-      localStorage.setItem("currentUser", JSON.stringify(userData))
+      
+      // Store user data with token for offline PWA access
+      const userWithToken = {
+        ...userData,
+        loginToken: data.token || null,
+        loginTimestamp: Date.now()
+      }
+      localStorage.setItem("currentUser", JSON.stringify(userWithToken))
+      
+      // Also store token separately for quick access
+      if (data.token) {
+        localStorage.setItem("pwa_auth_token", data.token)
+      }
 
       // Determine redirect path based on role/department
       let redirectPath = "/basic-education-dashboard" // Default to basic education dashboard

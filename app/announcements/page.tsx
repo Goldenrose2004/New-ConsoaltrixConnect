@@ -170,7 +170,7 @@ export default function AnnouncementsPage() {
 
       {/* Header Section */}
       <div
-        className="text-white py-12 px-6"
+        className="text-white px-6 py-8 sm:py-12"
         style={{
           background: "linear-gradient(135deg, #001F54, #004AAD)",
           boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
@@ -180,10 +180,10 @@ export default function AnnouncementsPage() {
         }}
       >
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>
             📢 Announcements
           </h1>
-          <p className="text-sm sm:text-xl opacity-90 max-w-2xl mx-auto" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <p className="text-xs sm:text-xl opacity-90 max-w-2xl mx-auto" style={{ fontFamily: "'Inter', sans-serif" }}>
             Stay updated with important announcements and updates from the school administration
           </p>
         </div>

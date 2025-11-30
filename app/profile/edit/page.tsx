@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { AuthenticatedHeader } from "@/components/authenticated-header"
-import { Upload, Trash2, Eye, EyeOff, ArrowLeft, Check, GraduationCap } from "lucide-react"
+import { SuccessDialog } from "@/components/ui/success-dialog"
+import { Upload, Trash2, Eye, EyeOff, ArrowLeft, GraduationCap, Loader2 } from "lucide-react"
 import Image from "next/image"
 
 const departmentYearMap: Record<string, string[]> = {
@@ -12,6 +13,13 @@ const departmentYearMap: Record<string, string[]> = {
   "Junior High School": ["Grade 7", "Grade 8", "Grade 9", "Grade 10"],
   Elementary: ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"],
 }
+
+type SuccessDialogState = {
+  title: string
+  message: string
+  confirmLabel?: string
+  onConfirm?: () => void
+} | null
 
 export default function EditProfilePage() {
   const router = useRouter()
@@ -22,7 +30,9 @@ export default function EditProfilePage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [fileName, setFileName] = useState<string>("No file chosen")
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [successDialog, setSuccessDialog] = useState<SuccessDialogState>(null)
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -35,8 +45,25 @@ export default function EditProfilePage() {
     course: "",
     yearLevel: "",
   })
+  const handleSuccessDialogClose = () => {
+    setSuccessDialog((prev) => {
+      // Defer the onConfirm callback to avoid updating Router during render
+      if (prev?.onConfirm) {
+        setTimeout(() => {
+          prev.onConfirm?.()
+        }, 0)
+      }
+      return null
+    })
+  }
 
   useEffect(() => {
+    // Check if offline - edit profile requires online connection
+    if (!navigator.onLine) {
+      router.push("/profile")
+      return
+    }
+
     // Check if user is logged in
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
@@ -48,6 +75,11 @@ export default function EditProfilePage() {
     
     // Fetch fresh user data from database to ensure we have the latest profile
     const fetchFreshUserData = async () => {
+      if (!navigator.onLine) {
+        router.push("/profile")
+        return
+      }
+
       try {
         const response = await fetch(`/api/users/${userData.id}`)
         const data = await response.json()
@@ -123,6 +155,8 @@ export default function EditProfilePage() {
   const handleUploadPicture = async () => {
     if (!selectedFile || !user) return
 
+    setIsUploading(true)
+
     try {
       // Convert file to base64
       const reader = new FileReader()
@@ -169,13 +203,18 @@ export default function EditProfilePage() {
           fileInput.value = ""
         }
         
-        alert("Profile picture uploaded successfully!")
+        setSuccessDialog({
+          title: "Profile Picture Updated",
+          message: "Your profile picture has been uploaded successfully.",
+        })
       } else {
         alert("Failed to upload profile picture: " + (data.error || "Unknown error"))
       }
     } catch (error) {
       console.error("Error uploading profile picture:", error)
       alert("Failed to upload profile picture")
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -201,7 +240,10 @@ export default function EditProfilePage() {
         // Dispatch event to update profile picture in chats
         window.dispatchEvent(new CustomEvent("profilePictureUpdated", { detail: updatedUser }))
         
-        alert("Profile picture removed successfully!")
+        setSuccessDialog({
+          title: "Profile Picture Removed",
+          message: "Your profile picture has been removed successfully.",
+        })
       } else {
         alert("Failed to remove profile picture: " + (data.error || "Unknown error"))
       }
@@ -213,6 +255,8 @@ export default function EditProfilePage() {
 
   const handleSaveChanges = async () => {
     if (!user) return
+
+    setIsSaving(true)
 
     try {
       // Prepare the profile edit request
@@ -251,17 +295,21 @@ export default function EditProfilePage() {
 
       const data = await response.json()
       if (data.ok) {
-        setShowSuccessMessage(true)
-        setTimeout(() => {
-          setShowSuccessMessage(false)
-          router.push("/profile")
-        }, 3000)
+        setSuccessDialog({
+          title: "Profile Changes Submitted",
+          message: "Your edit request has been sent for administrator approval.",
+          onConfirm: () => {
+            router.push("/profile")
+          },
+        })
       } else {
         alert("Failed to submit profile edit request: " + (data.error || "Unknown error"))
       }
     } catch (error) {
       console.error("Error submitting profile edit request:", error)
       alert("Failed to submit profile edit request")
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -292,41 +340,6 @@ export default function EditProfilePage() {
               Back to Profile
             </button>
           </div>
-
-          {/* Success Message Notification */}
-          {showSuccessMessage && (
-            <div 
-              className="mb-4 sm:mb-6 flex items-center"
-              style={{
-                backgroundColor: "#e6ffe6",
-                border: "1px solid #c8e6c9",
-                borderRadius: "8px",
-                padding: "10px 12px",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)"
-              }}
-            >
-              <div 
-                className="rounded-full flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0"
-                style={{ 
-                  backgroundColor: "#388e3c",
-                  width: "20px",
-                  height: "20px"
-                }}
-              >
-                <Check className="text-white" style={{ width: "14px", height: "14px", strokeWidth: 3 }} />
-              </div>
-              <p 
-                style={{ 
-                  color: "#2e7d32",
-                  fontWeight: 500,
-                  fontSize: "12px",
-                  margin: 0
-                }}
-              >
-                Profile edit request submitted! Waiting for admin approval.
-              </p>
-            </div>
-          )}
 
           {/* Page Header */}
           <div className="mb-5 sm:mb-8">
@@ -395,10 +408,20 @@ export default function EditProfilePage() {
                       <button
                         type="button"
                         onClick={handleUploadPicture}
-                        className="bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm font-medium flex items-center justify-center"
+                        disabled={!selectedFile || isUploading}
+                        className="bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                        Upload Picture
+                        {isUploading ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            Upload Picture
+                          </>
+                        )}
                       </button>
                       <button
                         type="button"
@@ -648,14 +671,29 @@ export default function EditProfilePage() {
               </button>
               <button
                 type="submit"
-                className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[#041A44] text-white rounded-lg hover:bg-[#1e3a8a] transition-colors text-sm sm:text-base font-medium"
+                disabled={isSaving}
+                className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[#041A44] text-white rounded-lg hover:bg-[#1e3a8a] transition-colors text-sm sm:text-base font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Changes
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
               </button>
             </div>
           </form>
         </div>
       </main>
+      <SuccessDialog
+        open={Boolean(successDialog)}
+        title={successDialog?.title ?? ""}
+        description={successDialog?.message ?? ""}
+        confirmLabel={successDialog?.confirmLabel}
+        onConfirm={handleSuccessDialogClose}
+      />
     </div>
   )
 }

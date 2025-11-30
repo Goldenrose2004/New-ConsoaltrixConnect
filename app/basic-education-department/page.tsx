@@ -60,14 +60,14 @@ export default function BasicEducationDepartmentPage() {
 
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <AuthenticatedHeader userName={user?.firstName} userInitials={userInitials} />
+      <AuthenticatedHeader userName={user?.firstName} userInitials={userInitials} useLandingPageStylingMobileOnly={true} />
 
-      <main className="max-w-4xl mx-auto p-6 mb-20 pb-12">
+      <main className="max-w-4xl mx-auto px-2 sm:px-4 md:p-6 pb-16 md:pb-32">
         {/* Back to Dashboard Button */}
-        <div className="mb-4 mt-16">
+        <div className="mb-4 mt-8 md:mt-16">
           <Link
             href={homeHref}
-            className="inline-flex items-center text-gray-800 transition-colors"
+            className="inline-flex items-center text-gray-800 transition-colors text-sm md:text-base"
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,25 +78,23 @@ export default function BasicEducationDepartmentPage() {
         </div>
 
         {/* Main Container */}
-        <div className="bg-[#001E4D] rounded-lg shadow-xl overflow-hidden">
+        <div className="rounded-lg shadow-xl overflow-hidden" style={{ backgroundColor: "#001E4D" }}>
           {/* Title Section */}
-          <div className="bg-[#001E4D] text-white text-center py-8">
-            <h1 className="text-3xl font-bold tracking-wide" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <div className="text-white text-center py-4 md:py-8" style={{ backgroundColor: "#001E4D" }}>
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide px-2 md:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>
               BASIC EDUCATION DEPARTMENT
             </h1>
-            <div className="mt-2 h-1 bg-blue-400 mx-auto w-24"></div>
+            <div className="mt-2 w-32 sm:w-40 md:w-48 h-1 bg-blue-400 mx-auto"></div>
           </div>
 
           {/* Content Section */}
-          <div className="bg-[#1A355F] mx-8 my-8 rounded-lg p-8 mobile-reading-card">
+          <div className="mx-2 sm:mx-4 md:mx-8 my-4 md:my-8 rounded-lg p-3 sm:p-4 md:p-8 mobile-reading-card" style={{ backgroundColor: "#1A355F" }}>
             {/* Department Goals */}
-            <div className="space-y-4 text-white text-sm leading-relaxed">
+            <div className="space-y-3 md:space-y-4 text-white text-[11px] sm:text-sm leading-relaxed" style={{ textAlign: "justify" }}>
               {objectives.map((objective, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className="text-white font-bold min-w-[1.5rem]" style={{ fontFamily: "'Inter', sans-serif" }}>
-                    {index + 1}.
-                  </div>
-                  <div style={{ fontFamily: "'Inter', sans-serif" }}>
+                <div key={index} className="flex items-start space-x-2 md:space-x-3">
+                  <div className="text-white font-bold min-w-[1rem] sm:min-w-[1.5rem] flex-shrink-0 text-[11px] sm:text-sm">{index + 1}.</div>
+                  <div className="flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                     {objective}
                   </div>
                 </div>

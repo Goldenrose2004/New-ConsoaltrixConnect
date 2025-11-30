@@ -286,7 +286,11 @@ export default function SectionsPage() {
 
         {/* Main Content Area */}
         <div className="main-content flex-1 overflow-y-auto" style={{ backgroundColor: "#C4D7F0", fontFamily: "Inter, sans-serif" }}>
-          <div ref={contentAreaRef} className="max-w-4xl mx-auto px-2 sm:px-4 md:p-6" style={{ maxWidth: "62.5rem" }}>
+          <div
+            ref={contentAreaRef}
+            className={`max-w-4xl mx-auto px-2 sm:px-4 md:p-6 ${!isBasicEducation ? "college-section-content" : ""}`}
+            style={{ maxWidth: "62.5rem" }}
+          >
           {selectedSection === 1 && (
             <div className="w-full">
               {/* Section Header */}
@@ -304,10 +308,10 @@ export default function SectionsPage() {
 
               {/* Main White Container with all content */}
               {!isBasicEducation && (
-                <div className="rounded-lg shadow-sm p-4 sm:p-6 md:p-8 mb-4 sm:mb-6" style={{ backgroundColor: "#FFFFFF" }}>
+                <div className="rounded-lg shadow-sm p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 section-one-college" style={{ backgroundColor: "#FFFFFF" }}>
                   {/* Main Title */}
                   <div className="mb-4 sm:mb-6 md:mb-8">
-                    <h1 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "20px" }}>
+                    <h1 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 leading-snug" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                       1 Academic entrance requirements
                     </h1>
                     <p className="mb-4 sm:mb-6 text-xs sm:text-sm md:text-base" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", lineHeight: 1.6, textAlign: "justify" }}>
@@ -324,7 +328,7 @@ export default function SectionsPage() {
                         Requirements
                       </h3>
                     </div>
-                    <p className="mb-4" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", lineHeight: 1.6, textAlign: "justify" }}>
+                    <p className="mb-4 text-[13px] sm:text-sm md:text-base text-justify max-sm:leading-relaxed max-sm:hyphens-auto max-sm:break-words max-sm:tracking-[0.01em]" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", lineHeight: 1.5 }}>
                       To qualify for admission to a particular Curriculum Program, the following are the requirements:
                     </p>
                     
@@ -399,19 +403,19 @@ export default function SectionsPage() {
                               <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#C4D7F0", color: "#041A44" }}>
                                 1
                               </div>
-                              <span>Original Copy of Live Birth Certificate - NSO/PSA</span>
+                              <span className="section-one-text">Original Copy of Live Birth Certificate - NSO/PSA</span>
                             </div>
                             <div className="flex items-start" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", textAlign: "justify" }}>
                               <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#C4D7F0", color: "#041A44" }}>
                                 2
                               </div>
-                              <span>Original Copy of Baptismal & Confirmation Certificate</span>
+                              <span className="section-one-text">Original Copy of Baptismal & Confirmation Certificate</span>
                             </div>
                             <div className="flex items-start" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", textAlign: "justify" }}>
                               <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#C4D7F0", color: "#041A44" }}>
                                 3
                               </div>
-                              <span>Report Card - Form 135 duly signed</span>
+                              <span className="section-one-text">Report Card - Form 135 duly signed</span>
                             </div>
                           </div>
                           <div className="space-y-3">
@@ -419,19 +423,19 @@ export default function SectionsPage() {
                               <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#C4D7F0", color: "#041A44" }}>
                                 4
                               </div>
-                              <span>Certification to Transfer/Good Moral</span>
+                              <span className="section-one-text">Certification to Transfer/Good Moral</span>
                             </div>
                             <div className="flex items-start" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", textAlign: "justify" }}>
                               <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#C4D7F0", color: "#041A44" }}>
                                 5
                               </div>
-                              <span>Colored ID pictures - 2 pcs. '1x1'</span>
+                              <span className="section-one-text">Colored ID pictures - 2 pcs. '1x1'</span>
                             </div>
                             <div className="flex items-start" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", textAlign: "justify" }}>
                               <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#C4D7F0", color: "#041A44" }}>
                                 6
                               </div>
-                              <span>Colored ID pictures of parents/guardian - '1x1'</span>
+                              <span className="section-one-text">Colored ID pictures of parents/guardian - '1x1'</span>
                             </div>
                           </div>
                         </div>
@@ -467,21 +471,21 @@ export default function SectionsPage() {
                 <div className="rounded-lg shadow-sm p-4 sm:p-6 md:p-8 mb-4 sm:mb-6" style={{ backgroundColor: "#FFFFFF" }}>
                   {/* Section 2: Enrollment Procedures */}
                   <div className="mb-4 sm:mb-6 md:mb-8">
-                    <h1 className="text-xl font-bold mb-6" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "20px" }}>
+                    <h1 className="text-base sm:text-xl font-bold mb-6" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                       2 Enrollment Procedures
                     </h1>
                     
                     {/* Step 1 */}
                     <div className="rounded-lg shadow-sm p-3 mb-2" style={{ backgroundColor: "#C4D7F0" }}>
                       <div className="flex items-start">
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-xs mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#041A44" }}>
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[11px] mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#041A44" }}>
                           1
                         </div>
                         <div>
-                          <span className="font-bold" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "15px" }}>
+                          <span className="font-bold text-sm sm:text-base" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                             STEP 1
                           </span>
-                          <span style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", textAlign: "justify" }}>
+                          <span className="text-[11px] sm:text-sm" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, textAlign: "justify" }}>
                             {" "}Apply and fill out the application form.
                           </span>
                         </div>
@@ -490,14 +494,14 @@ export default function SectionsPage() {
                     {/* Step 2 */}
                     <div className="rounded-lg shadow-sm p-3 mb-2" style={{ backgroundColor: "#C4D7F0" }}>
                       <div className="flex items-start">
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-xs mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#041A44" }}>
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[11px] mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#041A44" }}>
                           2
                         </div>
                         <div>
-                          <span className="font-bold" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "15px" }}>
+                          <span className="font-bold text-sm sm:text-base" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                             STEP 2
                           </span>
-                          <span style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", textAlign: "justify" }}>
+                          <span className="text-[11px] sm:text-sm" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, textAlign: "justify" }}>
                             {" "}Proceed to the Accounting Department for the Assessment of Fees and pay the required amount
                           </span>
                         </div>
@@ -506,14 +510,14 @@ export default function SectionsPage() {
                     {/* Step 3 */}
                     <div className="rounded-lg shadow-sm p-3 mb-6" style={{ backgroundColor: "#C4D7F0" }}>
                       <div className="flex items-start">
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-xs mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#041A44" }}>
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[11px] mr-3 mt-0.5 flex-shrink-0" style={{ backgroundColor: "#041A44" }}>
                           3
                         </div>
                         <div>
-                          <span className="font-bold" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "15px" }}>
+                          <span className="font-bold text-sm sm:text-base" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                             STEP 3
                           </span>
-                          <span style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", textAlign: "justify" }}>
+                          <span className="text-[11px] sm:text-sm" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, textAlign: "justify" }}>
                             {" "}Submit the required documents in the Registrar's Office
                           </span>
                         </div>
@@ -525,13 +529,13 @@ export default function SectionsPage() {
                   <div className="mb-4 sm:mb-6 md:mb-8">
                     {/* Main Light Gray Container for 2.1 Content */}
                     <div className="rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6" style={{ backgroundColor: "#F1F3F8" }}>
-                      <h1 className="text-xl font-bold mb-6" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "20px" }}>
+                      <h1 className="text-base sm:text-xl font-bold mb-6" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                         2.1 These admission credentials are required for enrollment:
                       </h1>
                       
                       {/* Senior High School Graduates */}
                       <div className="rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-3 sm:mb-4" style={{ backgroundColor: "#C4D7F0" }}>
-                        <h3 className="text-lg font-bold mb-2" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
+                        <h3 className="text-base sm:text-lg font-bold mb-2" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                           Senior High School Graduates (New First Years)
                         </h3>
                         <p className="mb-4" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", fontStyle: "italic" }}>
@@ -578,7 +582,7 @@ export default function SectionsPage() {
                       
                       {/* Transferees */}
                       <div className="rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6" style={{ backgroundColor: "#C4D7F0" }}>
-                        <h3 className="text-lg font-bold mb-2" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
+                        <h3 className="text-base sm:text-lg font-bold mb-2" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                           Transferees
                         </h3>
                         <p className="mb-4" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", fontStyle: "italic" }}>
@@ -1265,10 +1269,10 @@ export default function SectionsPage() {
                     {/* Section 2: Dropping from Class */}
                     <div className="mb-0">
                       <div className="flex items-start mb-3 sm:mb-4">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4 flex-shrink-0" style={{ backgroundColor: "#041A44" }}>
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm mr-3 sm:mr-4 flex-shrink-0" style={{ backgroundColor: "#041A44" }}>
                           2
                         </div>
-                        <h1 className="text-base sm:text-lg md:text-xl font-bold flex-1" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "20px" }}>
+                        <h1 className="text-base sm:text-lg md:text-xl font-bold flex-1 leading-tight" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                           Dropping from Class
                         </h1>
                       </div>
@@ -1281,11 +1285,11 @@ export default function SectionsPage() {
                   {/* Main White Container for All Section III Content */}
                   <div className="rounded-lg shadow-sm p-4 sm:p-6 md:p-8 mb-4 sm:mb-6" style={{ backgroundColor: "#FFFFFF" }}>
                     {/* Section 3: Summer Study in Another School */}
-                    <div className="flex items-start mb-3 sm:mb-4">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4 flex-shrink-0" style={{ backgroundColor: "#041A44" }}>
+                    <div className="flex items-center mb-3 sm:mb-4">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm mr-3 sm:mr-4 flex-shrink-0" style={{ backgroundColor: "#041A44" }}>
                         3
                       </div>
-                      <h1 className="text-base sm:text-lg md:text-xl font-bold flex-1" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "20px" }}>
+                      <h1 className="text-base sm:text-lg md:text-xl font-bold flex-1 leading-tight" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                         Summer Study in Another School
                       </h1>
                     </div>
@@ -1295,7 +1299,7 @@ export default function SectionsPage() {
                     
                     {/* No Permit Box - Light Blue Container */}
                     <div className="rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6" style={{ backgroundColor: "#C4D7F0" }}>
-                      <h3 className="text-lg font-bold mb-3" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
+                      <h3 className="text-sm sm:text-lg font-bold mb-3" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                         No permit to study in another school during summer will be granted for the following:
                       </h3>
                       <ul className="space-y-2">
@@ -1313,10 +1317,10 @@ export default function SectionsPage() {
                     {/* Section 3.1: Excess Loads - Light Blue Container */}
                     <div className="rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6" style={{ backgroundColor: "#C4D7F0" }}>
                       <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4" style={{ backgroundColor: "#041A44" }}>
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm mr-3 sm:mr-4" style={{ backgroundColor: "#041A44" }}>
                           3.1
                         </div>
-                        <h1 className="text-xl font-bold" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "20px" }}>
+                        <h1 className="text-base sm:text-xl font-bold leading-tight" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                           Excess Loads
                         </h1>
                       </div>
@@ -1328,10 +1332,10 @@ export default function SectionsPage() {
                     {/* Section 3.2: Sequence of Subjects - Light Blue Container */}
                     <div className="rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6" style={{ backgroundColor: "#C4D7F0" }}>
                       <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4" style={{ backgroundColor: "#041A44" }}>
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm mr-3 sm:mr-4" style={{ backgroundColor: "#041A44" }}>
                           3.2
                         </div>
-                        <h1 className="text-xl font-bold" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "20px" }}>
+                        <h1 className="text-base sm:text-xl font-bold leading-tight" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                           Sequence of Subjects
                         </h1>
                       </div>
@@ -1343,10 +1347,10 @@ export default function SectionsPage() {
                     {/* Section 3.3: Religious Education - Light Blue Container */}
                     <div className="rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6" style={{ backgroundColor: "#C4D7F0" }}>
                       <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4" style={{ backgroundColor: "#041A44" }}>
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm mr-3 sm:mr-4" style={{ backgroundColor: "#041A44" }}>
                           3.3
                         </div>
-                        <h1 className="text-xl font-bold" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "20px" }}>
+                        <h1 className="text-base sm:text-xl font-bold leading-tight" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                           Religious Education
                         </h1>
                       </div>
@@ -1358,10 +1362,10 @@ export default function SectionsPage() {
                     {/* Section 3.4: NSTP - Light Blue Container */}
                     <div className="rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6" style={{ backgroundColor: "#C4D7F0" }}>
                       <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4" style={{ backgroundColor: "#041A44" }}>
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm mr-3 sm:mr-4" style={{ backgroundColor: "#041A44" }}>
                           3.4
                         </div>
-                        <h1 className="text-xl font-bold" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "20px" }}>
+                        <h1 className="text-base sm:text-xl font-bold leading-tight" style={{ color: "#041A44", fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
                           NSTP
                         </h1>
                       </div>

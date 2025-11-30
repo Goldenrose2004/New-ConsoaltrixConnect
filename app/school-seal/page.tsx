@@ -62,7 +62,7 @@ export default function SchoolSealPage() {
         <div className="rounded-lg shadow-xl overflow-hidden mb-16 md:mb-32" style={{ backgroundColor: "#001E4D" }}>
           {/* Title Section */}
           <div className="text-white text-center py-4 md:py-8" style={{ backgroundColor: "#001E4D" }}>
-            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold tracking-wide relative px-2 md:px-4" style={{ fontFamily: "'Inter', sans-serif" }}>
+            <h1 className="text-lg sm:text-3xl md:text-4xl font-bold tracking-wide relative px-2 md:px-4" style={{ fontFamily: "'Inter', sans-serif" }}>
               THE SCHOOL SEAL
               <div className="w-32 sm:w-40 md:w-56 h-1 mx-auto mt-2" style={{ backgroundColor: "#60A5FA" }}></div>
             </h1>
@@ -86,14 +86,14 @@ export default function SchoolSealPage() {
             </div>
 
             {/* Explanation text */}
-            <div className="text-white text-xs sm:text-sm mb-3 md:mb-6 no-justify" style={{ fontFamily: "'Inter', sans-serif", textAlign: "center" }}>
+            <div className="text-white text-[11px] sm:text-sm mb-3 md:mb-6 no-justify" style={{ fontFamily: "'Inter', sans-serif", textAlign: "center" }}>
               (Explanation of the Seal)
             </div>
 
             {/* Seal Elements Explanation */}
-            <div className="space-y-3 md:space-y-4 text-white text-xs sm:text-sm leading-relaxed" style={{ fontFamily: "'Inter', sans-serif", textAlign: "justify" }}>
+            <div className="space-y-3 md:space-y-4 text-white text-[11px] sm:text-sm leading-relaxed text-left sm:text-justify" style={{ fontFamily: "'Inter', sans-serif" }}>
               <div className="flex items-start space-x-2 md:space-x-3">
-                <div className="text-white font-bold text-base md:text-lg flex-shrink-0">+</div>
+                <div className="text-white font-bold text-sm sm:text-base md:text-lg flex-shrink-0">+</div>
                 <div>
                   <span className="font-bold" style={{ color: "#FCD34D" }}>THE SHIELD</span> - bears the national colors: red, white and blue, an indication that the institution is genuinely Filipino and to express "PATRIA" field of the shield.
                 </div>

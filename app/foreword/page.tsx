@@ -32,7 +32,7 @@ export default function ForewordPage() {
             <div className="text-center lg:text-left">
               <div className="inline-block mx-auto lg:mx-0">
                 <h1 
-                  className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-wide leading-tight drop-shadow-sm"
+                  className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-wide leading-tight drop-shadow-sm"
                   style={{ 
                     color: "#0B234A",
                     fontFamily: "'Inter', sans-serif"
@@ -46,7 +46,7 @@ export default function ForewordPage() {
                 ></div>
               </div>
               <p 
-                className="text-sm sm:text-base mt-2"
+                className="text-xs sm:text-base mt-2"
                 style={{ 
                   color: "rgba(11, 35, 74, 0.8)",
                   fontFamily: "'Inter', sans-serif"
@@ -63,13 +63,13 @@ export default function ForewordPage() {
               className="text-white p-5 sm:p-8 lg:p-10 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl max-w-full lg:max-w-[880px] w-full mt-2 sm:mt-4 lg:mt-0 lg:ml-auto"
               style={{ backgroundColor: "#041A44" }}
             >
-              <p className="mb-6 sm:mb-8 leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <p className="mb-6 sm:mb-8 leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                 This Student Handbook covers the policies, rules and regulations of Consolatrix 
                 College of Toledo City, Inc. All students are hereby mandated to know and be guided 
                 accordingly. Policies issued by the School Administrative Board that are not included 
                 in this Handbook shall be part of the set guidelines.
               </p>
-              <p className="leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <p className="leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                 Consolatrix College of Toledo City, Inc. reserves the right to admit, refuse admission, 
                 suspend, or dismiss student on the basis of his/her academic performance, 
                 behavioral conduct, criminal offense and non-conformity with the school rules and 

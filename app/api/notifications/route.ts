@@ -53,6 +53,50 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST - Create notification for a user
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { userId, title, message, type, relatedId, badgeColor } = body
+
+    if (!userId || !title || !message) {
+      return NextResponse.json(
+        { ok: false, error: "userId, title, and message are required" },
+        { status: 400 },
+      )
+    }
+
+    const db = await connectToDatabase().then((r) => r.db)
+    const allowedTypes = ["announcement", "message", "profile_approval", "profile_rejection", "other"]
+    const normalizedType = allowedTypes.includes(type) ? type : "other"
+    const payload = {
+      userId,
+      title,
+      description: message,
+      type: normalizedType,
+      relatedId: relatedId || null,
+      badgeColor: badgeColor || "#3B82F6",
+      read: false,
+      createdAt: new Date(),
+    }
+
+    const result = await db.collection("notifications").insertOne(payload)
+    return NextResponse.json(
+      {
+        ok: true,
+        notification: { id: result.insertedId.toString(), ...payload },
+      },
+      { status: 201 },
+    )
+  } catch (error: any) {
+    console.error("Error creating notification:", error)
+    return NextResponse.json(
+      { ok: false, error: error?.message || "Failed to create notification" },
+      { status: 500 },
+    )
+  }
+}
+
 // PATCH - Mark notifications as read
 export async function PATCH(request: NextRequest) {
   try {

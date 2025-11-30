@@ -15,17 +15,31 @@ export default function ProfilePage() {
   const [lastLogin, setLastLogin] = useState<string>("")
 
   useEffect(() => {
-    // Check if user is logged in
+    // Check if user is logged in (online or offline)
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
       return
     }
 
-    const userData = JSON.parse(currentUser)
+    let userData
+    try {
+      userData = JSON.parse(currentUser)
+    } catch (error) {
+      console.error("Error parsing user data:", error)
+      router.push("/login")
+      return
+    }
     
-    // Fetch fresh user data from database to ensure we have the latest profile
+    // Fetch fresh user data from database to ensure we have the latest profile (only if online)
     const fetchFreshUserData = async () => {
+      if (!navigator.onLine) {
+        // Offline mode - use cached data only
+        setUser(userData)
+        setIsLoading(false)
+        return
+      }
+
       try {
         const response = await fetch(`/api/users/${userData.id}`)
         const data = await response.json()
@@ -61,8 +75,10 @@ export default function ProfilePage() {
     // Listen for profile update events (when admin approves profile changes)
     window.addEventListener("userProfileUpdated", handleProfileUpdate as EventListener)
 
-    // Set up periodic polling to check for profile updates (every 5 seconds)
+    // Set up periodic polling to check for profile updates (every 5 seconds, only when online)
     const pollInterval = setInterval(async () => {
+      if (!navigator.onLine) return
+
       try {
         const response = await fetch(`/api/users/${userData.id}`)
         const data = await response.json()
@@ -336,13 +352,20 @@ export default function ProfilePage() {
 
               {/* Action Buttons */}
               <div className="space-y-1 sm:space-y-1.5">
-                <button
-                  onClick={handleEditProfileClick}
-                  className="w-full bg-[#0B1E45] text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg flex items-center justify-center font-medium hover:bg-[#254B82] transition-colors text-sm sm:text-base"
-                >
-                  <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                  Edit Profile
-                </button>
+                {navigator.onLine ? (
+                  <button
+                    onClick={handleEditProfileClick}
+                    className="w-full bg-[#0B1E45] text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg flex items-center justify-center font-medium hover:bg-[#254B82] transition-colors text-sm sm:text-base"
+                  >
+                    <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                    Edit Profile
+                  </button>
+                ) : (
+                  <div className="w-full bg-gray-300 text-gray-600 px-3 sm:px-4 py-2 sm:py-3 rounded-lg flex items-center justify-center font-medium text-sm sm:text-base cursor-not-allowed">
+                    <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                    Edit Profile (Offline - Read Only)
+                  </div>
+                )}
                 <button
                   onClick={handleLogout}
                   className="w-full bg-transparent text-[#C62828] border border-[#C62828] px-3 sm:px-4 py-2 sm:py-3 rounded-lg flex items-center justify-center font-medium hover:bg-[#C62828] hover:text-white transition-colors text-sm sm:text-base mt-2 sm:mt-2.5"

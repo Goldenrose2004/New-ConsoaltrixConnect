@@ -71,17 +71,17 @@ export default function InstitutionalObjectivesPage() {
         <div className="rounded-lg shadow-xl overflow-hidden" style={{ backgroundColor: "#001E4D" }}>
           {/* Title Section */}
           <div className="text-white text-center py-4 md:py-8" style={{ backgroundColor: "#001E4D" }}>
-            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold tracking-wide mb-2 px-2 md:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>INSTITUTIONAL OBJECTIVES</h1>
+            <h1 className="text-lg sm:text-2xl md:text-4xl font-bold tracking-wide mb-2 px-2 md:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>INSTITUTIONAL OBJECTIVES</h1>
             <div className="w-20 sm:w-24 h-1 mx-auto mt-3 md:mt-4 rounded" style={{ backgroundColor: "#93C5FD" }}></div>
           </div>
 
           {/* Content Sections */}
           <div className="mx-2 sm:mx-4 md:mx-8 my-4 md:my-8 rounded-lg p-3 sm:p-4 md:p-8 text-white mobile-reading-card" style={{ backgroundColor: "#1A355F" }}>
             {/* Objectives List */}
-            <div className="space-y-4 md:space-y-6 text-xs sm:text-sm leading-relaxed" style={{ textAlign: "justify" }}>
+            <div className="space-y-4 md:space-y-6 text-[11px] sm:text-sm leading-relaxed" style={{ textAlign: "justify" }}>
               {objectives.map((objective, index) => (
                 <div key={index} className="flex items-start">
-                  <span className="font-bold mr-2 sm:mr-3 md:mr-4 flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm md:text-base" style={{ backgroundColor: "#1D4ED8" }}>
+                  <span className="font-bold mr-2 sm:mr-3 md:mr-4 flex-shrink-0 w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white text-[11px] sm:text-sm md:text-base" style={{ backgroundColor: "#1D4ED8" }}>
                     {index + 1}
                   </span>
                   <p className="flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>{objective}</p>

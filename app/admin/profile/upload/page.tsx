@@ -3,9 +3,17 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { AdminHeader, type AdminNavItem } from "@/components/admin/header"
+import { SuccessDialog } from "@/components/ui/success-dialog"
 import { Footer } from "@/components/footer"
 import { Upload, Trash2, ArrowLeft, Megaphone, LayoutDashboard, MessageSquare, Eye } from "lucide-react"
 import Image from "next/image"
+
+type SuccessDialogState = {
+  title: string
+  message: string
+  confirmLabel?: string
+  onConfirm?: () => void
+} | null
 
 const navItems: AdminNavItem[] = [
   {
@@ -43,6 +51,13 @@ export default function AdminUploadProfilePage() {
   const [filePreview, setFilePreview] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [notifications, setNotifications] = useState<any[]>([])
+  const [successDialog, setSuccessDialog] = useState<SuccessDialogState>(null)
+  const handleSuccessDialogClose = () => {
+    setSuccessDialog((prev) => {
+      prev?.onConfirm?.()
+      return null
+    })
+  }
 
   // Fetch notifications
   const fetchNotifications = async (adminId: string) => {
@@ -165,10 +180,10 @@ export default function AdminUploadProfilePage() {
           fileInput.value = ""
         }
         
-        alert("Profile picture uploaded successfully!")
-        
-        // Navigate back to profile
-        router.push("/admin/profile")
+        setSuccessDialog({
+          title: "Profile Picture Updated",
+          message: "Your profile picture has been uploaded successfully.",
+        })
       } else {
         alert("Failed to upload profile picture: " + (data.error || "Unknown error"))
       }
@@ -203,10 +218,10 @@ export default function AdminUploadProfilePage() {
         // Dispatch event to update profile picture in chats
         window.dispatchEvent(new CustomEvent("profilePictureUpdated", { detail: updatedUser }))
         
-        alert("Profile picture removed successfully!")
-        
-        // Navigate back to profile
-        router.push("/admin/profile")
+        setSuccessDialog({
+          title: "Profile Picture Removed",
+          message: "Your profile picture has been removed successfully.",
+        })
       } else {
         alert("Failed to remove profile picture: " + (data.error || "Unknown error"))
       }
@@ -347,6 +362,14 @@ export default function AdminUploadProfilePage() {
           </div>
         </div>
       </main>
+
+      <SuccessDialog
+        open={Boolean(successDialog)}
+        title={successDialog?.title ?? ""}
+        description={successDialog?.message ?? ""}
+        confirmLabel={successDialog?.confirmLabel}
+        onConfirm={handleSuccessDialogClose}
+      />
 
       <Footer />
     </div>

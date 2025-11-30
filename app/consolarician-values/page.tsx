@@ -61,7 +61,7 @@ export default function ConsolaricianValuesPage() {
         <div className="rounded-lg shadow-xl overflow-hidden" style={{ backgroundColor: "#001E4D" }}>
           {/* Title Section */}
           <div className="text-white text-center py-4 md:py-8" style={{ backgroundColor: "#001E4D" }}>
-            <h1 className="text-lg sm:text-xl md:text-3xl font-bold tracking-wide px-2 md:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>THE CONSOLATRICIAN CORE VALUES are:</h1>
+            <h1 className="text-base sm:text-xl md:text-3xl font-bold tracking-wide px-2 md:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>THE CONSOLATRICIAN CORE VALUES are:</h1>
             <div className="mt-2 h-1 mx-auto w-20 sm:w-24" style={{ backgroundColor: "#60A5FA" }}></div>
           </div>
 
@@ -71,20 +71,20 @@ export default function ConsolaricianValuesPage() {
             <div style={{ backgroundColor: "#1A355F" }}>
               <div className="text-white text-center space-y-4 md:space-y-6" style={{ textAlign: "justify" }}>
                 <div className="flex justify-center items-center space-x-2 md:space-x-4">
-                  <div className="text-white font-bold text-base sm:text-lg md:text-xl flex-shrink-0">•</div>
-                  <div className="text-lg sm:text-xl md:text-2xl font-medium tracking-wide" style={{ fontFamily: "'Inter', sans-serif" }}>Charity</div>
+                  <div className="text-white font-bold text-sm sm:text-lg md:text-xl flex-shrink-0">•</div>
+                  <div className="text-base sm:text-xl md:text-2xl font-medium tracking-wide" style={{ fontFamily: "'Inter', sans-serif" }}>Charity</div>
                 </div>
                 <div className="flex justify-center items-center space-x-2 md:space-x-4">
-                  <div className="text-white font-bold text-base sm:text-lg md:text-xl flex-shrink-0">•</div>
-                  <div className="text-lg sm:text-xl md:text-2xl font-medium tracking-wide" style={{ fontFamily: "'Inter', sans-serif" }}>Compassion</div>
+                  <div className="text-white font-bold text-sm sm:text-lg md:text-xl flex-shrink-0">•</div>
+                  <div className="text-base sm:text-xl md:text-2xl font-medium tracking-wide" style={{ fontFamily: "'Inter', sans-serif" }}>Compassion</div>
                 </div>
                 <div className="flex justify-center items-center space-x-2 md:space-x-4">
-                  <div className="text-white font-bold text-base sm:text-lg md:text-xl flex-shrink-0">•</div>
-                  <div className="text-lg sm:text-xl md:text-2xl font-medium tracking-wide" style={{ fontFamily: "'Inter', sans-serif" }}>Tenacity</div>
+                  <div className="text-white font-bold text-sm sm:text-lg md:text-xl flex-shrink-0">•</div>
+                  <div className="text-base sm:text-xl md:text-2xl font-medium tracking-wide" style={{ fontFamily: "'Inter', sans-serif" }}>Tenacity</div>
                 </div>
                 <div className="flex justify-center items-center space-x-2 md:space-x-4">
-                  <div className="text-white font-bold text-base sm:text-lg md:text-xl flex-shrink-0">•</div>
-                  <div className="text-lg sm:text-xl md:text-2xl font-medium tracking-wide" style={{ fontFamily: "'Inter', sans-serif" }}>Commitment</div>
+                  <div className="text-white font-bold text-sm sm:text-lg md:text-xl flex-shrink-0">•</div>
+                  <div className="text-base sm:text-xl md:text-2xl font-medium tracking-wide" style={{ fontFamily: "'Inter', sans-serif" }}>Commitment</div>
                 </div>
               </div>
             </div>

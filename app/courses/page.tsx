@@ -70,15 +70,15 @@ export default function CoursesPage() {
             {/* Course List */}
             <div className="space-y-2 md:space-y-3 text-white">
               <div className="flex items-start space-x-2 md:space-x-3">
-                <div className="text-white font-bold min-w-[1rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-base sm:text-lg flex-shrink-0">•</div>
-                <div className="text-xs sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <div className="text-white font-bold min-w-[0.85rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-sm sm:text-lg flex-shrink-0">•</div>
+                <div className="text-[11px] sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                   <strong>Bachelor of Elementary Education (BEED)</strong>
                 </div>
               </div>
 
               <div className="flex items-start space-x-2 md:space-x-3">
-                <div className="text-white font-bold min-w-[1rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-base sm:text-lg flex-shrink-0">•</div>
-                <div className="text-xs sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <div className="text-white font-bold min-w-[0.85rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-sm sm:text-lg flex-shrink-0">•</div>
+                <div className="text-[11px] sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                   <strong>Bachelor of Secondary Education (BSED)</strong>
                   <div className="ml-2 sm:ml-3 md:ml-4 mt-1 space-y-0.5 md:space-y-1">
                     <div className="text-[10px] sm:text-xs text-white" style={{ fontFamily: "'Inter', sans-serif" }}>Major in: English</div>
@@ -89,29 +89,29 @@ export default function CoursesPage() {
               </div>
 
               <div className="flex items-start space-x-2 md:space-x-3">
-                <div className="text-white font-bold min-w-[1rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-base sm:text-lg flex-shrink-0">•</div>
-                <div className="text-xs sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <div className="text-white font-bold min-w-[0.85rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-sm sm:text-lg flex-shrink-0">•</div>
+                <div className="text-[11px] sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                   <strong>Bachelor of Science in Hospitality Management (BSHM)</strong>
                 </div>
               </div>
 
               <div className="flex items-start space-x-2 md:space-x-3">
-                <div className="text-white font-bold min-w-[1rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-base sm:text-lg flex-shrink-0">•</div>
-                <div className="text-xs sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <div className="text-white font-bold min-w-[0.85rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-sm sm:text-lg flex-shrink-0">•</div>
+                <div className="text-[11px] sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                   <strong>Bachelor of Science in Information Technology (BSIT)</strong>
                 </div>
               </div>
 
               <div className="flex items-start space-x-2 md:space-x-3">
-                <div className="text-white font-bold min-w-[1rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-base sm:text-lg flex-shrink-0">•</div>
-                <div className="text-xs sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <div className="text-white font-bold min-w-[0.85rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-sm sm:text-lg flex-shrink-0">•</div>
+                <div className="text-[11px] sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                   <strong>Bachelor of Science in Entrepreneurship (BSENTREP)</strong>
                 </div>
               </div>
 
               <div className="flex items-start space-x-2 md:space-x-3">
-                <div className="text-white font-bold min-w-[1rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-base sm:text-lg flex-shrink-0">•</div>
-                <div className="text-xs sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <div className="text-white font-bold min-w-[0.85rem] sm:min-w-[1.25rem] md:min-w-[1.5rem] text-sm sm:text-lg flex-shrink-0">•</div>
+                <div className="text-[11px] sm:text-sm leading-relaxed flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                   <strong>Bachelor in Physical Education (BPED)</strong>
                 </div>
               </div>

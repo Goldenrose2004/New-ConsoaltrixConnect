@@ -105,6 +105,53 @@ export async function GET(request: NextRequest) {
       console.log(`[API] ⚠️ No violations found for department ${department}. Check if department names match.`)
     }
 
+    const rawUserIds = violations
+      .map((violation) => {
+        if (!violation.userId) return null
+        if (typeof violation.userId === "string") {
+          return violation.userId
+        }
+        if (violation.userId instanceof ObjectId) {
+          return violation.userId.toString()
+        }
+        return null
+      })
+      .filter((id): id is string => Boolean(id))
+
+    const uniqueUserIds = [...new Set(rawUserIds.filter((id) => ObjectId.isValid(id)))]
+    let userProfilesMap = new Map<string, any>()
+
+    if (uniqueUserIds.length > 0) {
+      const userObjectIds = uniqueUserIds.map((id) => new ObjectId(id))
+      const users = await db
+        .collection("users")
+        .find(
+          { _id: { $in: userObjectIds } },
+          { projection: { password: 0 } }
+        )
+        .toArray()
+
+      userProfilesMap = new Map(
+        users.map((user) => [
+          user._id.toString(),
+          {
+            id: user._id.toString(),
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            email: user.email || "",
+            studentId: user.studentId || "",
+            department: user.department || "",
+            yearLevel: user.yearLevel || null,
+            section: user.section || null,
+            strand: user.strand || null,
+            course: user.course || null,
+            profilePicture: user.profilePicture || null,
+            profilePictureName: user.profilePictureName || null,
+          },
+        ])
+      )
+    }
+
     // Format violations for frontend
     const formattedViolations = violations.map((violation) => ({
       id: violation._id.toString(),
@@ -143,6 +190,20 @@ export async function GET(request: NextRequest) {
             minute: "2-digit",
             hour12: true,
           }),
+      profilePicture: (() => {
+        const key = typeof violation.userId === "string" ? violation.userId : violation.userId?.toString()
+        const profile = key ? userProfilesMap.get(key) : null
+        return profile?.profilePicture || violation.profilePicture || null
+      })(),
+      profilePictureName: (() => {
+        const key = typeof violation.userId === "string" ? violation.userId : violation.userId?.toString()
+        const profile = key ? userProfilesMap.get(key) : null
+        return profile?.profilePictureName || null
+      })(),
+      userProfile: (() => {
+        const key = typeof violation.userId === "string" ? violation.userId : violation.userId?.toString()
+        return key ? userProfilesMap.get(key) || null : null
+      })(),
     }))
 
     return NextResponse.json({ ok: true, violations: formattedViolations }, { status: 200 })

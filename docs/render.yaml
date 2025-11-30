@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: consolatrix-connect
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: consolatrix_db
+        required: false
+      - key: ADMIN_EMAIL
+        value: admin@consolatrix.edu
+        required: false
+      - key: ADMIN_PASSWORD
+        sync: false
+        required: false
+      - key: ADMIN_SEED_TOKEN
+        sync: false
+        required: false
+

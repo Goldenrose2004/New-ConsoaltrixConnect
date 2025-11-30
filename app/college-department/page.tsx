@@ -79,17 +79,17 @@ export default function CollegeDepartmentPage() {
         <div className="rounded-lg shadow-xl overflow-hidden" style={{ backgroundColor: "#001E4D" }}>
           {/* Title Section */}
           <div className="text-white text-center py-4 md:py-8" style={{ backgroundColor: "#001E4D" }}>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-wide px-2 md:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>COLLEGE DEPARTMENT</h1>
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide px-2 md:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>COLLEGE DEPARTMENT</h1>
             <div className="mt-2 w-32 sm:w-40 md:w-48 h-1 bg-white mx-auto"></div>
           </div>
 
           {/* Content Section */}
           <div className="mx-2 sm:mx-4 md:mx-8 my-4 md:my-8 rounded-lg p-3 sm:p-4 md:p-8 mobile-reading-card" style={{ backgroundColor: "#1A355F" }}>
             {/* Department Goals */}
-            <div className="space-y-3 md:space-y-4 text-white text-xs sm:text-sm leading-relaxed" style={{ textAlign: "justify" }}>
+            <div className="space-y-3 md:space-y-4 text-white text-[11px] sm:text-sm leading-relaxed" style={{ textAlign: "justify" }}>
               {objectives.map((objective, index) => (
                 <div key={index} className="flex items-start space-x-2 md:space-x-3">
-                  <div className="text-white font-bold min-w-[1.25rem] sm:min-w-[1.5rem] flex-shrink-0 text-xs sm:text-sm">{index + 1}.</div>
+                  <div className="text-white font-bold min-w-[1rem] sm:min-w-[1.5rem] flex-shrink-0 text-[11px] sm:text-sm">{index + 1}.</div>
                   <div className="flex-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                     {objective}
                   </div>

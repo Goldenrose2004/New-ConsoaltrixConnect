@@ -3,39 +3,40 @@
 import { useEffect, useState, useRef, useCallback, memo } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { usePresence } from "@/hooks/use-presence"
+import { SuccessDialog } from "@/components/ui/success-dialog"
 import {
   AlertCircle,
+  ArrowLeft,
   BookOpen,
+  Building,
   Calendar,
+  Check,
   CheckCircle2,
+  ChevronDown,
   ClipboardList,
+  Copy,
   Edit,
+  Eye,
   GraduationCap,
   LayoutDashboard,
+  Mail,
   Megaphone,
+  Menu,
   MessageSquare,
+  MoreVertical,
   Orbit,
   Paperclip,
   Plus,
   RefreshCw,
-  Send,
-  Trash2,
-  Users,
-  Menu,
-  Eye,
-  X,
-  Check,
   Reply,
-  Smile,
-  MoreVertical,
   Search,
-  Building,
-  Mail,
-  User,
+  Send,
   Settings,
-  ChevronDown,
-  ArrowLeft,
-  Copy,
+  Smile,
+  Trash2,
+  User,
+  Users,
+  X,
 } from "lucide-react"
 import {
   Bar,
@@ -54,8 +55,7 @@ import {
 } from "recharts"
 import { AdminHeader, type AdminNavItem } from "@/components/admin/header"
 
-// FontAwesome fa-graduation-cap icon - exact match
-function GraduationCapIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
+function SchoolFilledIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
   return (
     <svg
       width={size}
@@ -63,9 +63,58 @@ function GraduationCapIcon({ size = 20, className = "" }: { size?: number; class
       viewBox="0 0 640 512"
       fill="currentColor"
       className={className}
+      shapeRendering="geometricPrecision"
     >
-      {/* FontAwesome graduation cap - flat top with tassel on right */}
       <path d="M622.34 153.2L343.4 67.5c-15.2-4.67-31.6-4.67-46.79 0L17.66 153.2c-23.54 7.23-23.54 38.36 0 45.59l48.63 14.94c-10.67 13.19-17.23 29.28-17.88 46.9C38.78 266.15 32 276.11 32 288c0 10.78 5.68 19.85 13.86 25.65L20.33 428.53C18.11 438.52 25.71 448 35.94 448h56.11c10.24 0 17.84-9.48 15.62-19.47L82.7 313.65C90.88 307.85 96.55 298.78 96.55 288c0-11.57-6.47-21.25-15.66-26.87.76-15.02 8.44-28.3 20.5-36.72L312.89 190l-60.13-18.5c-19.28-5.93-19.28-37.17 0-43.1l247.15-76c11.12-3.41 23.75-.36 30.75 7.57l11 13.31c4.19 5.07 4.19 12.35 0 17.42l-11 13.31c-4.45 5.39-11.25 8.57-18.38 8.57l-82.51-25.38L622.34 153.2c23.55-7.24 23.55-38.36 0-45.59zM352.79 315.09c-28.53-14.29-51.5-35.14-67.67-57.25L256 192l-29.12 65.84c-16.17 22.11-39.14 42.96-67.67 57.25L352.79 315.09z" />
+    </svg>
+  )
+}
+
+function UniversityFilledIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 640 512"
+      fill="currentColor"
+      className={className}
+      shapeRendering="geometricPrecision"
+    >
+      <path d="M48 32C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h16v-80H48c-8.8 0-16-7.2-16-16V80c0-8.8 7.2-16 16-16h544c8.8 0 16 7.2 16 16v352c0 8.8-7.2 16-16 16h-16v80h16c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48H48zm176 400H80v-80h144v80zm224 0H304v-80h144v80zm112-128h-48V128h48v176zm-480 0H48v-48h144v48zm352-96H224v-64h192v64zm-192-96H96v-64h192v64z" />
+    </svg>
+  )
+}
+
+function ElementaryFilledIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 64 64"
+      fill="currentColor"
+      className={className}
+      shapeRendering="geometricPrecision"
+    >
+      <path d="M6 14a6 6 0 0 1 6-6h16a6 6 0 0 1 6 6v34c0 1.2-.68 2.3-1.76 2.86L22 56l-10.24-5.14A3.2 3.2 0 0 1 10 48V14z" />
+      <path d="M30 14a6 6 0 0 1 6-6h16a6 6 0 0 1 6 6v34a3.2 3.2 0 0 1-1.76 2.86L46 56l-10.24-5.14A3.2 3.2 0 0 1 34 48V14z" fillOpacity=".85" />
+      <path d="M14 20h10v4H14zm0 10h10v4H14zm26-10h10v4H40zm0 10h10v4H40z" />
+    </svg>
+  )
+}
+
+function CollegeFilledIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 64 64"
+      fill="currentColor"
+      className={className}
+      shapeRendering="geometricPrecision"
+    >
+      <path d="M32 6 6 18v8h6v24h12V30h16v20h12V26h6v-8L32 6z" />
+      <path d="M8 52h48v6H8z" />
+      <path d="M18 26h8v8h-8zm20 0h8v8h-8z" />
     </svg>
   )
 }
@@ -98,22 +147,6 @@ function UserGraduateIcon({ size = 20, className = "" }: { size?: number; classN
     >
       {/* FontAwesome user-graduate - graduation cap with person's head */}
       <path d="M319.4 320.6L224 416l-95.4-95.4C57.1 323.7 0 382.2 0 454.4v9.6c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-9.6c0-72.2-57.1-130.7-128.6-133.8zM13.6 79.8l6.4 1.5v58.4c-7 4.2-12 11.5-12 20.3 0 8.4 4.6 15.4 11.1 19.7L3.5 242c-1.7 6.9 2.1 14 7.6 14h41.8c5.5 0 9.3-7.1 7.6-14l-15.6-62.3C51.4 175.4 56 168.4 56 160c0-8.8-5-16.1-12-20.3V87.1l66 15.9c-8.6 17.2-14 36.4-14 57 0 70.7 57.3 128 128 128s128-57.3 128-128c0-20.6-5.3-39.8-14-57l96.3-23.2c18.2-4.4 18.2-27.1 0-31.5l-190.4-46c-13-3.1-26.7-3.1-39.7 0L13.6 48.2c-18.1 4.4-18.1 27.2 0 31.6z" />
-    </svg>
-  )
-}
-
-// FontAwesome fa-university icon - exact match (classical building with columns and pediment)
-function UniversityIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 640 512"
-      fill="currentColor"
-      className={className}
-    >
-      {/* FontAwesome university - building with columns and triangular pediment */}
-      <path d="M48 32C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h16v-80H48c-8.8 0-16-7.2-16-16V80c0-8.8 7.2-16 16-16h544c8.8 0 16 7.2 16 16v352c0 8.8-7.2 16-16 16h-16v80h16c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48H48zm176 400H80v-80h144v80zm224 0H304v-80h144v80zm112-128h-48V128h48v176zm-480 0H48v-48h144v48zm352-96H224v-64h192v64zm-192-96H96v-64h192v64z" />
     </svg>
   )
 }
@@ -151,6 +184,13 @@ type AdminUserSummary = {
   lastActive?: string | null
 }
 
+type SuccessDialogState = {
+  title: string
+  message: string
+  confirmLabel?: string
+  onConfirm?: () => void
+} | null
+
 // Removed hardcoded data - now fetched from database
 
 // chatUsers will be loaded from the database
@@ -186,6 +226,13 @@ export default function AdminPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null)
   const [notifications, setNotifications] = useState<any[]>([])
+  const [successDialog, setSuccessDialog] = useState<SuccessDialogState>(null)
+  const closeSuccessDialog = () => {
+    setSuccessDialog((prev) => {
+      prev?.onConfirm?.()
+      return null
+    })
+  }
   
   // Track admin presence/activity
   usePresence()
@@ -335,7 +382,7 @@ export default function AdminPage() {
       />
       <main className={`mx-auto px-3 md:px-6 py-4 md:py-8 ${activeTab === "records" ? "max-w-full md:max-w-[98%] xl:max-w-[1800px]" : activeTab === "announcements" ? "max-w-full md:max-w-[85rem] xl:max-w-[95rem]" : "max-w-full md:max-w-7xl"}`}>
         {activeTab === "overview" ? (
-          <OverviewSection />
+          <OverviewSection onShowSuccess={setSuccessDialog} />
         ) : activeTab === "announcements" ? (
           <AnnouncementsSection />
         ) : activeTab === "records" ? (
@@ -346,6 +393,13 @@ export default function AdminPage() {
           <ChatSection />
         )}
       </main>
+      <SuccessDialog
+        open={Boolean(successDialog)}
+        title={successDialog?.title ?? ""}
+        description={successDialog?.message ?? ""}
+        confirmLabel={successDialog?.confirmLabel}
+        onConfirm={closeSuccessDialog}
+      />
     </div>
   )
 }
@@ -383,7 +437,11 @@ type PendingProfileEdit = {
   submittedAt: string
 }
 
-const OverviewSection = memo(function OverviewSection() {
+const OverviewSection = memo(function OverviewSection({
+  onShowSuccess,
+}: {
+  onShowSuccess?: (dialog: SuccessDialogState) => void
+}) {
   const [pendingEdits, setPendingEdits] = useState<PendingProfileEdit[]>([])
   const [selectedEditId, setSelectedEditId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -538,7 +596,10 @@ const OverviewSection = memo(function OverviewSection() {
         // Dispatch event to refresh chat user list
         window.dispatchEvent(new CustomEvent("profileUpdateTrigger"))
         
-        alert("Profile edit request approved successfully! The user's profile has been updated.")
+        onShowSuccess?.({
+          title: "Profile Approved",
+          message: "The profile edit request was approved successfully.",
+        })
       } else {
         alert(data.error || "Failed to approve profile edit request")
       }
@@ -576,6 +637,10 @@ const OverviewSection = memo(function OverviewSection() {
       if (data.ok) {
         // Remove the rejected request from the list
         setPendingEdits((prev) => prev.filter((edit) => edit.id !== id))
+        onShowSuccess?.({
+          title: "Profile Rejected",
+          message: "The profile edit request was rejected successfully.",
+        })
       } else {
         alert(data.error || "Failed to reject profile edit request")
       }
@@ -1664,6 +1729,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
   const [longPressViolationId, setLongPressViolationId] = useState<string | null>(null)
   const [hoveredViolationId, setHoveredViolationId] = useState<string | null>(null)
   const longPressViolationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [isMobileStatusMenuOpen, setIsMobileStatusMenuOpen] = useState(false)
   const violationsChannelRef = useRef<BroadcastChannel | null>(null)
   const statusOptions = ["pending", "warning", "resolved"]
   const showInitialViolationsLoader = !hasLoadedViolations && isLoadingViolations
@@ -1883,6 +1949,16 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
           window.dispatchEvent(
             new CustomEvent("violationUpdated", { detail: { department, violationId, status, userId: targetUserId } }),
           )
+
+          if (targetUserId) {
+            await notifyUser({
+              userId: targetUserId,
+              title: "Violation Status Updated",
+              message: `Your violation status is now ${formatStatusLabel(status)}.`,
+              relatedId: violationId,
+              badgeColor: status === "resolved" ? "#16A34A" : "#F97316",
+            })
+          }
         } else {
           alert(data.error || "Failed to update violation status")
         }
@@ -1953,6 +2029,51 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
     }
   }, [fetchViolations, department])
 
+  const notifyUser = useCallback(
+    async (payload: {
+      userId: string
+      title: string
+      message: string
+      type?: string
+      relatedId?: string
+      badgeColor?: string
+    }) => {
+      try {
+        const response = await fetch("/api/notifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: payload.userId,
+            title: payload.title,
+            message: payload.message,
+            type: payload.type,
+            relatedId: payload.relatedId,
+            badgeColor: payload.badgeColor,
+          }),
+        })
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => null)
+          throw new Error(data?.error || "Failed to create notification")
+        }
+
+        if (typeof window !== "undefined") {
+          const broadcastKey = "notificationUpdateBroadcast"
+          localStorage.setItem(
+            broadcastKey,
+            JSON.stringify({ userId: payload.userId, timestamp: Date.now() }),
+          )
+          setTimeout(() => {
+            localStorage.removeItem(broadcastKey)
+          }, 100)
+        }
+      } catch (error) {
+        console.error("Failed to notify user:", error)
+      }
+    },
+    [],
+  )
+
   const handleAddViolation = async () => {
     if (!selectedUser || !violationForm.violation.trim()) {
       alert("Please fill in the violation description")
@@ -2014,6 +2135,14 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
         window.dispatchEvent(event)
         console.log("Violation created event dispatched:", event)
         
+        await notifyUser({
+          userId: selectedUser.id,
+          title: "New Violation Recorded",
+          message: `A new violation was added to your record: ${violationForm.violation.trim()}.`,
+          relatedId: data.violation?.id,
+          badgeColor: "#DC2626",
+        })
+        
         showViolationNotification(`${selectedUser?.firstName || "Student"} ${selectedUser?.lastName || ""}`.trim())
       } else {
         alert(data.error || "Failed to add violation")
@@ -2040,6 +2169,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
         if (selectedViolation?.id === deleteViolationTarget.id) {
           setShowViolationDetails(false)
           setSelectedViolation(null)
+          setIsMobileStatusMenuOpen(false)
         }
         window.dispatchEvent(new CustomEvent("violationDeleted", { detail: { department } }))
       } else {
@@ -2438,79 +2568,62 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
               {/* Mobile Card Layout */}
               <div className="space-y-3 md:hidden">
                 {violations.map((violation) => {
-                  const studentInitials = violation.studentName
+                  const profile = violation.userProfile
+                  const profileName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim()
+                  const fallbackName = violation.studentName || "Student"
+                  const displayName = profileName || fallbackName
+                  const avatarUrl = profile?.profilePicture || violation.profilePicture || null
+                  const fallbackInitials = fallbackName
                     .split(" ")
                     .map((n: string) => n[0])
                     .join("")
                     .toUpperCase()
                     .slice(0, 2)
+                  const studentInitials = profile
+                    ? getInitials(profile.firstName || "", profile.lastName || "")
+                    : fallbackInitials
+                  const studentDetails = [
+                    profile?.studentId ? `ID: ${profile.studentId}` : null,
+                    profile?.department || violation.studentDepartment || null,
+                  ]
+                    .filter(Boolean)
+                    .join(" • ")
                   const normalizedStatus = normalizeStatus(violation.status)
-                  const isResolved = normalizedStatus === "resolved"
 
                   return (
                     <div key={violation.id} className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
                       <div className="flex items-center gap-3 bg-gradient-to-r from-[#041A44] via-[#0d2f7b] to-[#123a91] px-3 py-2">
-                        <div className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold text-sm border-2 border-white/70">
-                          {studentInitials}
-                        </div>
+                        {avatarUrl ? (
+                          <img
+                            src={avatarUrl}
+                            alt={displayName}
+                            className="h-10 w-10 rounded-full object-cover border-2 border-white/70 shadow-sm"
+                          />
+                        ) : (
+                          <div className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold text-sm border-2 border-white/70">
+                            {studentInitials}
+                          </div>
+                        )}
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-white truncate">{violation.studentName}</p>
+                          <p className="text-sm font-semibold text-white truncate">{displayName}</p>
+                          {studentDetails && (
+                            <p className="text-[10px] text-white/80 truncate">{studentDetails}</p>
+                          )}
                         </div>
                       </div>
-                        <div className="p-4">
-                          <div className="mt-1 flex flex-wrap gap-2">
+                      <div className="p-4">
+                        <div className="mt-1 flex flex-wrap gap-2">
                             <button
                               type="button"
                               onClick={() => {
                                 setSelectedViolation(violation)
                                 setShowViolationDetails(true)
+                                setIsMobileStatusMenuOpen(false)
                               }}
                               className="flex-1 min-w-[30%] inline-flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 shadow-sm"
                             >
                               View
                             </button>
-                            <div className="relative flex-1 min-w-[30%] violation-status-dropdown">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setOpenStatusDropdownId((prev) =>
-                                    prev === `mobile-${violation.id}` ? null : `mobile-${violation.id}`,
-                                  )
-                                }
-                                className={`w-full inline-flex items-center justify-between rounded-full px-3 py-2 text-xs font-semibold border ${getStatusClasses(
-                                  violation.status,
-                                )}`}
-                              >
-                                <span className="flex items-center gap-1">
-                                  <Check className="h-3 w-3" />
-                                  Status
-                                </span>
-                                <ChevronDown className="h-3 w-3" />
-                              </button>
-                              {openStatusDropdownId === `mobile-${violation.id}` && (
-                                <div className="absolute z-30 mt-2 w-36 rounded-2xl border border-gray-100 bg-white shadow-xl">
-                                  {statusOptions.map((statusOption) => (
-                                    <button
-                                      key={statusOption}
-                                      type="button"
-                                  onClick={() => {
-                                        setOpenStatusDropdownId(null)
-                                        if (normalizedStatus === statusOption) return
-                                    handleStatusUpdate(violation, statusOption)
-                                      }}
-                                      className={`flex w-full items-center justify-between px-4 py-2 text-xs font-medium transition ${
-                                        normalizedStatus === statusOption
-                                          ? "bg-green-50 text-green-600 font-semibold rounded-xl"
-                                          : "text-gray-600 hover:bg-gray-50"
-                                      }`}
-                                    >
-                                      <span>{formatStatusLabel(statusOption)}</span>
-                                      {normalizedStatus === statusOption && <Check className="h-3 w-3 text-green-500" />}
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
                         <button
                           type="button"
                           onClick={() => {
@@ -2521,7 +2634,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                         >
                           Delete
                         </button>
-                      </div>
+                        </div>
                       </div>
                     </div>
                   )
@@ -2577,14 +2690,26 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                 </thead>
                 <tbody className="divide-y divide-gray-100 bg-white">
                   {violations.map((violation) => {
-                    const studentInitials = violation.studentName
+                    const profile = violation.userProfile
+                    const profileName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim()
+                    const fallbackName = violation.studentName || "Student"
+                    const displayName = profileName || fallbackName
+                    const avatarUrl = profile?.profilePicture || violation.profilePicture || null
+                    const fallbackInitials = fallbackName
                       .split(" ")
                       .map((n: string) => n[0])
                       .join("")
                       .toUpperCase()
                       .slice(0, 2)
-                    const [firstName, ...lastNameParts] = violation.studentName.split(" ")
-                    const lastName = lastNameParts.join(" ")
+                    const studentInitials = profile
+                      ? getInitials(profile.firstName || "", profile.lastName || "")
+                      : fallbackInitials
+                    const studentDetails = [
+                      profile?.studentId ? `ID: ${profile.studentId}` : null,
+                      profile?.department || violation.studentDepartment || null,
+                    ]
+                      .filter(Boolean)
+                      .join(" • ")
                     const normalizedStatus = normalizeStatus(violation.status)
                     
                     return (
@@ -2607,10 +2732,23 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                       >
                         <td className="px-3 md:px-6 py-2 md:py-5">
                           <div className="flex items-center gap-2 md:gap-3">
-                            <div className="h-7 w-7 md:h-10 md:w-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold text-xs md:text-sm">
-                              {studentInitials}
+                            {avatarUrl ? (
+                              <img
+                                src={avatarUrl}
+                                alt={displayName}
+                                className="h-7 w-7 md:h-10 md:w-10 rounded-full object-cover border border-white shadow-sm"
+                              />
+                            ) : (
+                              <div className="h-7 w-7 md:h-10 md:w-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold text-xs md:text-sm">
+                                {studentInitials}
+                              </div>
+                            )}
+                            <div>
+                              <span className="text-xs md:text-sm font-semibold text-[#041A44] block">{displayName}</span>
+                              {studentDetails && (
+                                <span className="text-[10px] md:text-xs text-gray-500">{studentDetails}</span>
+                              )}
                             </div>
-                            <span className="text-xs md:text-sm font-semibold text-[#041A44]">{violation.studentName}</span>
                           </div>
                         </td>
                         <td className="px-3 md:px-6 py-2 md:py-5 text-xs md:text-sm text-gray-600 hidden md:table-cell">{violation.violationType || violation.violation}</td>
@@ -2745,6 +2883,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                 onClick={() => {
                   setShowViolationDetails(false)
                   setSelectedViolation(null)
+                  setIsMobileStatusMenuOpen(false)
                 }}
                 className="text-gray-400 hover:text-gray-600 transition"
               >
@@ -2835,43 +2974,61 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
               )}
 
               {/* Action Buttons */}
-              <div className="flex flex-col gap-2 pt-4 border-t border-gray-200">
-                {selectedViolation.status !== "resolved" && (
+              <div className="flex flex-col gap-3 pt-4 border-t border-gray-200">
+                <div className="relative violation-status-dropdown">
                   <button
                     type="button"
-                    onClick={async () => {
-                      try {
-                        const response = await fetch(`/api/violations/${selectedViolation.id}`, {
-                          method: "PATCH",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ status: "resolved" }),
-                        })
-                        const data = await response.json()
-                        if (data.ok) {
-                          alert("Violation resolved successfully!")
-                          fetchViolations()
-                          window.dispatchEvent(new CustomEvent("violationUpdated", { detail: { department } }))
-                          setShowViolationDetails(false)
-                          setSelectedViolation(null)
-                        } else {
-                          alert(data.error || "Failed to resolve violation")
-                        }
-                      } catch (error) {
-                        console.error("Error resolving violation:", error)
-                        alert("Failed to resolve violation. Please try again.")
-                      }
-                    }}
-                    className="w-full rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-green-700 text-xs font-medium transition hover:bg-green-100 flex items-center justify-center gap-2"
+                    onClick={() => setIsMobileStatusMenuOpen((prev) => !prev)}
+                    className={`w-full inline-flex items-center justify-between rounded-full px-4 py-2 text-xs font-semibold border ${getStatusClasses(
+                      selectedViolation.status,
+                    )}`}
                   >
-                    <Check className="h-4 w-4" />
-                    Resolve
+                    <span className="flex items-center gap-2">
+                      <Check className="h-3.5 w-3.5" />
+                      Status
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] uppercase tracking-wide">{formatStatusLabel(selectedViolation.status)}</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </div>
                   </button>
-                )}
+                  {isMobileStatusMenuOpen && (
+                    <div className="absolute z-30 mt-2 w-full rounded-2xl border border-gray-100 bg-white shadow-xl">
+                      {statusOptions.map((statusOption) => {
+                        const optionLabel = formatStatusLabel(statusOption)
+                        return (
+                          <button
+                            key={statusOption}
+                            type="button"
+                            onClick={() => {
+                              const normalizedStatus = normalizeStatus(selectedViolation.status)
+                              if (normalizedStatus === statusOption) {
+                                setIsMobileStatusMenuOpen(false)
+                                return
+                              }
+                              setIsMobileStatusMenuOpen(false)
+                              handleStatusUpdate(selectedViolation, statusOption)
+                            }}
+                            className={`flex w-full items-center justify-between px-4 py-2 text-xs font-medium transition ${
+                              normalizeStatus(selectedViolation.status) === statusOption
+                                ? "bg-green-50 text-green-600 font-semibold rounded-xl"
+                                : "text-gray-600 hover:bg-gray-50"
+                            }`}
+                          >
+                            <span>{optionLabel}</span>
+                            {normalizeStatus(selectedViolation.status) === statusOption && <Check className="h-3 w-3 text-green-500" />}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={() => {
                     setDeleteViolationTarget({ id: selectedViolation.id, studentName: selectedViolation.studentName })
                     setShowViolationDeleteModal(true)
+                    setIsMobileStatusMenuOpen(false)
                   }}
                   className="w-full rounded-lg border border-red-200 bg-white px-4 py-2.5 text-red-600 text-xs font-medium transition hover:bg-red-50 flex items-center justify-center gap-2"
                 >
@@ -3458,35 +3615,45 @@ type ViolationDepartmentStat = { department: string; violations: number; noViola
 type ViolationBreakdownSlice = { name: string; value: number; fill: string }
 type TopViolatorStat = { studentId: string; name: string; department: string; count: number }
 
+const BASE_DEPARTMENT_SERIES: RegisteredStudentsSeries[] = [
+  { department: "Elementary", students: 0 },
+  { department: "Junior High", students: 0 },
+  { department: "Senior High", students: 0 },
+  { department: "College", students: 0 },
+]
+
+const BASE_VIOLATION_DEPARTMENT_SERIES: ViolationDepartmentStat[] = [
+  { department: "Elementary", violations: 0, noViolations: 0 },
+  { department: "Junior High", violations: 0, noViolations: 0 },
+  { department: "Senior High", violations: 0, noViolations: 0 },
+  { department: "College", violations: 0, noViolations: 0 },
+]
+
+const METRIC_TEMPLATE: MetricCard[] = [
+  { label: "Elementary", value: 0, icon: ElementaryFilledIcon, department: "ELEMENTARY" },
+  { label: "Junior High", value: 0, icon: BookReaderIcon, department: "JUNIOR HIGH" },
+  { label: "Senior High", value: 0, icon: UserGraduateIcon, department: "SENIOR HIGH" },
+  { label: "College", value: 0, icon: CollegeFilledIcon, department: "COLLEGE" },
+]
+
+const DEFAULT_VIOLATION_BREAKDOWN: ViolationBreakdownSlice[] = [
+  { name: "Attendance", value: 0, fill: "#2563eb" },
+  { name: "Behavior", value: 0, fill: "#f97316" },
+  { name: "Uniform", value: 0, fill: "#ef4444" },
+  { name: "Academic", value: 0, fill: "#22c55e" },
+  { name: "Others", value: 0, fill: "#8b5cf6" },
+]
+
 function DashboardSection({ onDepartmentClick }: { onDepartmentClick: (department: string) => void }) {
-  const [metrics, setMetrics] = useState<MetricCard[]>([
-    { label: "Elementary", value: 0, icon: GraduationCapIcon, department: "ELEMENTARY" },
-    { label: "Junior High", value: 0, icon: BookReaderIcon, department: "JUNIOR HIGH" },
-    { label: "Senior High", value: 0, icon: UserGraduateIcon, department: "SENIOR HIGH" },
-    { label: "College", value: 0, icon: UniversityIcon, department: "COLLEGE" },
-  ])
-  const [registeredStudents, setRegisteredStudents] = useState<RegisteredStudentsSeries[]>([
-    { department: "Elementary", students: 0 },
-    { department: "Junior High", students: 0 },
-    { department: "Senior High", students: 0 },
-    { department: "College", students: 0 },
-  ])
-  const [violationPerDepartment, setViolationPerDepartment] = useState<ViolationDepartmentStat[]>([
-    { department: "Elementary", violations: 0, noViolations: 0 },
-    { department: "Junior High", violations: 0, noViolations: 0 },
-    { department: "Senior High", violations: 0, noViolations: 0 },
-    { department: "College", violations: 0, noViolations: 0 },
-  ])
-  const [violationBreakdown, setViolationBreakdown] = useState<ViolationBreakdownSlice[]>([
-    { name: "Attendance", value: 0, fill: "#2563eb" },
-    { name: "Behavior", value: 0, fill: "#f97316" },
-    { name: "Uniform", value: 0, fill: "#ef4444" },
-    { name: "Academic", value: 0, fill: "#22c55e" },
-    { name: "Others", value: 0, fill: "#8b5cf6" },
-  ])
+  const [metrics, setMetrics] = useState<MetricCard[]>(METRIC_TEMPLATE)
+  const [registeredStudents, setRegisteredStudents] = useState<RegisteredStudentsSeries[]>(BASE_DEPARTMENT_SERIES)
+  const [violationPerDepartment, setViolationPerDepartment] = useState<ViolationDepartmentStat[]>(BASE_VIOLATION_DEPARTMENT_SERIES)
+  const [violationBreakdown, setViolationBreakdown] = useState<ViolationBreakdownSlice[]>(DEFAULT_VIOLATION_BREAKDOWN)
   const [topViolators, setTopViolators] = useState<TopViolatorStat[]>([])
   const hasLoadedChartsRef = useRef(false)
   const fetchAbortControllerRef = useRef<AbortController | null>(null)
+  const [isRefreshingCharts, setIsRefreshingCharts] = useState(false)
+  const isMountedRef = useRef(true)
 
   const departmentLabels: Record<string, string> = {
     ELEMENTARY: "Elementary",
@@ -3496,12 +3663,17 @@ function DashboardSection({ onDepartmentClick }: { onDepartmentClick: (departmen
   }
 
   const fetchDashboardData = useCallback(async () => {
+    if (!isMountedRef.current) {
+      return
+    }
+
     const controller = new AbortController()
     fetchAbortControllerRef.current?.abort()
     fetchAbortControllerRef.current = controller
+    setIsRefreshingCharts(true)
 
     try {
-      const response = await fetch("/api/analytics/dashboard", {
+      const response = await fetch(`/api/analytics/dashboard?ts=${Date.now()}`, {
         cache: "no-store",
         signal: controller.signal,
       })
@@ -3515,29 +3687,49 @@ function DashboardSection({ onDepartmentClick }: { onDepartmentClick: (departmen
         throw new Error(data?.error || "Failed to read analytics dashboard data")
       }
 
-      setMetrics((prev: MetricCard[]) =>
-        prev.map((metric) => {
-          const updated = data.metrics?.find((item: any) => item.department === metric.department)
-          return { ...metric, value: updated?.count ?? 0 }
-        }),
-      )
+      const updatedMetrics = METRIC_TEMPLATE.map((metric) => {
+        const updated = Array.isArray(data.metrics)
+          ? data.metrics.find((item: any) => item.department === metric.department)
+          : null
+        return { ...metric, value: Number(updated?.count ?? 0) }
+      })
+      setMetrics(updatedMetrics)
 
-      setRegisteredStudents((prev: RegisteredStudentsSeries[]) =>
-        Array.isArray(data.registeredStudents) && data.registeredStudents.length > 0 ? data.registeredStudents : prev,
-      )
+      const registeredStudentsData = Array.isArray(data.registeredStudents) ? data.registeredStudents : []
+      const sanitizedRegisteredStudents = BASE_DEPARTMENT_SERIES.map((base) => {
+        const updated = registeredStudentsData.find((item: RegisteredStudentsSeries) => item.department === base.department)
+        return {
+          department: base.department,
+          students: Number(updated?.students ?? 0),
+        }
+      })
+      setRegisteredStudents(sanitizedRegisteredStudents)
 
-      setViolationPerDepartment((prev: ViolationDepartmentStat[]) =>
-        Array.isArray(data.violationPerDepartment) && data.violationPerDepartment.length > 0
-          ? data.violationPerDepartment
-          : prev,
-      )
+      const violationDepartmentData = Array.isArray(data.violationPerDepartment) ? data.violationPerDepartment : []
+      const sanitizedViolationDepartment = BASE_VIOLATION_DEPARTMENT_SERIES.map((base) => {
+        const updated = violationDepartmentData.find(
+          (item: ViolationDepartmentStat) => item.department === base.department,
+        )
+        return {
+          department: base.department,
+          violations: Number(updated?.violations ?? 0),
+          noViolations: Number(updated?.noViolations ?? 0),
+        }
+      })
+      setViolationPerDepartment(sanitizedViolationDepartment)
 
       const breakdown = Array.isArray(data.violationBreakdown) ? data.violationBreakdown : []
       setViolationBreakdown(
-        breakdown.length > 0 ? breakdown : [{ name: "No Violations", value: 1, fill: "#CBD5F5" }],
+        breakdown.length > 0
+          ? breakdown.map((slice: ViolationBreakdownSlice, index: number) => ({
+              name: slice.name || `Category ${index + 1}`,
+              value: Number(slice.value ?? 0),
+              fill: slice.fill || DEFAULT_VIOLATION_BREAKDOWN[index % DEFAULT_VIOLATION_BREAKDOWN.length].fill,
+            }))
+          : [{ name: "No Violations", value: 1, fill: "#CBD5F5" }],
       )
 
-      setTopViolators(Array.isArray(data.topViolators) ? data.topViolators : [])
+      setTopViolators(Array.isArray(data.topViolators) ? [...data.topViolators] : [])
     } catch (error: any) {
       if (error?.name === "AbortError") {
         return
@@ -3549,11 +3741,15 @@ function DashboardSection({ onDepartmentClick }: { onDepartmentClick: (departmen
       }
       if (fetchAbortControllerRef.current === controller) {
         fetchAbortControllerRef.current = null
+        if (isMountedRef.current) {
+          setIsRefreshingCharts(false)
+        }
       }
     }
   }, [])
 
   useEffect(() => {
+    isMountedRef.current = true
     fetchDashboardData()
     const interval = setInterval(fetchDashboardData, 30000) // Refresh every 30 seconds
     
@@ -3567,6 +3763,7 @@ function DashboardSection({ onDepartmentClick }: { onDepartmentClick: (departmen
     window.addEventListener("violationUpdated", handleViolationEvent as EventListener)
     
     return () => {
+      isMountedRef.current = false
       clearInterval(interval)
       window.removeEventListener("violationCreated", handleViolationEvent as EventListener)
       window.removeEventListener("violationDeleted", handleViolationEvent as EventListener)
@@ -3576,6 +3773,7 @@ function DashboardSection({ onDepartmentClick }: { onDepartmentClick: (departmen
   }, [fetchDashboardData])
 
   const refreshCharts = () => {
+    hasLoadedChartsRef.current = false
     fetchDashboardData()
   }
 
@@ -3623,13 +3821,21 @@ function DashboardSection({ onDepartmentClick }: { onDepartmentClick: (departmen
           </div>
           <button
             onClick={refreshCharts}
-            className="inline-flex shrink-0 items-center justify-center gap-2 px-2 md:px-5 py-1.5 md:py-2.5 text-[11px] md:text-sm font-medium text-white rounded-lg shadow-md transition-all hover:shadow-lg active:scale-[0.98] self-start sm:self-auto w-fit sm:w-auto"
+            disabled={isRefreshingCharts}
+            aria-busy={isRefreshingCharts}
+            className={`inline-flex shrink-0 items-center justify-center gap-2 px-2 md:px-5 py-1.5 md:py-2.5 text-[11px] md:text-sm font-medium text-white rounded-lg shadow-md transition-all self-start sm:self-auto w-fit sm:w-auto ${
+              isRefreshingCharts ? "opacity-80 cursor-not-allowed" : "hover:shadow-lg active:scale-[0.98]"
+            }`}
             style={{
               background: "linear-gradient(135deg, #041A44 0%, #0d2f7b 50%, #123a91 100%)",
             }}
           >
-            <RefreshCw className="h-3.5 w-3.5 md:h-4 md:w-4 text-white" />
-            Refresh Data
+            <RefreshCw
+              className={`h-3.5 w-3.5 md:h-4 md:w-4 text-white ${
+                isRefreshingCharts ? "animate-spin" : ""
+              }`}
+            />
+            {isRefreshingCharts ? "Refreshing..." : "Refresh Data"}
           </button>
         </div>
 
@@ -3936,6 +4142,7 @@ function ChatSection() {
   const [replyingToMessageId, setReplyingToMessageId] = useState<string | null>(null)
   const [longPressMessageId, setLongPressMessageId] = useState<string | null>(null)
   const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null)
+  const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null)
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
   const messageMenuRef = useRef<HTMLDivElement>(null)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -4046,8 +4253,11 @@ function ChatSection() {
             const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150
             shouldAutoScrollRef.current = isNearBottom
           }
+        } else if (isInitialLoad) {
+          // Initial load - scroll to bottom to show latest messages
+          shouldAutoScrollRef.current = true
         } else {
-          // Initial load or no new messages - don't auto-scroll
+          // No new messages and not initial load - don't auto-scroll
           shouldAutoScrollRef.current = false
         }
         
@@ -4144,8 +4354,8 @@ function ChatSection() {
 
   useEffect(() => {
     if (selectedUser) {
-      // Don't auto-scroll when selecting a new user (user clicked)
-      shouldAutoScrollRef.current = false
+      // Enable auto-scroll when selecting a new user to show latest messages
+      shouldAutoScrollRef.current = true
       userScrolledRef.current = false
       lastMessageCountRef.current = 0
       fetchMessages(selectedUser.id, true) // Pass true to indicate this is initial load
@@ -4293,6 +4503,22 @@ function ChatSection() {
       }
     } catch (error) {
       console.error("Error sending message:", error)
+    }
+  }
+
+  const scrollToMessage = (messageId: string) => {
+    const messageElement = document.getElementById(`message-${messageId}`)
+    if (messageElement && messagesContainerRef.current) {
+      // Highlight the message
+      setHighlightedMessageId(messageId)
+      
+      // Scroll to the message
+      messageElement.scrollIntoView({ behavior: "smooth", block: "center" })
+      
+      // Remove highlight after 2 seconds
+      setTimeout(() => {
+        setHighlightedMessageId(null)
+      }, 2000)
     }
   }
 
@@ -4770,18 +4996,19 @@ function ChatSection() {
               <div 
                 ref={messagesContainerRef}
                 onScroll={handleScroll}
-                className="flex-1 px-2.5 sm:px-3 md:px-6 py-3 sm:py-4 md:py-6 overflow-y-auto bg-gray-50 min-h-0"
+                className="flex-1 px-1.5 sm:px-3 md:px-6 py-2 sm:py-4 md:py-6 overflow-y-auto bg-gray-50 min-h-0"
               >
                 {messages.length > 0 ? (
-                  <div className="space-y-2.5 sm:space-y-3 md:space-y-4">
+                  <div className="space-y-1.5 sm:space-y-3 md:space-y-4">
                     {messages.map((message) => (
                       <div
                         key={message.id}
-                        className={`group flex gap-1.5 sm:gap-2 md:gap-3 items-start ${message.isOutgoing ? "justify-end" : "justify-start"}`}
+                        id={`message-${message.id}`}
+                        className={`group flex gap-1 sm:gap-2 md:gap-3 items-start transition-all duration-300 ${message.isOutgoing ? "justify-end" : "justify-start"} ${highlightedMessageId === message.id ? "bg-yellow-100 dark:bg-yellow-900 rounded-lg p-1 sm:p-2 -m-1 sm:-m-2" : ""}`}
                       >
                         {!message.isOutgoing && (
                           message.senderProfilePicture ? (
-                            <div className="relative h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 rounded-full overflow-hidden flex-shrink-0" style={{ marginTop: message.repliedTo ? '3.5rem' : '1.25rem' }}>
+                            <div className={`self-start ${message.repliedTo ? "mt-[3rem] sm:mt-[3.25rem] md:mt-[3.5rem]" : "mt-1.5"} relative h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 rounded-full overflow-hidden flex-shrink-0`}>
                               <img
                                 src={message.senderProfilePicture}
                                 alt={message.senderName}
@@ -4789,7 +5016,7 @@ function ChatSection() {
                               />
                             </div>
                           ) : (
-                            <div className="flex h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 items-center justify-center rounded-full bg-blue-100 text-[#041A44] text-[9px] sm:text-[10px] md:text-xs font-semibold flex-shrink-0" style={{ marginTop: message.repliedTo ? '3.5rem' : '1.25rem' }}>
+                            <div className={`self-start ${message.repliedTo ? "mt-[3rem] sm:mt-[3.25rem] md:mt-[3.5rem]" : "mt-1.5"} flex h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 items-center justify-center rounded-full bg-blue-100 text-[#041A44] text-[9px] sm:text-[10px] md:text-xs font-semibold flex-shrink-0`}>
                               {message.senderInitials}
                             </div>
                           )
@@ -4798,14 +5025,19 @@ function ChatSection() {
                           {message.repliedTo && !message.deleted && (() => {
                             const repliedMessage = messages.find(m => m.id === message.repliedTo)
                             return repliedMessage ? (
-                              <div className={`mb-1 ${message.isOutgoing ? 'items-end flex flex-col' : 'inline-block'}`}>
+                              <div className={`mb-0.5 sm:mb-1 ${message.isOutgoing ? 'items-end flex flex-col' : 'inline-block'}`}>
                                 <p className={`text-[9px] sm:text-[10px] md:text-xs text-gray-500 mb-0.5 sm:mb-1 px-1 ${message.isOutgoing ? 'text-right' : 'text-left'}`}>
                                   {message.isOutgoing 
                                     ? `You replied to ${repliedMessage.senderName}`
                                     : `${message.senderName} replied to ${repliedMessage.senderName}`}
                                 </p>
-                                <div className="rounded-xl px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 max-w-[65%] sm:max-w-[60%] bg-gray-100 border border-gray-200 inline-block">
-                                  <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-600 truncate">{repliedMessage.text}</p>
+                                <div 
+                                  className="rounded-xl px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 max-w-[65%] sm:max-w-[60%] bg-gray-100 border border-gray-200 inline-block cursor-pointer hover:bg-gray-200 transition-colors"
+                                  onClick={() => scrollToMessage(message.repliedTo!)}
+                                >
+                                  <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-600 truncate">
+                                    {repliedMessage.text.length > 50 ? repliedMessage.text.substring(0, 50) + '...' : repliedMessage.text}
+                                  </p>
                                 </div>
                               </div>
                             ) : null
@@ -4851,7 +5083,7 @@ function ChatSection() {
                           <>
                             <div className="relative">
                               <div
-                                className={`rounded-2xl px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-3 max-w-full ${
+                                className={`rounded-2xl px-2 sm:px-3 md:px-4 py-1 sm:py-2 md:py-3 max-w-full ${
                                   message.isOutgoing
                                     ? message.deleted 
                                       ? "bg-gray-100 text-gray-500 border border-gray-200"
@@ -4920,7 +5152,7 @@ function ChatSection() {
                                       </div>
                                     )}
                                     {message.text && (
-                                      <p className="text-[11px] sm:text-xs md:text-sm whitespace-pre-wrap break-words text-justify md:text-left" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{message.text}</p>
+                                      <p className="text-[11px] sm:text-xs md:text-sm whitespace-pre-wrap break-words text-justify md:text-left" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', textJustify: 'inter-word', hyphens: 'auto', WebkitHyphens: 'auto', MozHyphens: 'auto', lineHeight: '1.5' }}>{message.text}</p>
                                     )}
                                   </>
                                 )}
@@ -5238,7 +5470,7 @@ function ChatSection() {
                           </>
                         )}
                       </div>
-                      <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-400 mt-1 px-1">{message.timestamp}</p>
+                      <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-400 mt-0.5 sm:mt-1 px-1">{message.timestamp}</p>
                     </div>
                   </div>
                 ))}
@@ -5267,9 +5499,14 @@ function ChatSection() {
                   const repliedMessage = messages.find(m => m.id === replyingToMessageId)
                   return repliedMessage ? (
                     <div className="mb-2.5 sm:mb-3 flex items-start justify-between bg-white rounded-lg px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 md:py-2.5 border-l-[4px] border-[#041A44] shadow-sm">
-                      <div className="flex-1 min-w-0 pr-1.5 sm:pr-2">
+                      <div 
+                        className="flex-1 min-w-0 pr-1.5 sm:pr-2 cursor-pointer hover:bg-gray-50 rounded transition-colors -mx-2 px-2 py-1"
+                        onClick={() => scrollToMessage(replyingToMessageId!)}
+                      >
                         <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mb-0.5 sm:mb-1">Replying to {repliedMessage.senderName}</p>
-                        <p className="text-[9px] sm:text-[10px] md:text-sm text-gray-700 break-words line-clamp-2 text-justify md:text-left">{repliedMessage.text || "No text content"}</p>
+                        <p className="text-[9px] sm:text-[10px] md:text-sm text-gray-700 break-words line-clamp-2 text-justify md:text-left" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', textJustify: 'inter-word', hyphens: 'auto', WebkitHyphens: 'auto', MozHyphens: 'auto', lineHeight: '1.5' }}>
+                          {repliedMessage.text && repliedMessage.text.length > 80 ? repliedMessage.text.substring(0, 80) + '...' : (repliedMessage.text || "No text content")}
+                        </p>
                       </div>
                       <button
                         type="button"

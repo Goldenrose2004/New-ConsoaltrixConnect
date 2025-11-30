@@ -32,7 +32,7 @@ export default function HandbookRevisionProcessPage() {
             <div className="text-center lg:text-left">
               <div className="inline-block mx-auto lg:mx-0">
                 <h1 
-                  className="text-3xl sm:text-4xl lg:text-4xl font-extrabold tracking-wide leading-tight drop-shadow-sm"
+                  className="text-2xl sm:text-4xl lg:text-4xl font-extrabold tracking-wide leading-tight drop-shadow-sm"
                   style={{ 
                     color: "#0B234A",
                     fontFamily: "'Inter', sans-serif"
@@ -41,7 +41,7 @@ export default function HandbookRevisionProcessPage() {
                   HANDBOOK
                 </h1>
                 <h1 
-                  className="text-3xl lg:text-4xl font-extrabold tracking-wide leading-none drop-shadow-sm"
+                  className="text-2xl lg:text-4xl font-extrabold tracking-wide leading-none drop-shadow-sm"
                   style={{ 
                     color: "#0B234A",
                     fontFamily: "'Inter', sans-serif"
@@ -55,7 +55,7 @@ export default function HandbookRevisionProcessPage() {
                 ></div>
               </div>
               <p 
-                className="text-sm sm:text-base mt-2"
+                className="text-xs sm:text-base mt-2"
                 style={{ 
                   color: "rgba(11, 35, 74, 0.8)",
                   fontFamily: "'Inter', sans-serif"
@@ -74,13 +74,13 @@ export default function HandbookRevisionProcessPage() {
             >
               <div className="text-center mb-8">
                 <h2 
-                  className="text-lg sm:text-xl font-normal mb-3 sm:mb-4"
+                  className="text-base sm:text-xl font-normal mb-3 sm:mb-4"
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   Important Matters about the Handbook
                 </h2>
                 <p 
-                  className="text-white mb-6 sm:mb-8 text-sm sm:text-base"
+                  className="text-white mb-6 sm:mb-8 text-xs sm:text-base"
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   The Handbook was revised through the following stages:
@@ -90,12 +90,12 @@ export default function HandbookRevisionProcessPage() {
               <div className="space-y-5 sm:space-y-6 text-left">
                 <div className="flex items-start space-x-3 sm:space-x-4">
                   <span 
-                    className="text-xl sm:text-2xl font-normal text-white flex-shrink-0"
+                    className="text-lg sm:text-2xl font-normal text-white flex-shrink-0"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     1.
                   </span>
-                  <p className="leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <p className="leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                     <span className="font-normal">First stage:</span> The gathering of data from student organizations, Faculty, Staff, Administration and 
                     Colleges to be added to the existing provisions.
                   </p>
@@ -103,12 +103,12 @@ export default function HandbookRevisionProcessPage() {
 
                 <div className="flex items-start space-x-3 sm:space-x-4">
                   <span 
-                    className="text-xl sm:text-2xl font-normal text-white flex-shrink-0"
+                    className="text-lg sm:text-2xl font-normal text-white flex-shrink-0"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     2.
                   </span>
-                  <p className="leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <p className="leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                     <span className="font-normal">Second stage:</span> The review and checking of data which was done by the English Professors and Dean 
                     of College.
                   </p>
@@ -116,12 +116,12 @@ export default function HandbookRevisionProcessPage() {
 
                 <div className="flex items-start space-x-3 sm:space-x-4">
                   <span 
-                    className="text-xl sm:text-2xl font-normal text-white flex-shrink-0"
+                    className="text-lg sm:text-2xl font-normal text-white flex-shrink-0"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     3.
                   </span>
-                  <p className="leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <p className="leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                     <span className="font-normal">Third stage:</span> Focused on the review of Minor and Major Offenses which was done by the Prefect of 
                     Discipline and Guidance Counselor.
                   </p>
@@ -129,12 +129,12 @@ export default function HandbookRevisionProcessPage() {
 
                 <div className="flex items-start space-x-3 sm:space-x-4">
                   <span 
-                    className="text-xl sm:text-2xl font-normal text-white flex-shrink-0"
+                    className="text-lg sm:text-2xl font-normal text-white flex-shrink-0"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     4.
                   </span>
-                  <p className="leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <p className="leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                     <span className="font-normal">Fourth stage:</span> Was done by the Planning and Executive Committee to review in details the 
                     terminologies, entries, definitions, policies, grammar and the consistencies and synchronization of 
                     the provisions and other existing policies and laws pertaining that of other manuals e.g Library, 
@@ -144,24 +144,24 @@ export default function HandbookRevisionProcessPage() {
 
                 <div className="flex items-start space-x-3 sm:space-x-4">
                   <span 
-                    className="text-xl sm:text-2xl font-normal text-white flex-shrink-0"
+                    className="text-lg sm:text-2xl font-normal text-white flex-shrink-0"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     5.
                   </span>
-                  <p className="leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <p className="leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                     <span className="font-normal">Fifth stage:</span> Was the approval of the School Administrative Board.
                   </p>
                 </div>
 
                 <div className="flex items-start space-x-3 sm:space-x-4">
                   <span 
-                    className="text-xl sm:text-2xl font-normal text-white flex-shrink-0"
+                    className="text-lg sm:text-2xl font-normal text-white flex-shrink-0"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     6.
                   </span>
-                  <p className="leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <p className="leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                     <span className="font-normal">Sixth stage:</span> The copy was then sent for printing.
                   </p>
                 </div>

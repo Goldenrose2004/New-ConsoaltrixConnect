@@ -1,0 +1,51 @@
+{
+  "name": "ConsolatrixConnect - Digital School Handbook",
+  "short_name": "ConsolatrixConnect",
+  "description": "Your school policy handbook, digitized. Access information, resources, and stay connected with ConsolatrixConnect.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#041A44",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/logo-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Basic Education Dashboard",
+      "short_name": "Basic Ed",
+      "description": "Access Basic Education Dashboard",
+      "url": "/basic-education-dashboard",
+      "icons": [{ "src": "/images/logo-icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "College Dashboard",
+      "short_name": "College",
+      "description": "Access College Dashboard",
+      "url": "/college-dashboard",
+      "icons": [{ "src": "/images/logo-icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Profile",
+      "short_name": "Profile",
+      "description": "View your profile",
+      "url": "/profile",
+      "icons": [{ "src": "/images/logo-icon.png", "sizes": "192x192" }]
+    }
+  ]
+}
+

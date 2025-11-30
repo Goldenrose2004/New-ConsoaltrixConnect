@@ -141,9 +141,15 @@ export async function POST(request: NextRequest) {
     }
 
     const accountData = admin || user
+    
+    // Generate a simple token for offline authentication
+    // In production, you might want to use JWT or a more secure token
+    const token = Buffer.from(`${accountData._id.toString()}:${Date.now()}`).toString('base64')
+    
     return NextResponse.json(
       {
         success: true,
+        token: token, // Include token in response for PWA offline auth
         user: {
           id: accountData._id.toString(),
           firstName: accountData.firstName,

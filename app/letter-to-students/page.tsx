@@ -32,7 +32,7 @@ export default function LetterToStudentsPage() {
             <div className="text-center lg:text-left">
               <div className="inline-block mx-auto lg:mx-0">
                 <h1 
-                  className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-wide leading-snug drop-shadow-sm"
+                  className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-wide leading-snug drop-shadow-sm"
                   style={{ 
                     color: "#0B234A",
                     fontFamily: "'Inter', sans-serif"
@@ -46,7 +46,7 @@ export default function LetterToStudentsPage() {
                 ></div>
               </div>
               <p 
-                className="text-sm sm:text-base mt-2"
+                className="text-xs sm:text-base mt-2"
                 style={{ 
                   color: "rgba(11, 35, 74, 0.8)",
                   fontFamily: "'Inter', sans-serif"
@@ -63,11 +63,11 @@ export default function LetterToStudentsPage() {
               className="text-white p-5 sm:p-8 lg:p-10 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl max-w-full lg:max-w-[880px] w-full mt-2 sm:mt-4 lg:mt-0 lg:ml-auto"
               style={{ backgroundColor: "#041A44" }}
             >
-              <p className="mb-6 leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <p className="mb-6 leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                 <span className="font-semibold">Dear Students,</span>
               </p>
 
-              <p className="mb-6 leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <p className="mb-6 leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                 These student guidelines are expressions of the concern your educators have for the continuous 
                 development of your personality. They are meant to help you strengthen your character through 
                 responsible and self-disciplined life and guarantee a school atmosphere of order, cooperation and 
@@ -77,7 +77,7 @@ export default function LetterToStudentsPage() {
                 exist among all in the school.
               </p>
 
-              <p className="mb-6 leading-relaxed text-justify text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <p className="mb-6 leading-relaxed text-justify text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                 These guidelines are likewise expressions of the beautiful family Spirit, the life-blood of every 
                 Augustinian Recollect School. Accept them therefore as coming from the hearts of your educators who 
                 love you. Look to and follow the Blessed Virgin Mary, who lived a life of obedience to the Father's will, 
@@ -87,8 +87,8 @@ export default function LetterToStudentsPage() {
               </p>
 
               <div className="text-left sm:text-right">
-                <p className="font-semibold mb-1 text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>Sincerely yours,</p>
-                <p className="text-white text-sm sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>The School Administrative Board</p>
+                <p className="font-semibold mb-1 text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>Sincerely yours,</p>
+                <p className="text-white text-xs sm:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>The School Administrative Board</p>
               </div>
             </div>
           </div>
