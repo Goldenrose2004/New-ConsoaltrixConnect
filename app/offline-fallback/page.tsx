@@ -81,11 +81,21 @@ export default function OfflineFallbackPage() {
           ) : (
             <>
               <p className="text-sm text-gray-500 mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>
-                To use the app offline, please log in while you have an internet connection first.
+                This page requires an internet connection. You can browse static content offline without logging in.
               </p>
               <button
+                onClick={() => {
+                  localStorage.setItem('anonymousOfflineMode', 'true')
+                  router.push('/')
+                }}
+                className="w-full bg-[#041A44] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#1e3a8a] transition-colors flex items-center justify-center mb-3"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                Continue Anonymously
+              </button>
+              <button
                 onClick={handleRetry}
-                className="w-full bg-[#041A44] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#1e3a8a] transition-colors flex items-center justify-center"
+                className="w-full bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors flex items-center justify-center"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 <RefreshCw className="w-5 h-5 inline-block mr-2" />

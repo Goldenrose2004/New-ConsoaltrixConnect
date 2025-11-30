@@ -79,6 +79,22 @@ export function OfflineDetector() {
 
     // If user is not authenticated and trying to access offline pages
     if (!isOfflineAuthenticated() && pathname !== '/offline-fallback') {
+      // Check if anonymous offline mode is enabled
+      const anonymousMode = localStorage.getItem('anonymousOfflineMode')
+      
+      // If anonymous mode is enabled, allow access to offline-allowed routes
+      if (anonymousMode === 'true') {
+        // Allow access to static pages
+        if (OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+          return // Allow access
+        }
+        // If trying to access online-only route, redirect to fallback
+        if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
+          router.push('/offline-fallback')
+          return
+        }
+      }
+      
       // Check if they have currentUser in localStorage (from previous online session)
       const currentUser = localStorage.getItem('currentUser')
       if (!currentUser) {

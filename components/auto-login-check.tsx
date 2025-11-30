@@ -22,6 +22,13 @@ export function AutoLoginCheck() {
 
     // Check immediately (localStorage is always available)
     const checkAuth = () => {
+      // Don't auto-redirect if anonymous offline mode is enabled (user chose to browse anonymously)
+      const anonymousMode = localStorage.getItem('anonymousOfflineMode')
+      if (anonymousMode === 'true' && !navigator.onLine) {
+        // User is browsing anonymously offline - don't redirect
+        return
+      }
+
       // First, try offline auth utility
       if (isOfflineAuthenticated()) {
         const user = getOfflineUser()

@@ -83,7 +83,9 @@ export default function LoginPage() {
     return () => clearTimeout(timeoutId)
   }, [router, isOffline])
 
-  const handleProceedOffline = () => {
+  const handleContinueAnonymously = () => {
+    // Set a flag to allow anonymous offline browsing
+    localStorage.setItem('anonymousOfflineMode', 'true')
     // Redirect to home page where they can browse static content
     router.push('/')
   }
@@ -245,35 +247,28 @@ export default function LoginPage() {
           <p className="text-gray-600 text-sm md:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>Please sign in to continue</p>
         </div>
 
-        {isOffline && (
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 rounded-lg mb-6 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
-            <p className="font-semibold mb-1">⚠️ You are currently offline</p>
-            <p className="text-xs">You need an internet connection to log in. If you've logged in before, you should be automatically logged in.</p>
+        {isOffline && !isOfflineAuthenticated() && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-blue-800 text-sm mb-3" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <strong>⚠️ No internet connection detected.</strong> You can browse static content offline without logging in.
+            </p>
+            <button
+              type="button"
+              onClick={handleContinueAnonymously}
+              className="w-full bg-[#041A44] text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-[#1e3a8a] transition-colors mb-2"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              Continue Anonymously
+            </button>
+            <p className="text-blue-600 text-xs text-center" style={{ fontFamily: "'Inter', sans-serif" }}>
+              You'll only be able to view static content (About, History, Core Values, etc.). To access dashboards and all features, please connect to the internet and log in.
+            </p>
           </div>
         )}
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg mb-6 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
             {error}
-          </div>
-        )}
-
-        {showOfflineMode && !isOfflineAuthenticated() && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-blue-800 text-sm mb-3" style={{ fontFamily: "'Inter', sans-serif" }}>
-              <strong>No internet connection detected.</strong> You can still browse some content offline, but you won't be able to access all features.
-            </p>
-            <button
-              type="button"
-              onClick={handleProceedOffline}
-              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-              style={{ fontFamily: "'Inter', sans-serif" }}
-            >
-              Proceed Offline Mode
-            </button>
-            <p className="text-blue-600 text-xs mt-2 text-center" style={{ fontFamily: "'Inter', sans-serif" }}>
-              You'll only be able to view static content. To access all features, please connect to the internet and log in.
-            </p>
           </div>
         )}
 

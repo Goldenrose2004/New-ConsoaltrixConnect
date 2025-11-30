@@ -105,7 +105,7 @@ self.addEventListener('fetch', (event) => {
         // Redirect to offline fallback if offline
         return caches.match('/offline-fallback').then((response) => {
           return response || new Response(
-            '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offline</title></head><body><h1>This page requires an internet connection</h1><p><a href="/">Go to Home</a></p></body></html>',
+            '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offline</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f3f4f6;padding:1rem}div{background:white;border-radius:0.5rem;padding:2rem;text-align:center;max-width:24rem;width:100%}h1{font-size:1.5rem;font-weight:bold;margin-bottom:1rem;color:#111827}button{background:#041A44;color:white;border:none;padding:0.75rem 1.5rem;border-radius:0.5rem;font-weight:600;cursor:pointer;width:100%;margin-top:1rem}button:hover{background:#1e3a8a}</style></head><body><div><h1>This page requires an internet connection</h1><button onclick="window.location.href=\'/\'">Continue Anonymously</button></div></body></html>',
             {
               status: 200,
               headers: { 'Content-Type': 'text/html' }

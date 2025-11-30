@@ -38,6 +38,16 @@ export default function RecordsPage() {
   }, [user?.id])
 
   useEffect(() => {
+    // Check if anonymous offline mode is enabled
+    const anonymousMode = localStorage.getItem('anonymousOfflineMode')
+    const isOffline = !navigator.onLine
+    
+    // Allow anonymous access when offline and anonymous mode is enabled
+    if (isOffline && anonymousMode === 'true') {
+      setIsLoading(false)
+      return
+    }
+
     // Check if user is logged in
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
