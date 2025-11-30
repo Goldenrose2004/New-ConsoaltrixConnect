@@ -50,19 +50,30 @@ export function OfflineDetector() {
     }
     redirectHandledRef.current = pathname
 
-    // If on an online-only route while offline, redirect
-    if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
-      // If user is authenticated offline, redirect to their dashboard
-      if (isOfflineAuthenticated()) {
-        const user = getOfflineUser()
-        if (user) {
+    // If user is authenticated offline, redirect to dashboard if on home/login/signup
+    if (isOfflineAuthenticated()) {
+      const user = getOfflineUser()
+      if (user) {
+        // If on home, login, or signup page, redirect to dashboard
+        if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
           const dashboardUrl = getDashboardUrl(user)
           router.push(dashboardUrl)
+          return
         }
-      } else {
-        // Not authenticated - redirect to offline fallback
-        router.push('/offline-fallback')
+        // If on an online-only route, redirect to dashboard
+        if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
+          const dashboardUrl = getDashboardUrl(user)
+          router.push(dashboardUrl)
+          return
+        }
+        // User is authenticated and on allowed route - allow access
+        return
       }
+    }
+
+    // If on an online-only route while offline and NOT authenticated, redirect to fallback
+    if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
+      router.push('/offline-fallback')
       return
     }
 
@@ -71,7 +82,7 @@ export function OfflineDetector() {
       // Check if they have currentUser in localStorage (from previous online session)
       const currentUser = localStorage.getItem('currentUser')
       if (!currentUser) {
-        // No valid auth, redirect to offline fallback
+        // No valid auth, redirect to offline fallback if not on allowed route
         if (!OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
           router.push('/offline-fallback')
         }
@@ -84,8 +95,25 @@ export function OfflineDetector() {
     const online = isOnline()
     setIsOffline(!online)
 
-    // Only handle redirect if offline on initial mount
+    // If offline on app startup, check for authenticated user and auto-redirect
     if (!online) {
+      // Check if user is authenticated offline
+      if (isOfflineAuthenticated()) {
+        const user = getOfflineUser()
+        if (user) {
+          const dashboardUrl = getDashboardUrl(user)
+          // If not already on dashboard or allowed offline page, redirect
+          if (pathname === '/' || pathname === '/login' || pathname === '/signup' || 
+              ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
+            // Small delay to prevent flickering
+            setTimeout(() => {
+              router.push(dashboardUrl)
+            }, 200)
+            return
+          }
+        }
+      }
+      
       // Small delay to prevent flickering
       const timeoutId = setTimeout(() => {
         handleOfflineRedirect()

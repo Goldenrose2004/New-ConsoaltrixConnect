@@ -2,10 +2,11 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { X } from "lucide-react"
+import { isOfflineAuthenticated, getOfflineUser, getDashboardUrl, isOnline } from "@/lib/offline-auth"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -15,6 +16,17 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+
+  // Check if user is already authenticated offline on mount
+  useEffect(() => {
+    if (!isOnline() && isOfflineAuthenticated()) {
+      const user = getOfflineUser()
+      if (user) {
+        const dashboardUrl = getDashboardUrl(user)
+        router.push(dashboardUrl)
+      }
+    }
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -99,7 +111,15 @@ export default function LoginPage() {
       // Also store token separately for quick access
       if (data.token) {
         localStorage.setItem("pwa_auth_token", data.token)
+      } else {
+        // Generate token if not provided
+        const token = btoa(`${userData.id}:${Date.now()}`).replace(/[^a-zA-Z0-9]/g, '')
+        localStorage.setItem("pwa_auth_token", token)
       }
+      
+      // Save offline auth using the utility function (ensures proper storage)
+      const { saveOfflineAuth } = require("@/lib/offline-auth")
+      saveOfflineAuth(userWithToken, data.token || localStorage.getItem("pwa_auth_token") || undefined)
 
       // Determine redirect path based on role/department
       let redirectPath = "/basic-education-dashboard" // Default to basic education dashboard
