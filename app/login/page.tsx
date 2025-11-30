@@ -16,34 +16,77 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isOffline, setIsOffline] = useState(false)
+  const [showOfflineMode, setShowOfflineMode] = useState(false)
+
+  // Check online/offline status
+  useEffect(() => {
+    const checkOnlineStatus = () => {
+      const offline = !navigator.onLine
+      setIsOffline(offline)
+      
+      // If offline and not authenticated, show offline mode option
+      if (offline && !isOfflineAuthenticated()) {
+        setShowOfflineMode(true)
+      } else if (!offline) {
+        setShowOfflineMode(false)
+      }
+    }
+    
+    checkOnlineStatus()
+    window.addEventListener('online', checkOnlineStatus)
+    window.addEventListener('offline', checkOnlineStatus)
+    
+    return () => {
+      window.removeEventListener('online', checkOnlineStatus)
+      window.removeEventListener('offline', checkOnlineStatus)
+    }
+  }, [])
 
   // Check if user is already authenticated (both online and offline) on mount
   useEffect(() => {
-    // Check for stored credentials
-    const currentUser = localStorage.getItem('currentUser')
-    if (currentUser) {
-      try {
-        const user = JSON.parse(currentUser)
-        if (user.id && user.email) {
+    // Small delay to ensure localStorage is accessible
+    const timeoutId = setTimeout(() => {
+      // Check for stored credentials using offline auth utility
+      if (isOfflineAuthenticated()) {
+        const user = getOfflineUser()
+        if (user) {
           // User has stored credentials - auto-login
           const dashboardUrl = getDashboardUrl(user)
           router.push(dashboardUrl)
           return
         }
-      } catch (error) {
-        // Invalid stored data, continue to login form
       }
-    }
 
-    // Also check offline auth specifically
-    if (!isOnline() && isOfflineAuthenticated()) {
-      const user = getOfflineUser()
-      if (user) {
-        const dashboardUrl = getDashboardUrl(user)
-        router.push(dashboardUrl)
+      // Fallback: check currentUser directly
+      const currentUser = localStorage.getItem('currentUser')
+      if (currentUser) {
+        try {
+          const user = JSON.parse(currentUser)
+          if (user.id && user.email) {
+            // User has stored credentials - auto-login
+            const dashboardUrl = getDashboardUrl(user)
+            router.push(dashboardUrl)
+            return
+          }
+        } catch (error) {
+          // Invalid stored data, continue to login form
+        }
       }
-    }
-  }, [router])
+
+      // If offline and not authenticated, show offline mode option immediately
+      if (!navigator.onLine && !isOfflineAuthenticated()) {
+        setShowOfflineMode(true)
+      }
+    }, 200)
+
+    return () => clearTimeout(timeoutId)
+  }, [router, isOffline])
+
+  const handleProceedOffline = () => {
+    // Redirect to home page where they can browse static content
+    router.push('/')
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -61,8 +104,9 @@ export default function LoginPage() {
         }
       }
       
-      // Offline and not authenticated - show message
+      // Offline and not authenticated - show message and offline mode option
       setError("You need to be online to log in. If you've logged in before, the app should auto-login you when offline.")
+      setShowOfflineMode(true)
       return
     }
 
@@ -201,13 +245,39 @@ export default function LoginPage() {
           <p className="text-gray-600 text-sm md:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>Please sign in to continue</p>
         </div>
 
+        {isOffline && (
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 rounded-lg mb-6 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
+            <p className="font-semibold mb-1">⚠️ You are currently offline</p>
+            <p className="text-xs">You need an internet connection to log in. If you've logged in before, you should be automatically logged in.</p>
+          </div>
+        )}
+
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg mb-6 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4" autoComplete="off">
+        {showOfflineMode && !isOfflineAuthenticated() && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-blue-800 text-sm mb-3" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <strong>No internet connection detected.</strong> You can still browse some content offline, but you won't be able to access all features.
+            </p>
+            <button
+              type="button"
+              onClick={handleProceedOffline}
+              className="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
+              Proceed Offline Mode
+            </button>
+            <p className="text-blue-600 text-xs mt-2 text-center" style={{ fontFamily: "'Inter', sans-serif" }}>
+              You'll only be able to view static content. To access all features, please connect to the internet and log in.
+            </p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4" autoComplete="off" style={{ display: isOffline && !isOfflineAuthenticated() ? 'none' : 'block' }}>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: "'Inter', sans-serif" }}>Email</label>
             <input

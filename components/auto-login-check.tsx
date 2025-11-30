@@ -20,9 +20,9 @@ export function AutoLoginCheck() {
     }
     hasCheckedRef.current = true
 
-    // Small delay to ensure localStorage is accessible
-    const timeoutId = setTimeout(() => {
-      // Check if user has stored credentials using offline auth utility
+    // Check immediately (localStorage is always available)
+    const checkAuth = () => {
+      // First, try offline auth utility
       if (isOfflineAuthenticated()) {
         const user = getOfflineUser()
         if (user) {
@@ -30,44 +30,51 @@ export function AutoLoginCheck() {
           if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
             const dashboardUrl = getDashboardUrl(user)
             router.push(dashboardUrl)
-          }
-        }
-      } else {
-        // Fallback: check currentUser directly
-        const currentUser = localStorage.getItem('currentUser')
-        if (currentUser) {
-          try {
-            const user = JSON.parse(currentUser)
-            
-            // Validate user data
-            if (user.id && user.email) {
-              // Generate token if missing
-              const token = localStorage.getItem('pwa_auth_token')
-              if (!token && user.id) {
-                const newToken = btoa(`${user.id}:${Date.now()}`).replace(/[^a-zA-Z0-9]/g, '')
-                localStorage.setItem('pwa_auth_token', newToken)
-                
-                // Update user data
-                const updatedUser = {
-                  ...user,
-                  loginToken: newToken,
-                  loginTimestamp: user.loginTimestamp || Date.now()
-                }
-                localStorage.setItem('currentUser', JSON.stringify(updatedUser))
-              }
-
-              // If on home page, login page, or signup page, redirect to dashboard
-              if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
-                const dashboardUrl = getDashboardUrl(user)
-                router.push(dashboardUrl)
-              }
-            }
-          } catch (error) {
-            console.error('Error checking auto-login:', error)
+            return
           }
         }
       }
-    }, 100)
+
+      // Fallback: check currentUser directly
+      const currentUser = localStorage.getItem('currentUser')
+      if (currentUser) {
+        try {
+          const user = JSON.parse(currentUser)
+          
+          // Validate user data
+          if (user.id && user.email) {
+            // Generate token if missing
+            const token = localStorage.getItem('pwa_auth_token')
+            if (!token && user.id) {
+              const newToken = btoa(`${user.id}:${Date.now()}`).replace(/[^a-zA-Z0-9]/g, '')
+              localStorage.setItem('pwa_auth_token', newToken)
+              
+              // Update user data
+              const updatedUser = {
+                ...user,
+                loginToken: newToken,
+                loginTimestamp: user.loginTimestamp || Date.now()
+              }
+              localStorage.setItem('currentUser', JSON.stringify(updatedUser))
+            }
+
+            // If on home page, login page, or signup page, redirect to dashboard
+            if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
+              const dashboardUrl = getDashboardUrl(user)
+              router.push(dashboardUrl)
+            }
+          }
+        } catch (error) {
+          console.error('Error checking auto-login:', error)
+        }
+      }
+    }
+
+    // Check immediately
+    checkAuth()
+    
+    // Also check after a small delay (in case localStorage wasn't ready)
+    const timeoutId = setTimeout(checkAuth, 50)
 
     return () => clearTimeout(timeoutId)
   }, [pathname, router])
