@@ -17,8 +17,25 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  // Check if user is already authenticated offline on mount
+  // Check if user is already authenticated (both online and offline) on mount
   useEffect(() => {
+    // Check for stored credentials
+    const currentUser = localStorage.getItem('currentUser')
+    if (currentUser) {
+      try {
+        const user = JSON.parse(currentUser)
+        if (user.id && user.email) {
+          // User has stored credentials - auto-login
+          const dashboardUrl = getDashboardUrl(user)
+          router.push(dashboardUrl)
+          return
+        }
+      } catch (error) {
+        // Invalid stored data, continue to login form
+      }
+    }
+
+    // Also check offline auth specifically
     if (!isOnline() && isOfflineAuthenticated()) {
       const user = getOfflineUser()
       if (user) {
@@ -31,6 +48,23 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+
+    // Check if offline - if so, check for stored credentials first
+    if (!isOnline()) {
+      // Check if user is already authenticated offline
+      if (isOfflineAuthenticated()) {
+        const user = getOfflineUser()
+        if (user) {
+          const dashboardUrl = getDashboardUrl(user)
+          router.push(dashboardUrl)
+          return
+        }
+      }
+      
+      // Offline and not authenticated - show message
+      setError("You need to be online to log in. If you've logged in before, the app should auto-login you when offline.")
+      return
+    }
 
     // Validate inputs - both fields must not be empty
     if (!email.trim() || !password.trim()) {

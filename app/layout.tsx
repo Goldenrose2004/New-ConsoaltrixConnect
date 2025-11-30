@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
 import { ServiceWorkerRegister } from "@/components/service-worker-register"
 import { OfflineDetector } from "@/components/offline-detector"
+import { AutoLoginCheck } from "@/components/auto-login-check"
 import "./globals.css"
 
 const geist = Geist({ subsets: ["latin"] })
@@ -56,6 +57,7 @@ export default function RootLayout({
       <body className={`${geist.className} font-sans antialiased`}>
         <ServiceWorkerRegister />
         <OfflineDetector />
+        <AutoLoginCheck />
         {children}
         <Analytics />
       </body>
