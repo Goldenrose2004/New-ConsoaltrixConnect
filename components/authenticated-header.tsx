@@ -24,6 +24,7 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
   const [profilePicture, setProfilePicture] = useState<string | null>(null)
   const [notifications, setNotifications] = useState<any[]>([])
   const [userId, setUserId] = useState<string | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
   
   // Track user presence/activity
   usePresence()
@@ -42,6 +43,7 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
   }, [])
 
   useEffect(() => {
+    setIsMounted(true)
     try {
       const raw = localStorage.getItem("currentUser")
       if (raw) {
