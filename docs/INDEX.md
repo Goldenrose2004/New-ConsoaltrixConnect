@@ -18,6 +18,7 @@ All documentation files are organized in the `/docs` folder for clean file struc
 |----------|---------|----------|
 | **ANONYMOUS_OFFLINE_MODE.md** | Full feature documentation | Complete understanding of the feature |
 | **PERSISTENT_LOGIN.md** | Auto-login & session management | Understanding persistent login |
+| **OFFLINE_PAGE_ACCESS.md** | Offline page caching & access | Understanding offline page access |
 | **INTEGRATION_GUIDE.md** | How to integrate in components | Developers integrating the feature |
 | **ARCHITECTURE.md** | System design & diagrams | Understanding system architecture |
 | **DEPLOYMENT_CHECKLIST.md** | Deployment & testing guide | DevOps & QA teams |
@@ -56,6 +57,7 @@ docs/
 ├── IMPLEMENTATION_SUMMARY.md
 ├── ANONYMOUS_OFFLINE_MODE.md
 ├── PERSISTENT_LOGIN.md
+├── OFFLINE_PAGE_ACCESS.md
 ├── INTEGRATION_GUIDE.md
 ├── ARCHITECTURE.md
 └── DEPLOYMENT_CHECKLIST.md
@@ -141,6 +143,16 @@ if (!canAccessFeature('chats')) {
 - Troubleshooting
 - Testing checklist
 - Best practices
+
+### OFFLINE_PAGE_ACCESS.md
+- Offline page caching overview
+- How caching works
+- Service worker strategy
+- Offline detector logic
+- First-time setup
+- Testing scenarios
+- Troubleshooting
+- Cache management
 
 ### INTEGRATION_GUIDE.md
 - Quick start guide

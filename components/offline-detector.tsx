@@ -50,7 +50,7 @@ export function OfflineDetector() {
     }
     redirectHandledRef.current = pathname
 
-    // If user is authenticated offline, redirect to dashboard if on home/login/signup
+    // If user is authenticated offline, allow access to offline pages
     if (isOfflineAuthenticated()) {
       const user = getOfflineUser()
       if (user) {
@@ -66,7 +66,8 @@ export function OfflineDetector() {
           router.push(dashboardUrl)
           return
         }
-        // User is authenticated and on allowed route - allow access
+        // User is authenticated and on allowed route - allow access (don't block)
+        // This allows authenticated users to access all offline-allowed pages
         return
       }
     }
@@ -101,11 +102,17 @@ export function OfflineDetector() {
       
       // Check if they have currentUser in localStorage (from previous online session)
       const currentUser = localStorage.getItem('currentUser')
-      if (!currentUser) {
-        // No valid auth, redirect to offline fallback if not on allowed route
-        if (!OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
-          router.push('/offline-fallback')
+      if (currentUser) {
+        // They have stored user data - allow access to offline pages
+        // This enables auto-logged-in users to access offline content
+        if (OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+          return // Allow access to offline pages
         }
+      }
+      
+      // No valid auth and not on allowed route, redirect to offline fallback
+      if (!OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+        router.push('/offline-fallback')
       }
     }
   }, [pathname, router])
