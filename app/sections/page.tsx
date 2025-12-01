@@ -14,17 +14,26 @@ export default function SectionsPage() {
   const contentAreaRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const isOffline = !navigator.onLine
+    const currentUser = localStorage.getItem("currentUser")
+
     // Check if anonymous offline mode is enabled
     const anonymousMode = localStorage.getItem('anonymousOfflineMode')
-    const isOffline = !navigator.onLine
-    
-    // Allow anonymous access when offline and anonymous mode is enabled
     if (isOffline && anonymousMode === 'true') {
       setIsLoading(false)
       return
     }
 
-    const currentUser = localStorage.getItem("currentUser")
+    // If offline, allow access even without currentUser (page is cached)
+    if (isOffline) {
+      if (currentUser) {
+        setUser(JSON.parse(currentUser))
+      }
+      setIsLoading(false)
+      return
+    }
+
+    // If online, require authentication
     if (!currentUser) {
       router.push("/login")
       return

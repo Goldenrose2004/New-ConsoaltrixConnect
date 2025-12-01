@@ -20,6 +20,9 @@ All documentation files are organized in the `/docs` folder for clean file struc
 | **PERSISTENT_LOGIN.md** | Auto-login & session management | Understanding persistent login |
 | **OFFLINE_PAGE_ACCESS.md** | Offline page caching & access | Understanding offline page access |
 | **OFFLINE_PAGES_EXPANDED.md** | Expanded offline pages & loading animation | All offline pages & UX |
+| **OFFLINE_ACCESS_FIXED.md** | All pages now working offline | Latest fixes and verification |
+| **SECTIONS_OFFLINE_VERIFIED.md** | Sections pages offline verification | Sections page details |
+| **MISSING_PAGES_FIXED.md** | Missing pages creation | College Courses & Historical Background |
 | **INTEGRATION_GUIDE.md** | How to integrate in components | Developers integrating the feature |
 | **ARCHITECTURE.md** | System design & diagrams | Understanding system architecture |
 | **DEPLOYMENT_CHECKLIST.md** | Deployment & testing guide | DevOps & QA teams |

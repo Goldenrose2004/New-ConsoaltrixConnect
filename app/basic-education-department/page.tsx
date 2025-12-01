@@ -5,23 +5,32 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { AuthenticatedHeader } from "@/components/authenticated-header"
 import { Footer } from "@/components/footer"
-
 export default function BasicEducationDepartmentPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    const isOffline = !navigator.onLine
+
     // Check if anonymous offline mode is enabled
     const anonymousMode = localStorage.getItem('anonymousOfflineMode')
-    const isOffline = !navigator.onLine
-    
-    // Allow anonymous access when offline and anonymous mode is enabled
     if (isOffline && anonymousMode === 'true') {
       setIsLoading(false)
       return
     }
 
+    // If offline, allow access even without currentUser (page is cached)
+    if (isOffline) {
+      const currentUser = localStorage.getItem("currentUser")
+      if (currentUser) {
+        setUser(JSON.parse(currentUser))
+      }
+      setIsLoading(false)
+      return
+    }
+
+    // If online, require authentication
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
