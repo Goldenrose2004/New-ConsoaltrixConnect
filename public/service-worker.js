@@ -1,7 +1,7 @@
 // Service Worker for ConsolatrixConnect PWA
-// Version: 1.0.0
+// Version: 1.0.1 - Hydration Fix & Cache Invalidation
 
-const CACHE_NAME = 'consolatrix-connect-v3'
+const CACHE_NAME = 'consolatrix-connect-v4'
 const OFFLINE_PAGES = [
   '/',
   '/basic-education-dashboard',
