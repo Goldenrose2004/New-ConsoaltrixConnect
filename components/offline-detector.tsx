@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { isOfflineAuthenticated, getOfflineUser, getDashboardUrl, isOnline, isAnonymousMode } from '@/lib/offline-auth'
 
@@ -43,83 +43,17 @@ export function OfflineDetector() {
   const router = useRouter()
   const pathname = usePathname()
   const [isOffline, setIsOffline] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const redirectHandledRef = useRef<string | null>(null)
 
-  const handleOfflineRedirect = useCallback(() => {
-    // Prevent multiple redirects for the same pathname
-    if (redirectHandledRef.current === pathname) {
-      return
-    }
-    redirectHandledRef.current = pathname
-
-    // If user is authenticated offline, allow access to offline pages
-    if (isOfflineAuthenticated()) {
-      const user = getOfflineUser()
-      if (user) {
-        // If on home, login, or signup page, redirect to dashboard
-        if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
-          const dashboardUrl = getDashboardUrl(user)
-          router.push(dashboardUrl)
-          return
-        }
-        // If on an online-only route, redirect to dashboard
-        if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
-          const dashboardUrl = getDashboardUrl(user)
-          router.push(dashboardUrl)
-          return
-        }
-        // User is authenticated and on allowed route - allow access (don't block)
-        // This allows authenticated users to access all offline-allowed pages
-        return
-      }
-    }
-
-    // If on an online-only route while offline and NOT authenticated, redirect to fallback
-    if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
-      router.push('/offline-fallback')
-      return
-    }
-
-    // If user is not authenticated and trying to access offline pages
-    if (!isOfflineAuthenticated() && pathname !== '/offline-fallback') {
-      // Check if anonymous offline mode is enabled
-      const anonymousMode = isAnonymousMode()
-      
-      // If anonymous mode is enabled, allow access to offline-allowed routes and dashboards
-      if (anonymousMode) {
-        // Allow access to dashboards and static pages
-        if (OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
-          return // Allow access
-        }
-        // If trying to access online-only route, redirect to fallback
-        if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
-          router.push('/offline-fallback')
-          return
-        }
-        // Allow access to dashboards in anonymous mode
-        if (pathname === '/basic-education-dashboard' || pathname === '/college-dashboard' || pathname.startsWith('/basic-education-dashboard/') || pathname.startsWith('/college-dashboard/')) {
-          return // Allow access
-        }
-      }
-      
-      // Check if they have currentUser in localStorage (from previous online session)
-      const currentUser = localStorage.getItem('currentUser')
-      if (currentUser) {
-        // They have stored user data - allow access to offline pages
-        // This enables auto-logged-in users to access offline content
-        if (OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
-          return // Allow access to offline pages
-        }
-      }
-      
-      // No valid auth and not on allowed route, redirect to offline fallback
-      if (!OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
-        router.push('/offline-fallback')
-      }
-    }
-  }, [pathname, router])
+  // Only run after hydration
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
+    if (!mounted) return
+
     // Check initial online status
     const online = isOnline()
     setIsOffline(!online)
@@ -142,43 +76,100 @@ export function OfflineDetector() {
           }
         }
       }
-      
-      // Small delay to prevent flickering
-      const timeoutId = setTimeout(() => {
-        handleOfflineRedirect()
-      }, 300)
-      return () => clearTimeout(timeoutId)
     }
-  }, []) // Only run once on mount
+  }, [mounted, pathname, router])
 
   useEffect(() => {
-    // Reset redirect handler when pathname changes (to allow checking new routes)
+    if (!mounted) return
+
+    // Reset redirect handler when pathname changes
     redirectHandledRef.current = null
 
     // If offline, check if we need to redirect
     if (isOffline) {
       const timeoutId = setTimeout(() => {
-        handleOfflineRedirect()
+        // Prevent multiple redirects for the same pathname
+        if (redirectHandledRef.current === pathname) {
+          return
+        }
+        redirectHandledRef.current = pathname
+
+        // If user is authenticated offline, allow access to offline pages
+        if (isOfflineAuthenticated()) {
+          const user = getOfflineUser()
+          if (user) {
+            // If on home, login, or signup page, redirect to dashboard
+            if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
+              const dashboardUrl = getDashboardUrl(user)
+              router.push(dashboardUrl)
+              return
+            }
+            // If on an online-only route, redirect to dashboard
+            if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
+              const dashboardUrl = getDashboardUrl(user)
+              router.push(dashboardUrl)
+              return
+            }
+            // User is authenticated and on allowed route - allow access
+            return
+          }
+        }
+
+        // If on an online-only route while offline and NOT authenticated, redirect to fallback
+        if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
+          router.push('/offline-fallback')
+          return
+        }
+
+        // If user is not authenticated and trying to access offline pages
+        if (!isOfflineAuthenticated() && pathname !== '/offline-fallback') {
+          // Check if anonymous offline mode is enabled
+          const anonymousMode = isAnonymousMode()
+          
+          // If anonymous mode is enabled, allow access to offline-allowed routes and dashboards
+          if (anonymousMode) {
+            // Allow access to dashboards and static pages
+            if (OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+              return // Allow access
+            }
+            // If trying to access online-only route, redirect to fallback
+            if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
+              router.push('/offline-fallback')
+              return
+            }
+            // Allow access to dashboards in anonymous mode
+            if (pathname === '/basic-education-dashboard' || pathname === '/college-dashboard' || pathname.startsWith('/basic-education-dashboard/') || pathname.startsWith('/college-dashboard/')) {
+              return // Allow access
+            }
+          }
+          
+          // Check if they have currentUser in localStorage
+          const currentUser = localStorage.getItem('currentUser')
+          if (currentUser) {
+            // They have stored user data - allow access to offline pages
+            if (OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+              return // Allow access to offline pages
+            }
+          }
+          
+          // No valid auth and not on allowed route, redirect to offline fallback
+          if (!OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+            router.push('/offline-fallback')
+          }
+        }
       }, 100)
       return () => clearTimeout(timeoutId)
     }
-  }, [pathname, isOffline, handleOfflineRedirect])
+  }, [pathname, isOffline, mounted, router])
 
   useEffect(() => {
+    if (!mounted) return
+
     // Handle online/offline status changes
     const updateOnlineStatus = () => {
       const online = isOnline()
       setIsOffline(!online)
-      
-      // Reset redirect handler when status changes
       redirectHandledRef.current = null
-      
-      // If going offline, check for redirect
-      if (!online) {
-        setTimeout(() => {
-          handleOfflineRedirect()
-        }, 100)
-      }
     }
 
     // Listen for online/offline events
@@ -189,9 +180,13 @@ export function OfflineDetector() {
       window.removeEventListener('online', updateOnlineStatus)
       window.removeEventListener('offline', updateOnlineStatus)
     }
-  }, [handleOfflineRedirect])
+  }, [mounted])
 
   // Show offline indicator
+  if (!mounted) {
+    return null
+  }
+
   if (isOffline) {
     return (
       <div className="fixed top-0 left-0 right-0 bg-yellow-500 text-white text-center py-2 px-4 z-50">

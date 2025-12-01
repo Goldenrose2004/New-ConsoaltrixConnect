@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { isOfflineAuthenticated, getOfflineUser, getDashboardUrl, hasValidSession, getPersistentSession } from '@/lib/offline-auth'
 
@@ -12,8 +12,16 @@ export function AutoLoginCheck() {
   const router = useRouter()
   const pathname = usePathname()
   const hasCheckedRef = useRef(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Only run after hydration
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
+    if (!mounted) return
+    
     // Only check once on mount
     if (hasCheckedRef.current) {
       return
@@ -103,7 +111,7 @@ export function AutoLoginCheck() {
     const timeoutId = setTimeout(checkAuth, 50)
 
     return () => clearTimeout(timeoutId)
-  }, [pathname, router])
+  }, [pathname, router, mounted])
 
   return null
 }

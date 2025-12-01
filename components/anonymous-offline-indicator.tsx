@@ -12,7 +12,13 @@ export function AnonymousOfflineIndicator() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    // Set mounted flag first to prevent hydration mismatch
     setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+
     const online = isOnline()
     setIsOffline(!online)
     setIsAnonymous(isAnonymousMode())
@@ -28,7 +34,7 @@ export function AnonymousOfflineIndicator() {
       window.removeEventListener('online', handleOnlineStatusChange)
       window.removeEventListener('offline', handleOnlineStatusChange)
     }
-  }, [])
+  }, [mounted])
 
   if (!mounted || !isOffline || !isAnonymous) {
     return null
