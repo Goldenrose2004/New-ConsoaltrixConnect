@@ -10,8 +10,10 @@ export default function InstitutionalObjectivesPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     const isOffline = !navigator.onLine
     
     // Check if anonymous offline mode is enabled
@@ -43,7 +45,7 @@ export default function InstitutionalObjectivesPage() {
     setIsLoading(false)
   }, [router])
 
-  if (isLoading) {
+  if (!isMounted || isLoading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>
   }
 

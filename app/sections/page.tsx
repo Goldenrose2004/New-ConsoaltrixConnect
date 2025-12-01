@@ -9,11 +9,13 @@ export default function SectionsPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const [selectedSection, setSelectedSection] = useState<number | null>(1)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const contentAreaRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    setIsMounted(true)
     const isOffline = !navigator.onLine
     const currentUser = localStorage.getItem("currentUser")
 
@@ -51,7 +53,7 @@ export default function SectionsPage() {
     }
   }, [selectedSection])
 
-  if (isLoading) {
+  if (!isMounted || isLoading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>
   }
 
