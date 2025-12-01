@@ -21,7 +21,9 @@ export interface StoredUser {
 const TOKEN_KEY = 'pwa_auth_token'
 const USER_KEY = 'currentUser'
 const ANONYMOUS_MODE_KEY = 'anonymousOfflineMode'
+const SESSION_KEY = 'pwa_session_token'
 const TOKEN_EXPIRY_DAYS = 30 // Token valid for 30 days
+const SESSION_EXPIRY_DAYS = 365 // Session valid for 1 year (persistent login)
 
 // Features that require internet connection
 export const ONLINE_ONLY_FEATURES = [
@@ -124,11 +126,11 @@ export function isOfflineAuthenticated(): boolean {
       }
     }
 
-    // Check if token is expired
+    // Check if token is expired (using SESSION_EXPIRY_DAYS for persistent login)
     const user = JSON.parse(userData) as StoredUser
     if (user.loginTimestamp) {
       const daysSinceLogin = (Date.now() - user.loginTimestamp) / (1000 * 60 * 60 * 24)
-      if (daysSinceLogin > TOKEN_EXPIRY_DAYS) {
+      if (daysSinceLogin > SESSION_EXPIRY_DAYS) {
         clearOfflineAuth()
         return false
       }
@@ -266,5 +268,75 @@ export function isFeatureOnlineOnly(feature: string): boolean {
  */
 export function isFeatureOfflineAccessible(feature: string): boolean {
   return OFFLINE_ACCESSIBLE_FEATURES.some(f => feature.includes(f))
+}
+
+/**
+ * Create a persistent session for auto-login
+ */
+export function createPersistentSession(user: StoredUser, token?: string): void {
+  if (typeof window === 'undefined') return
+
+  try {
+    const sessionToken = token || generateSimpleToken(user.id)
+    const sessionData = {
+      userId: user.id,
+      email: user.email,
+      sessionToken,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + (SESSION_EXPIRY_DAYS * 24 * 60 * 60 * 1000)
+    }
+    localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData))
+  } catch (error) {
+    console.error('Error creating persistent session:', error)
+  }
+}
+
+/**
+ * Get persistent session data
+ */
+export function getPersistentSession(): { userId: string; email: string; sessionToken: string } | null {
+  if (typeof window === 'undefined') return null
+
+  try {
+    const sessionData = localStorage.getItem(SESSION_KEY)
+    if (!sessionData) return null
+
+    const session = JSON.parse(sessionData)
+    
+    // Check if session is expired
+    if (session.expiresAt && Date.now() > session.expiresAt) {
+      clearPersistentSession()
+      return null
+    }
+
+    return {
+      userId: session.userId,
+      email: session.email,
+      sessionToken: session.sessionToken
+    }
+  } catch (error) {
+    console.error('Error getting persistent session:', error)
+    return null
+  }
+}
+
+/**
+ * Clear persistent session
+ */
+export function clearPersistentSession(): void {
+  if (typeof window === 'undefined') return
+
+  try {
+    localStorage.removeItem(SESSION_KEY)
+  } catch (error) {
+    console.error('Error clearing persistent session:', error)
+  }
+}
+
+/**
+ * Check if user has a valid persistent session
+ */
+export function hasValidSession(): boolean {
+  return getPersistentSession() !== null
 }
 

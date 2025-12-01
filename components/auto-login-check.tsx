@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { isOfflineAuthenticated, getOfflineUser, getDashboardUrl } from '@/lib/offline-auth'
+import { isOfflineAuthenticated, getOfflineUser, getDashboardUrl, hasValidSession, getPersistentSession } from '@/lib/offline-auth'
 
 /**
  * Global component that checks for stored authentication on app startup
@@ -29,7 +29,26 @@ export function AutoLoginCheck() {
         return
       }
 
-      // First, try offline auth utility
+      // First, check for valid persistent session
+      if (hasValidSession()) {
+        const session = getPersistentSession()
+        if (session) {
+          // Check if user data exists
+          if (isOfflineAuthenticated()) {
+            const user = getOfflineUser()
+            if (user) {
+              // If on home page, login page, or signup page, redirect to dashboard
+              if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
+                const dashboardUrl = getDashboardUrl(user)
+                router.push(dashboardUrl)
+                return
+              }
+            }
+          }
+        }
+      }
+
+      // Fallback: try offline auth utility
       if (isOfflineAuthenticated()) {
         const user = getOfflineUser()
         if (user) {
@@ -42,7 +61,7 @@ export function AutoLoginCheck() {
         }
       }
 
-      // Fallback: check currentUser directly
+      // Final fallback: check currentUser directly
       const currentUser = localStorage.getItem('currentUser')
       if (currentUser) {
         try {

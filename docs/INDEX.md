@@ -17,6 +17,7 @@ All documentation files are organized in the `/docs` folder for clean file struc
 | Document | Purpose | Best For |
 |----------|---------|----------|
 | **ANONYMOUS_OFFLINE_MODE.md** | Full feature documentation | Complete understanding of the feature |
+| **PERSISTENT_LOGIN.md** | Auto-login & session management | Understanding persistent login |
 | **INTEGRATION_GUIDE.md** | How to integrate in components | Developers integrating the feature |
 | **ARCHITECTURE.md** | System design & diagrams | Understanding system architecture |
 | **DEPLOYMENT_CHECKLIST.md** | Deployment & testing guide | DevOps & QA teams |
@@ -54,6 +55,7 @@ docs/
 ├── QUICK_REFERENCE.md
 ├── IMPLEMENTATION_SUMMARY.md
 ├── ANONYMOUS_OFFLINE_MODE.md
+├── PERSISTENT_LOGIN.md
 ├── INTEGRATION_GUIDE.md
 ├── ARCHITECTURE.md
 └── DEPLOYMENT_CHECKLIST.md
@@ -129,6 +131,16 @@ if (!canAccessFeature('chats')) {
 - Testing scenarios
 - Security considerations
 - Future enhancements
+
+### PERSISTENT_LOGIN.md
+- Auto-login feature overview
+- Session storage structure
+- Login flow diagram
+- App startup flow
+- Session validation
+- Troubleshooting
+- Testing checklist
+- Best practices
 
 ### INTEGRATION_GUIDE.md
 - Quick start guide
