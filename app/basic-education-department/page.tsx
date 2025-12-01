@@ -46,7 +46,7 @@ export default function BasicEducationDepartmentPage() {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>
   }
 
-  const userInitials = (user?.firstName?.[0] || "U") + (user?.lastName?.[0] || "")
+  const userInitials = user ? ((user.firstName?.[0] || "U") + (user.lastName?.[0] || "")) : "U"
   
   // Determine home href based on department
   const isBasicEducation = 
