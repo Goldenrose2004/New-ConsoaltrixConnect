@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { X } from "lucide-react"
-import { isOfflineAuthenticated, getOfflineUser, getDashboardUrl, isOnline, enableAnonymousMode, createPersistentSession } from "@/lib/offline-auth"
+import { isOfflineAuthenticated, getOfflineUser, getDashboardUrl, isOnline, enableAnonymousMode, createPersistentSession, saveOfflineAuth } from "@/lib/offline-auth"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -198,7 +198,6 @@ export default function LoginPage() {
       }
       
       // Save offline auth using the utility function (ensures proper storage)
-      const { saveOfflineAuth } = require("@/lib/offline-auth")
       saveOfflineAuth(userWithToken, data.token || localStorage.getItem("pwa_auth_token") || undefined)
       
       // Create persistent session for auto-login on app restart
