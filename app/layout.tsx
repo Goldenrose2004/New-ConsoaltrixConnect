@@ -6,6 +6,7 @@ import Script from "next/script"
 import { ServiceWorkerRegister } from "@/components/service-worker-register"
 import { OfflineDetector } from "@/components/offline-detector"
 import { AutoLoginCheck } from "@/components/auto-login-check"
+import { AnonymousOfflineIndicator } from "@/components/anonymous-offline-indicator"
 import "./globals.css"
 
 const geist = Geist({ subsets: ["latin"] })
@@ -58,6 +59,7 @@ export default function RootLayout({
         <ServiceWorkerRegister />
         <OfflineDetector />
         <AutoLoginCheck />
+        <AnonymousOfflineIndicator />
         {children}
         <Analytics />
       </body>

@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { X } from "lucide-react"
-import { isOfflineAuthenticated, getOfflineUser, getDashboardUrl, isOnline } from "@/lib/offline-auth"
+import { isOfflineAuthenticated, getOfflineUser, getDashboardUrl, isOnline, enableAnonymousMode } from "@/lib/offline-auth"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -84,10 +84,10 @@ export default function LoginPage() {
   }, [router, isOffline])
 
   const handleContinueAnonymously = () => {
-    // Set a flag to allow anonymous offline browsing
-    localStorage.setItem('anonymousOfflineMode', 'true')
-    // Redirect to home page where they can browse static content
-    router.push('/')
+    // Enable anonymous offline mode
+    enableAnonymousMode()
+    // Redirect to dashboard instead of home page
+    router.push('/basic-education-dashboard')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

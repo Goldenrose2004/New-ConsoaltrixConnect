@@ -20,7 +20,42 @@ export interface StoredUser {
 
 const TOKEN_KEY = 'pwa_auth_token'
 const USER_KEY = 'currentUser'
+const ANONYMOUS_MODE_KEY = 'anonymousOfflineMode'
 const TOKEN_EXPIRY_DAYS = 30 // Token valid for 30 days
+
+// Features that require internet connection
+export const ONLINE_ONLY_FEATURES = [
+  'violations',
+  'chats',
+  'admin',
+  'announcements',
+  'profile-edit',
+  'login',
+  'signup'
+]
+
+// Features accessible offline
+export const OFFLINE_ACCESSIBLE_FEATURES = [
+  'basic-education-dashboard',
+  'college-dashboard',
+  'about-us',
+  'history',
+  'core-values',
+  'vision-mission',
+  'consolarician-values',
+  'institutional-objectives',
+  'school-seal',
+  'basic-education-department',
+  'college-department',
+  'sections',
+  'records',
+  'profile',
+  'foreword',
+  'ar-foundresses',
+  'handbook-revision-process',
+  'letter-to-students',
+  'courses'
+]
 
 /**
  * Save authentication token and user data for offline use
@@ -180,5 +215,56 @@ export function getDashboardUrl(user: StoredUser | null): string {
   } else {
     return '/basic-education-dashboard'
   }
+}
+
+/**
+ * Enable anonymous offline mode
+ */
+export function enableAnonymousMode(): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(ANONYMOUS_MODE_KEY, 'true')
+  } catch (error) {
+    console.error('Error enabling anonymous mode:', error)
+  }
+}
+
+/**
+ * Check if anonymous offline mode is enabled
+ */
+export function isAnonymousMode(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return localStorage.getItem(ANONYMOUS_MODE_KEY) === 'true'
+  } catch (error) {
+    console.error('Error checking anonymous mode:', error)
+    return false
+  }
+}
+
+/**
+ * Disable anonymous offline mode
+ */
+export function disableAnonymousMode(): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.removeItem(ANONYMOUS_MODE_KEY)
+  } catch (error) {
+    console.error('Error disabling anonymous mode:', error)
+  }
+}
+
+/**
+ * Check if a feature requires internet connection
+ */
+export function isFeatureOnlineOnly(feature: string): boolean {
+  return ONLINE_ONLY_FEATURES.some(f => feature.includes(f))
+}
+
+/**
+ * Check if a feature is accessible offline
+ */
+export function isFeatureOfflineAccessible(feature: string): boolean {
+  return OFFLINE_ACCESSIBLE_FEATURES.some(f => feature.includes(f))
 }
 

@@ -1,7 +1,7 @@
 // Service Worker for ConsolatrixConnect PWA
 // Version: 1.0.0
 
-const CACHE_NAME = 'consolatrix-connect-v1'
+const CACHE_NAME = 'consolatrix-connect-v2'
 const OFFLINE_PAGES = [
   '/',
   '/basic-education-dashboard',
@@ -24,6 +24,30 @@ const OFFLINE_PAGES = [
   '/letter-to-students',
   '/courses',
   '/offline-fallback'
+]
+
+// Pages that should be accessible in anonymous offline mode
+const ANONYMOUS_OFFLINE_PAGES = [
+  '/',
+  '/basic-education-dashboard',
+  '/college-dashboard',
+  '/about-us',
+  '/history',
+  '/core-values',
+  '/vision-mission',
+  '/consolarician-values',
+  '/institutional-objectives',
+  '/school-seal',
+  '/basic-education-department',
+  '/college-department',
+  '/sections',
+  '/records',
+  '/profile',
+  '/foreword',
+  '/ar-foundresses',
+  '/handbook-revision-process',
+  '/letter-to-students',
+  '/courses'
 ]
 
 // Pages that should NOT be cached (require online connection)
