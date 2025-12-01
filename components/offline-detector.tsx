@@ -26,6 +26,8 @@ const OFFLINE_ALLOWED_ROUTES = [
   '/school-seal',
   '/basic-education-department',
   '/college-department',
+  '/college-courses-offered',
+  '/historical-background',
   '/sections',
   '/records',
   '/profile',

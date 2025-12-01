@@ -1,7 +1,7 @@
 // Service Worker for ConsolatrixConnect PWA
 // Version: 1.0.0
 
-const CACHE_NAME = 'consolatrix-connect-v2'
+const CACHE_NAME = 'consolatrix-connect-v3'
 const OFFLINE_PAGES = [
   '/',
   '/basic-education-dashboard',
@@ -15,6 +15,8 @@ const OFFLINE_PAGES = [
   '/school-seal',
   '/basic-education-department',
   '/college-department',
+  '/college-courses-offered',
+  '/historical-background',
   '/sections',
   '/records',
   '/profile',
@@ -40,6 +42,8 @@ const ANONYMOUS_OFFLINE_PAGES = [
   '/school-seal',
   '/basic-education-department',
   '/college-department',
+  '/college-courses-offered',
+  '/historical-background',
   '/sections',
   '/records',
   '/profile',
@@ -138,16 +142,156 @@ self.addEventListener('fetch', (event) => {
     // For online-only pages, always try network first
     event.respondWith(
       fetch(request).catch(() => {
-        // Redirect to offline fallback if offline
-        return caches.match('/offline-fallback').then((response) => {
-          return response || new Response(
-            '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offline</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f3f4f6;padding:1rem}div{background:white;border-radius:0.5rem;padding:2rem;text-align:center;max-width:24rem;width:100%}h1{font-size:1.5rem;font-weight:bold;margin-bottom:1rem;color:#111827}button{background:#041A44;color:white;border:none;padding:0.75rem 1.5rem;border-radius:0.5rem;font-weight:600;cursor:pointer;width:100%;margin-top:1rem}button:hover{background:#1e3a8a}</style></head><body><div><h1>This page requires an internet connection</h1><button onclick="window.location.href=\'/\'">Continue Anonymously</button></div></body></html>',
+        // Show loading animation if offline
+        if (request.mode === 'navigate') {
+          return new Response(
+            `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Loading...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 1rem;
+    }
+    .container {
+      background: white;
+      border-radius: 1rem;
+      padding: 3rem 2rem;
+      text-align: center;
+      max-width: 24rem;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    .spinner {
+      width: 4rem;
+      height: 4rem;
+      margin: 0 auto 2rem;
+      position: relative;
+    }
+    .spinner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 4px solid #e5e7eb;
+      border-radius: 50%;
+    }
+    .spinner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 4px solid transparent;
+      border-top-color: #667eea;
+      border-right-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .countdown {
+      font-size: 0.875rem;
+      color: #9ca3af;
+      margin-bottom: 1.5rem;
+    }
+    .countdown strong {
+      color: #667eea;
+      font-weight: 600;
+    }
+    .buttons {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+    .info {
+      font-size: 0.75rem;
+      color: #d1d5db;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="spinner"></div>
+    <h1>Loading Page</h1>
+    <p>This page requires an internet connection. Please check your connection and try again.</p>
+    <div class="countdown">
+      Redirecting to home in <strong id="countdown">10</strong> seconds...
+    </div>
+    <div class="buttons">
+      <button class="btn-primary" onclick="window.location.href='/'">Go Home Now</button>
+      <button class="btn-secondary" onclick="window.history.back()">Go Back</button>
+    </div>
+    <p class="info">⚠️ You are currently offline. Some features may not be available.</p>
+  </div>
+  <script>
+    let timeLeft = 10;
+    const countdownEl = document.getElementById('countdown');
+    const interval = setInterval(() => {
+      timeLeft--;
+      countdownEl.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        window.location.href = '/';
+      }
+    }, 1000);
+  </script>
+</body>
+</html>`,
             {
               status: 200,
-              headers: { 'Content-Type': 'text/html' }
+              headers: { 'Content-Type': 'text/html; charset=utf-8' }
             }
           )
-        })
+        }
+        // For non-navigation requests, return error
+        return new Response('Offline', { status: 503 })
       })
     )
     return

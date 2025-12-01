@@ -49,6 +49,8 @@ export const OFFLINE_ACCESSIBLE_FEATURES = [
   'school-seal',
   'basic-education-department',
   'college-department',
+  'college-courses-offered',
+  'historical-background',
   'sections',
   'records',
   'profile',
