@@ -1,7 +1,7 @@
 // Service Worker for ConsolatrixConnect PWA
-// Version: 1.0.1 - Hydration Fix & Cache Invalidation
+// Version: 1.0.2 - Update Detection & Notification
 
-const CACHE_NAME = 'consolatrix-connect-v4'
+const CACHE_NAME = 'consolatrix-connect-v5'
 const OFFLINE_PAGES = [
   '/',
   '/basic-education-dashboard',
@@ -90,7 +90,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting() // Activate immediately
 })
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and notify clients
 self.addEventListener('activate', (event) => {
   console.log('[Service Worker] Activating...')
   event.waitUntil(
@@ -105,6 +105,17 @@ self.addEventListener('activate', (event) => {
       )
     })
   )
+  
+  // Notify all clients that update is ready
+  self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => {
+      client.postMessage({
+        type: 'UPDATE_AVAILABLE',
+        message: 'New version of ConsolatrixConnect is available!'
+      })
+    })
+  })
+  
   return self.clients.claim() // Take control of all pages immediately
 })
 

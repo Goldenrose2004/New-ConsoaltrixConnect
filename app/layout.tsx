@@ -7,6 +7,7 @@ import { ServiceWorkerRegister } from "@/components/service-worker-register"
 import { OfflineDetector } from "@/components/offline-detector"
 import { AutoLoginCheck } from "@/components/auto-login-check"
 import { AnonymousOfflineIndicator } from "@/components/anonymous-offline-indicator"
+import { PWAUpdateBanner } from "@/components/pwa-update-banner"
 import "./globals.css"
 
 const geist = Geist({ subsets: ["latin"] })
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     apple: "/images/logo-icon.png",
   },
   manifest: "/manifest.json",
-  themeColor: "#041A44",
+  themeColor: "#000000",
   viewport: {
     width: "device-width",
     initialScale: 1,
@@ -57,6 +58,7 @@ export default function RootLayout({
       </head>
       <body className={`${geist.className} font-sans antialiased`}>
         <ServiceWorkerRegister />
+        <PWAUpdateBanner />
         <OfflineDetector />
         <AutoLoginCheck />
         <AnonymousOfflineIndicator />

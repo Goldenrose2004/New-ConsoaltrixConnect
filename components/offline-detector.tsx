@@ -44,6 +44,7 @@ export function OfflineDetector() {
   const pathname = usePathname()
   const [isOffline, setIsOffline] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [bannerDismissed, setBannerDismissed] = useState(false)
   const redirectHandledRef = useRef<string | null>(null)
 
   // Only run after hydration
@@ -187,12 +188,22 @@ export function OfflineDetector() {
     return null
   }
 
-  if (isOffline) {
+  if (isOffline && !bannerDismissed) {
     return (
-      <div className="fixed top-0 left-0 right-0 bg-yellow-500 text-white text-center py-2 px-4 z-50">
-        <p className="text-sm font-medium">
+      <div className="fixed top-0 left-0 right-0 bg-yellow-500 text-white py-2 px-4 z-50 flex items-center justify-between gap-2">
+        <p className="text-sm font-medium flex-1 text-center">
           ⚠️ You are currently offline. Some features may not be available.
         </p>
+        <button
+          onClick={() => setBannerDismissed(true)}
+          className="flex-shrink-0 text-white hover:text-yellow-100 transition-colors p-1"
+          aria-label="Dismiss offline banner"
+          title="Dismiss"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
     )
   }
