@@ -190,18 +190,23 @@ export function OfflineDetector() {
 
   if (isOffline && !bannerDismissed) {
     return (
-      <div className="fixed top-0 left-0 right-0 bg-yellow-500 text-white py-2 px-4 z-50 flex items-center justify-between gap-2">
-        <p className="text-sm font-medium flex-1 text-center">
-          ⚠️ You are currently offline. Some features may not be available.
-        </p>
+      <div className="fixed top-0 left-0 right-0 bg-gray-900 text-white py-1.5 px-4 z-50 flex items-center justify-between gap-2 shadow-sm">
+        <div className="flex items-center gap-2 flex-1">
+          <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M13.477 14.89A6 6 0 015.11 2.526a6 6 0 008.367 8.368l-1.5-1.5a4 4 0 00-5.657-5.657l1.5 1.5a2 2 0 11-2.828 2.829l-1.5-1.5a4 4 0 005.657 5.657l1.5 1.5zm2.122-15.026a2 2 0 11-2.828 2.828l-1.5-1.5a4 4 0 005.657 5.657l1.5 1.5a6 6 0 01-8.367-8.368l1.5 1.5a2 2 0 102.828-2.829l1.5 1.5z" clipRule="evenodd" />
+          </svg>
+          <p className="text-xs font-medium">
+            No internet connection
+          </p>
+        </div>
         <button
           onClick={() => setBannerDismissed(true)}
-          className="flex-shrink-0 text-white hover:text-yellow-100 transition-colors p-1"
-          aria-label="Dismiss offline banner"
+          className="flex-shrink-0 text-white hover:text-gray-300 transition-colors p-0.5"
+          aria-label="Dismiss offline indicator"
           title="Dismiss"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
