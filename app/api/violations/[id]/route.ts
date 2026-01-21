@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { invalidateAnalyticsCache } from "@/lib/analytics-cache"
+import { getAdminId } from "@/lib/admin-helper"
 
 // PATCH - Update violation status
 export async function PATCH(
@@ -39,8 +40,12 @@ export async function PATCH(
 
     const db = await connectToDatabase().then((r) => r.db)
 
+    const adminId = await getAdminId(db)
+
     const updateData: any = {
       status: status,
+      statusUpdatedAt: new Date(),
+      statusUpdatedBy: adminId,
     }
 
     if (status === "resolved") {
@@ -114,6 +119,21 @@ export async function PATCH(
             minute: "2-digit",
             hour12: true,
           }),
+      statusUpdatedAt: updatedViolation.statusUpdatedAt ? new Date(updatedViolation.statusUpdatedAt).toISOString() : null,
+      statusUpdatedDate: updatedViolation.statusUpdatedAt
+        ? new Date(updatedViolation.statusUpdatedAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })
+        : null,
+      statusUpdatedTime: updatedViolation.statusUpdatedAt
+        ? new Date(updatedViolation.statusUpdatedAt).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          })
+        : null,
     }
 
     invalidateAnalyticsCache()

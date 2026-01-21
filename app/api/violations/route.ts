@@ -20,12 +20,17 @@ export async function GET(request: NextRequest) {
     const userId = url.searchParams.get("userId")
     const department = url.searchParams.get("department")
     const status = url.searchParams.get("status")
+    const violationType = url.searchParams.get("violationType")
     const limit = parseInt(url.searchParams.get("limit") || "100")
     
     const query: any = {}
     
     if (userId) {
       query.userId = userId
+    }
+    
+    if (violationType && violationType !== "all") {
+      query.violationType = violationType
     }
     
     if (department) {
@@ -190,6 +195,21 @@ export async function GET(request: NextRequest) {
             minute: "2-digit",
             hour12: true,
           }),
+      statusUpdatedAt: violation.statusUpdatedAt ? new Date(violation.statusUpdatedAt).toISOString() : null,
+      statusUpdatedDate: violation.statusUpdatedAt
+        ? new Date(violation.statusUpdatedAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })
+        : null,
+      statusUpdatedTime: violation.statusUpdatedAt
+        ? new Date(violation.statusUpdatedAt).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          })
+        : null,
       profilePicture: (() => {
         const key = typeof violation.userId === "string" ? violation.userId : violation.userId?.toString()
         const profile = key ? userProfilesMap.get(key) : null
@@ -302,6 +322,21 @@ export async function POST(request: NextRequest) {
             minute: "2-digit",
             hour12: true,
           }),
+      statusUpdatedAt: createdViolation.statusUpdatedAt ? new Date(createdViolation.statusUpdatedAt).toISOString() : null,
+      statusUpdatedDate: createdViolation.statusUpdatedAt
+        ? new Date(createdViolation.statusUpdatedAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })
+        : null,
+      statusUpdatedTime: createdViolation.statusUpdatedAt
+        ? new Date(createdViolation.statusUpdatedAt).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          })
+        : null,
     }
 
     return NextResponse.json(

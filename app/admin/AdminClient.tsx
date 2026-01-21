@@ -1719,6 +1719,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
     }
   }, [])
   const [violationStatusFilter, setViolationStatusFilter] = useState("all")
+  const [violationTypeFilter, setViolationTypeFilter] = useState("all")
   const [selectedViolation, setSelectedViolation] = useState<any>(null)
   const [showViolationDetails, setShowViolationDetails] = useState(false)
   // Long-press state for Academic Records
@@ -1833,12 +1834,14 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
     try {
       setIsLoadingViolations(true)
       const statusParam = violationStatusFilter === "all" ? "" : `&status=${violationStatusFilter}`
-      const url = `/api/violations?department=${encodeURIComponent(department)}${statusParam}`
+      const typeParam = violationTypeFilter === "all" ? "" : `&violationType=${encodeURIComponent(violationTypeFilter)}`
+      const url = `/api/violations?department=${encodeURIComponent(department)}${statusParam}${typeParam}`
       console.log(`[DepartmentRecordsSection] ===== FETCHING VIOLATIONS =====`)
       console.log(`[DepartmentRecordsSection] URL: ${url}`)
       console.log(`[DepartmentRecordsSection] Department code: ${department}`)
       console.log(`[DepartmentRecordsSection] Department name (mapped): ${getDepartmentName(department)}`)
       console.log(`[DepartmentRecordsSection] Status filter: ${violationStatusFilter}`)
+      console.log(`[DepartmentRecordsSection] Violation Type filter: ${violationTypeFilter}`)
       
       const response = await fetch(url)
       const data = await response.json()
@@ -1873,7 +1876,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
       setIsLoadingViolations(false)
       setHasLoadedViolations(true)
     }
-  }, [department, violationStatusFilter])
+  }, [department, violationStatusFilter, violationTypeFilter])
 
   const fetchUserViolations = useCallback(async (userId: string) => {
     try {
@@ -1918,13 +1921,15 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
         })
         const data = await response.json()
         if (data.ok) {
+          const updatedViolation = data.violation
+          // Update local state with server response (includes statusUpdatedAt/Date/Time)
           setViolations((prev) =>
-            prev.map((violation) => (violation.id === violationId ? { ...violation, status } : violation)),
+            prev.map((violation) => (violation.id === violationId ? updatedViolation : violation)),
           )
           setUserViolations((prev) =>
-            prev.map((violation) => (violation.id === violationId ? { ...violation, status } : violation)),
+            prev.map((violation) => (violation.id === violationId ? updatedViolation : violation)),
           )
-          setSelectedViolation((prev: any) => (prev?.id === violationId ? { ...prev, status } : prev))
+          setSelectedViolation((prev: any) => (prev?.id === violationId ? updatedViolation : prev))
 
           // Refresh main violations list
           fetchViolations()
@@ -1932,7 +1937,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
           if (showViewViolations && selectedUser) {
             fetchUserViolations(selectedUser.id)
           }
-          const updatedViolation = data.violation
+
           const targetUserId = violation.userId || updatedViolation?.userId || null
           const targetStudentName = violation.studentName || updatedViolation?.studentName || null
 
@@ -2537,18 +2542,35 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
               <p className="text-xs md:text-sm text-white/80">View and manage student violations</p>
             </div>
           </div>
-          <div className="relative w-full sm:w-auto sm:ml-auto">
-            <select
-              value={violationStatusFilter}
-              onChange={(e) => setViolationStatusFilter(e.target.value)}
-              className="appearance-none bg-white/20 border border-white/30 rounded-lg px-4 py-2 pr-8 text-white text-xs md:text-sm w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-white/50"
-            >
-              <option value="all" className="text-gray-900">All Status</option>
-              <option value="pending" className="text-gray-900">Pending</option>
-              <option value="warning" className="text-gray-900">Warning</option>
-              <option value="resolved" className="text-gray-900">Resolved</option>
-            </select>
-            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white pointer-events-none" />
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto sm:ml-auto">
+            <div className="relative flex-1 sm:flex-none">
+              <select
+                value={violationTypeFilter}
+                onChange={(e) => setViolationTypeFilter(e.target.value)}
+                className="appearance-none bg-white/20 border border-white/30 rounded-lg px-4 py-2 pr-8 text-white text-xs md:text-sm w-full focus:outline-none focus:ring-2 focus:ring-white/50"
+              >
+                <option value="all" className="text-gray-900">All Violations</option>
+                <option value="Attendance" className="text-gray-900">Attendance</option>
+                <option value="Behavior" className="text-gray-900">Behavior</option>
+                <option value="Uniform" className="text-gray-900">Uniform</option>
+                <option value="Academic" className="text-gray-900">Academic</option>
+                <option value="Others" className="text-gray-900">Others</option>
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white pointer-events-none" />
+            </div>
+            <div className="relative flex-1 sm:flex-none">
+              <select
+                value={violationStatusFilter}
+                onChange={(e) => setViolationStatusFilter(e.target.value)}
+                className="appearance-none bg-white/20 border border-white/30 rounded-lg px-4 py-2 pr-8 text-white text-xs md:text-sm w-full focus:outline-none focus:ring-2 focus:ring-white/50"
+              >
+                <option value="all" className="text-gray-900">All Status</option>
+                <option value="pending" className="text-gray-900">Pending</option>
+                <option value="warning" className="text-gray-900">Warning</option>
+                <option value="resolved" className="text-gray-900">Resolved</option>
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white pointer-events-none" />
+            </div>
           </div>
         </div>
 
@@ -2753,13 +2775,20 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                         </td>
                         <td className="px-3 md:px-6 py-2 md:py-5 text-xs md:text-sm text-gray-600 hidden md:table-cell">{violation.violationType || violation.violation}</td>
                         <td className="px-3 md:px-6 py-2 md:py-5">
-                          <span
-                            className={`inline-flex items-center px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-medium ${getStatusBadgeClasses(
-                              violation.status,
-                            )}`}
-                          >
-                            {formatStatusLabel(violation.status).toUpperCase()}
-                          </span>
+                          <div>
+                            <span
+                              className={`inline-flex items-center px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-medium ${getStatusBadgeClasses(
+                                violation.status,
+                              )}`}
+                            >
+                              {formatStatusLabel(violation.status).toUpperCase()}
+                            </span>
+                            {violation.statusUpdatedDate && violation.statusUpdatedTime && (
+                              <div className="text-[9px] md:text-[10px] text-gray-500 mt-1.5">
+                                Updated: {violation.statusUpdatedDate}, {violation.statusUpdatedTime}
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td className="px-3 md:px-6 py-2 md:py-5 hidden md:table-cell">
                           <div className="text-xs md:text-sm text-gray-600">
@@ -2866,7 +2895,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
 
       {/* Violation Details Modal - Mobile Only */}
       {showViolationDetails && selectedViolation && (
-        <div className="md:hidden fixed inset-0 bg-blue-900/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-blue-900/30 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full mx-4" style={{ maxHeight: "90vh", overflowY: "auto" }}>
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-4 rounded-t-2xl flex items-center justify-between">
@@ -2904,14 +2933,25 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                 </div>
               </div>
 
-              {/* Violation */}
+              {/* Violation Type */}
               <div>
                 <label className="flex items-center gap-2 text-xs font-medium text-gray-700 mb-2">
                   <AlertCircle className="h-4 w-4 text-gray-500" />
-                  Violation
+                  Type
                 </label>
-                <div className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs text-gray-700 text-justify md:text-left">
-                  {selectedViolation.violationType || selectedViolation.violation || "—"}
+                <div className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700">
+                  {selectedViolation.violationType || "—"}
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="flex items-center gap-2 text-xs font-medium text-gray-700 mb-2">
+                  <ClipboardList className="h-4 w-4 text-gray-500" />
+                  Description
+                </label>
+                <div className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 text-justify md:text-left whitespace-pre-wrap break-words">
+                  {selectedViolation.violation || "—"}
                 </div>
               </div>
 
@@ -2922,13 +2962,20 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                   Status
                 </label>
                 <div className="w-full">
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(
-                      selectedViolation.status,
-                    )}`}
-                  >
-                    {formatStatusLabel(selectedViolation.status).toUpperCase()}
-                  </span>
+                  <div>
+                    <span
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(
+                        selectedViolation.status,
+                      )}`}
+                    >
+                      {formatStatusLabel(selectedViolation.status).toUpperCase()}
+                    </span>
+                    {selectedViolation.statusUpdatedDate && selectedViolation.statusUpdatedTime && (
+                      <div className="text-[9px] text-gray-500 mt-2">
+                        Updated: {selectedViolation.statusUpdatedDate}, {selectedViolation.statusUpdatedTime}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -2967,75 +3014,11 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                     <ClipboardList className="h-4 w-4 text-gray-500" />
                     Notes
                   </label>
-                  <div className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs text-gray-700 text-justify md:text-left">
+                  <div className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 text-justify md:text-left whitespace-pre-wrap break-words">
                     {selectedViolation.notes}
                   </div>
                 </div>
               )}
-
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-3 pt-4 border-t border-gray-200">
-                <div className="relative violation-status-dropdown">
-                  <button
-                    type="button"
-                    onClick={() => setIsMobileStatusMenuOpen((prev) => !prev)}
-                    className={`w-full inline-flex items-center justify-between rounded-full px-4 py-2 text-xs font-semibold border ${getStatusClasses(
-                      selectedViolation.status,
-                    )}`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Check className="h-3.5 w-3.5" />
-                      Status
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] uppercase tracking-wide">{formatStatusLabel(selectedViolation.status)}</span>
-                      <ChevronDown className="h-3 w-3" />
-                    </div>
-                  </button>
-                  {isMobileStatusMenuOpen && (
-                    <div className="absolute z-30 mt-2 w-full rounded-2xl border border-gray-100 bg-white shadow-xl">
-                      {statusOptions.map((statusOption) => {
-                        const optionLabel = formatStatusLabel(statusOption)
-                        return (
-                          <button
-                            key={statusOption}
-                            type="button"
-                            onClick={() => {
-                              const normalizedStatus = normalizeStatus(selectedViolation.status)
-                              if (normalizedStatus === statusOption) {
-                                setIsMobileStatusMenuOpen(false)
-                                return
-                              }
-                              setIsMobileStatusMenuOpen(false)
-                              handleStatusUpdate(selectedViolation, statusOption)
-                            }}
-                            className={`flex w-full items-center justify-between px-4 py-2 text-xs font-medium transition ${
-                              normalizeStatus(selectedViolation.status) === statusOption
-                                ? "bg-green-50 text-green-600 font-semibold rounded-xl"
-                                : "text-gray-600 hover:bg-gray-50"
-                            }`}
-                          >
-                            <span>{optionLabel}</span>
-                            {normalizeStatus(selectedViolation.status) === statusOption && <Check className="h-3 w-3 text-green-500" />}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDeleteViolationTarget({ id: selectedViolation.id, studentName: selectedViolation.studentName })
-                    setShowViolationDeleteModal(true)
-                    setIsMobileStatusMenuOpen(false)
-                  }}
-                  className="w-full rounded-lg border border-red-200 bg-white px-4 py-2.5 text-red-600 text-xs font-medium transition hover:bg-red-50 flex items-center justify-center gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -3321,13 +3304,20 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                             Status
                           </label>
                           <div className="w-full">
-                            <span
-                              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(
-                                violation.status,
-                              )}`}
-                            >
-                              {formatStatusLabel(violation.status).toUpperCase()}
-                            </span>
+                            <div>
+                              <span
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(
+                                  violation.status,
+                                )}`}
+                              >
+                                {formatStatusLabel(violation.status).toUpperCase()}
+                              </span>
+                              {violation.statusUpdatedDate && violation.statusUpdatedTime && (
+                                <div className="text-[9px] text-gray-500 mt-2">
+                                  Updated: {violation.statusUpdatedDate}, {violation.statusUpdatedTime}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
 
@@ -3371,6 +3361,21 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                             </div>
                           </div>
                         )}
+                        {/* Action - View whole violation */}
+                        <div className="pt-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setSelectedViolation(violation)
+                              setShowViolationDetails(true)
+                            }}
+                            className="w-full inline-flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-600 shadow-sm"
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            View
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -3416,6 +3421,11 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                               STATUS
                             </div>
                           </th>
+                          <th className="px-6 py-4 font-semibold uppercase tracking-wide text-center">
+                            <div className="flex items-center gap-2 justify-center">
+                              ACTIONS
+                            </div>
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 bg-white">
@@ -3454,13 +3464,34 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                               </div>
                             </td>
                             <td className="px-6 py-5">
-                              <span
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(
-                                  violation.status,
-                                )}`}
+                              <div>
+                                <span
+                                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(
+                                    violation.status,
+                                  )}`}
+                                >
+                                  {formatStatusLabel(violation.status).toUpperCase()}
+                                </span>
+                                {violation.statusUpdatedDate && violation.statusUpdatedTime && (
+                                  <div className="text-[9px] text-gray-500 mt-1.5">
+                                    Updated: {violation.statusUpdatedDate}, {violation.statusUpdatedTime}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-5 text-center">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setSelectedViolation(violation)
+                                  setShowViolationDetails(true)
+                                }}
+                                className="inline-flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-600 transition hover:bg-blue-100"
                               >
-                                {formatStatusLabel(violation.status).toUpperCase()}
-                              </span>
+                                <Eye className="h-3.5 w-3.5 mr-2" />
+                                View
+                              </button>
                             </td>
                           </tr>
                         ))}
