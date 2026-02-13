@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { AuthenticatedHeader } from "@/components/authenticated-header"
 import { Footer } from "@/components/footer"
 import { User, BookOpen, Building, Briefcase, AlertTriangle, Check, RefreshCw, Calendar, Tag, FileText, List, CircleCheck, Eye, X } from "lucide-react"
+import { formatTimestampWithTimezone } from "@/lib/utils"
 
 export default function RecordsPage() {
   const router = useRouter()
@@ -359,6 +360,14 @@ export default function RecordsPage() {
                                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-orange-100 text-orange-800">
                                     {violation.violationType || "Behavior"}
                                   </span>
+                                  {violation.statusUpdatedAt && (
+                                    <div className="text-[9px] text-gray-500 mt-1">
+                                      {(() => {
+                                        const { date, time } = formatTimestampWithTimezone(violation.statusUpdatedAt)
+                                        return `Updated: ${date}, ${time}`
+                                      })()}
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="h-8 w-px bg-gray-300 flex-shrink-0"></div>
                                 <div className="flex-shrink-0">
@@ -482,12 +491,22 @@ export default function RecordsPage() {
                               <span className="text-sm text-gray-900">{violation.notes || violation.additionalNotes || "N/A"}</span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${statusMeta.className}`}
-                              >
-                                {renderStatusIcon(statusMeta.icon)}
-                                {statusMeta.label}
-                              </span>
+                              <div>
+                                <span
+                                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${statusMeta.className}`}
+                                >
+                                  {renderStatusIcon(statusMeta.icon)}
+                                  {statusMeta.label}
+                                </span>
+                                {violation.statusUpdatedAt && (
+                                  <div className="text-[10px] text-gray-500 mt-1">
+                                    {(() => {
+                                      const { date, time } = formatTimestampWithTimezone(violation.statusUpdatedAt)
+                                      return `Updated: ${date}, ${time}`
+                                    })()}
+                                  </div>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         )
@@ -581,12 +600,22 @@ export default function RecordsPage() {
                                   <CircleCheck className="w-3 h-3 mr-1.5" />
                                   Status
                                 </p>
-                                <span
-                                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${statusMeta.className}`}
-                                >
-                                  {renderStatusIcon(statusMeta.icon)}
-                                  {statusMeta.label}
-                                </span>
+                                <div>
+                                  <span
+                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${statusMeta.className}`}
+                                  >
+                                    {renderStatusIcon(statusMeta.icon)}
+                                    {statusMeta.label}
+                                  </span>
+                                  {selectedViolation.statusUpdatedAt && (
+                                    <div className="text-[10px] text-gray-500 mt-1">
+                                      {(() => {
+                                        const { date, time } = formatTimestampWithTimezone(selectedViolation.statusUpdatedAt)
+                                        return `Updated: ${date}, ${time}`
+                                      })()}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                               <div className="bg-gray-50 rounded-lg p-1.5 border border-gray-200 col-span-2">
                                 <p className="text-xs text-gray-500 mb-0.5 flex items-center">

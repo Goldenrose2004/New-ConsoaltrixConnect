@@ -196,20 +196,8 @@ export async function GET(request: NextRequest) {
             hour12: true,
           }),
       statusUpdatedAt: violation.statusUpdatedAt ? new Date(violation.statusUpdatedAt).toISOString() : null,
-      statusUpdatedDate: violation.statusUpdatedAt
-        ? new Date(violation.statusUpdatedAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })
-        : null,
-      statusUpdatedTime: violation.statusUpdatedAt
-        ? new Date(violation.statusUpdatedAt).toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-          })
-        : null,
+      statusUpdatedDate: null,
+      statusUpdatedTime: null,
       profilePicture: (() => {
         const key = typeof violation.userId === "string" ? violation.userId : violation.userId?.toString()
         const profile = key ? userProfilesMap.get(key) : null

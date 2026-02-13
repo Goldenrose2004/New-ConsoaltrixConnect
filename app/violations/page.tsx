@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { AuthenticatedHeader } from "@/components/authenticated-header"
 import { AlertCircle, CheckCircle2, Calendar, RefreshCw } from "lucide-react"
+import { formatTimestampWithTimezone } from "@/lib/utils"
 
 export default function ViolationsPage() {
   const router = useRouter()
@@ -189,17 +190,27 @@ export default function ViolationsPage() {
                       )}
                     </div>
                     <div className="mt-4 md:mt-0 md:ml-4">
-                      <span
-                        className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
-                          violation.status === "resolved"
-                            ? "bg-green-100 text-green-800"
-                            : violation.status === "warning"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {violation.status.charAt(0).toUpperCase() + violation.status.slice(1)}
-                      </span>
+                      <div>
+                        <span
+                          className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+                            violation.status === "resolved"
+                              ? "bg-green-100 text-green-800"
+                              : violation.status === "warning"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {violation.status.charAt(0).toUpperCase() + violation.status.slice(1)}
+                        </span>
+                        {violation.statusUpdatedAt && (
+                          <div className="text-[10px] text-gray-500 mt-1">
+                            {(() => {
+                              const { date, time } = formatTimestampWithTimezone(violation.statusUpdatedAt)
+                              return `Updated: ${date}, ${time}`
+                            })()}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 

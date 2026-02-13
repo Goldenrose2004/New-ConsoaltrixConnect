@@ -54,6 +54,7 @@ import {
   YAxis,
 } from "recharts"
 import { AdminHeader, type AdminNavItem } from "@/components/admin/header"
+import { formatTimestampWithTimezone } from "@/lib/utils"
 
 function SchoolFilledIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
   return (
@@ -129,13 +130,13 @@ function BookReaderIcon({ size = 20, className = "" }: { size?: number; classNam
       fill="currentColor"
       className={className}
     >
-      {/* FontAwesome book-reader - circle (head) above open book */}
+      {/* book-reader - circle above open book */}
       <path d="M352 96c0-53.02-42.98-96-96-96s-96 42.98-96 96s42.98 96 96 96s96-42.98 96-96zM233.59 241.1c-59.33-36.32-155.43-46.3-203.79-49.05C13.55 191.13 0 203.51 0 219.14v222.8c0 14.33 11.59 26.28 26.49 27.05c43.66 2.29 131.99 10.68 189.04 41.19c9.28 4.9 20.48-1.12 20.48-11.5V252.56c-.01-4.45-2.22-8.72-6.42-11.46zm248.61-49.05c-48.35 2.74-144.46 12.73-203.78 49.05c-4.2 2.74-6.41 7.01-6.41 11.46v245.79c0 10.37 11.2 16.4 20.48 11.5c57.06-30.51 145.38-38.9 189.04-41.19c14.9-.78 26.49-12.73 26.49-27.05V219.14c.01-15.63-13.54-28.01-28.86-27.09z" />
     </svg>
   )
 }
 
-// FontAwesome fa-user-graduate icon - exact match (person's head with graduation cap)
+// user-graduate icon -(person's head with graduation cap)
 function UserGraduateIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
   return (
     <svg
@@ -145,7 +146,7 @@ function UserGraduateIcon({ size = 20, className = "" }: { size?: number; classN
       fill="currentColor"
       className={className}
     >
-      {/* FontAwesome user-graduate - graduation cap with person's head */}
+      {/* user-graduate - graduation cap with person's head */}
       <path d="M319.4 320.6L224 416l-95.4-95.4C57.1 323.7 0 382.2 0 454.4v9.6c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-9.6c0-72.2-57.1-130.7-128.6-133.8zM13.6 79.8l6.4 1.5v58.4c-7 4.2-12 11.5-12 20.3 0 8.4 4.6 15.4 11.1 19.7L3.5 242c-1.7 6.9 2.1 14 7.6 14h41.8c5.5 0 9.3-7.1 7.6-14l-15.6-62.3C51.4 175.4 56 168.4 56 160c0-8.8-5-16.1-12-20.3V87.1l66 15.9c-8.6 17.2-14 36.4-14 57 0 70.7 57.3 128 128 128s128-57.3 128-128c0-20.6-5.3-39.8-14-57l96.3-23.2c18.2-4.4 18.2-27.1 0-31.5l-190.4-46c-13-3.1-26.7-3.1-39.7 0L13.6 48.2c-18.1 4.4-18.1 27.2 0 31.6z" />
     </svg>
   )
@@ -191,7 +192,7 @@ type SuccessDialogState = {
   onConfirm?: () => void
 } | null
 
-// Removed hardcoded data - now fetched from database
+
 
 // chatUsers will be loaded from the database
 
@@ -1691,6 +1692,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
   const [showStudentDetails, setShowStudentDetails] = useState(false)
   const [userViolations, setUserViolations] = useState<any[]>([])
   const [isLoadingUserViolations, setIsLoadingUserViolations] = useState(false)
+  const [userViolationSearchQuery, setUserViolationSearchQuery] = useState("")
   const [openStatusDropdownId, setOpenStatusDropdownId] = useState<string | null>(null)
   const [violationForm, setViolationForm] = useState({ 
     violation: "", 
@@ -1720,6 +1722,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
   }, [])
   const [violationStatusFilter, setViolationStatusFilter] = useState("all")
   const [violationTypeFilter, setViolationTypeFilter] = useState("all")
+  const [violationSearchQuery, setViolationSearchQuery] = useState("")
   const [selectedViolation, setSelectedViolation] = useState<any>(null)
   const [showViolationDetails, setShowViolationDetails] = useState(false)
   // Long-press state for Academic Records
@@ -2544,6 +2547,16 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto sm:ml-auto">
             <div className="relative flex-1 sm:flex-none">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/70" />
+              <input
+                type="text"
+                value={violationSearchQuery}
+                onChange={(e) => setViolationSearchQuery(e.target.value)}
+                placeholder="Search by student name..."
+                className="w-full pl-11 pr-4 py-2 text-xs md:text-sm rounded-lg border border-white/30 bg-white/20 text-white placeholder-white/70 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/40"
+              />
+            </div>
+            <div className="relative flex-1 sm:flex-none">
               <select
                 value={violationTypeFilter}
                 onChange={(e) => setViolationTypeFilter(e.target.value)}
@@ -2587,9 +2600,27 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
             </div>
           ) : (
             <>
+              {(() => {
+                // Filter violations based on search query
+                const filteredViolations = violations.filter((violation) => {
+                  const profile = violation.userProfile
+                  const profileName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim()
+                  const fallbackName = violation.studentName || "Student"
+                  const displayName = profileName || fallbackName
+                  const studentId = profile?.studentId || ""
+                  const searchLower = violationSearchQuery.toLowerCase()
+                  
+                  return (
+                    displayName.toLowerCase().includes(searchLower) ||
+                    studentId.toLowerCase().includes(searchLower)
+                  )
+                })
+
+                return (
+                  <>
               {/* Mobile Card Layout */}
               <div className="space-y-3 md:hidden">
-                {violations.map((violation) => {
+                {filteredViolations.map((violation) => {
                   const profile = violation.userProfile
                   const profileName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim()
                   const fallbackName = violation.studentName || "Student"
@@ -2711,7 +2742,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 bg-white">
-                  {violations.map((violation) => {
+                  {filteredViolations.map((violation) => {
                     const profile = violation.userProfile
                     const profileName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim()
                     const fallbackName = violation.studentName || "Student"
@@ -2783,9 +2814,12 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                             >
                               {formatStatusLabel(violation.status).toUpperCase()}
                             </span>
-                            {violation.statusUpdatedDate && violation.statusUpdatedTime && (
+                            {violation.statusUpdatedAt && (
                               <div className="text-[9px] md:text-[10px] text-gray-500 mt-1.5">
-                                Updated: {violation.statusUpdatedDate}, {violation.statusUpdatedTime}
+                                {(() => {
+                                  const { date, time } = formatTimestampWithTimezone(violation.statusUpdatedAt)
+                                  return `Updated: ${date}, ${time}`
+                                })()}
                               </div>
                             )}
                           </div>
@@ -2888,6 +2922,9 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
               </table>
                 </div>
               </div>
+                  </>
+                )
+              })()}
             </>
           )}
         </div>
@@ -2957,10 +2994,54 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
 
               {/* Status */}
               <div>
-                <label className="flex items-center gap-2 text-xs font-medium text-gray-700 mb-2">
-                  <CheckCircle2 className="h-4 w-4 text-gray-500" />
-                  Status
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="flex items-center gap-2 text-xs font-medium text-gray-700">
+                    <CheckCircle2 className="h-4 w-4 text-gray-500" />
+                    Status
+                  </label>
+                  {/* Status Update Button - Mobile Only */}
+                  <div className="md:hidden relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsMobileStatusMenuOpen(!isMobileStatusMenuOpen)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 transition"
+                    >
+                      Status
+                      <ChevronDown className={`h-3 w-3 transition ${isMobileStatusMenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isMobileStatusMenuOpen && (
+                      <div className="absolute right-0 z-30 mt-1 w-40 rounded-lg border border-gray-100 bg-white shadow-lg">
+                        {statusOptions.map((statusOption) => {
+                          const currentNormalizedStatus = normalizeStatus(selectedViolation.status)
+                          const isCurrentStatus = currentNormalizedStatus === statusOption
+                          return (
+                            <button
+                              key={statusOption}
+                              type="button"
+                              onClick={() => {
+                                setIsMobileStatusMenuOpen(false)
+                                if (isCurrentStatus) return
+                                // Optimistically update selected violation status and timestamp
+                                handleStatusUpdate(selectedViolation, statusOption)
+                                setSelectedViolation((prev: any) =>
+                                  prev ? { ...prev, status: statusOption, statusUpdatedAt: new Date().toISOString() } : prev,
+                                )
+                              }}
+                              className={`flex w-full items-center justify-between px-4 py-2 text-xs font-medium transition ${
+                                isCurrentStatus
+                                  ? "bg-green-50 text-green-600 font-semibold"
+                                  : "text-gray-600 hover:bg-gray-50"
+                              }`}
+                            >
+                              <span>{formatStatusLabel(statusOption)}</span>
+                              {isCurrentStatus && <Check className="h-3 w-3 text-green-500" />}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <div className="w-full">
                   <div>
                     <span
@@ -2970,11 +3051,12 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                     >
                       {formatStatusLabel(selectedViolation.status).toUpperCase()}
                     </span>
-                    {selectedViolation.statusUpdatedDate && selectedViolation.statusUpdatedTime && (
-                      <div className="text-[9px] text-gray-500 mt-2">
-                        Updated: {selectedViolation.statusUpdatedDate}, {selectedViolation.statusUpdatedTime}
-                      </div>
-                    )}
+                    {(() => {
+                      const timestamp = selectedViolation.statusUpdatedAt || selectedViolation.createdAt || null
+                      if (!timestamp) return null
+                      const { date, time } = formatTimestampWithTimezone(timestamp)
+                      return <div className="text-[9px] text-gray-500 mt-2">{`Updated: ${date}, ${time}`}</div>
+                    })()}
                   </div>
                 </div>
               </div>
@@ -3228,32 +3310,48 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
         <div className="fixed inset-0 bg-blue-900/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md md:max-w-7xl mx-auto max-h-[90vh] overflow-y-auto">
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4 rounded-t-2xl flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <AlertCircle className="h-5 w-5 text-blue-600" />
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4 rounded-t-2xl">
+              <div className="flex items-center justify-between gap-4 mb-3 md:mb-0">
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <AlertCircle className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-base md:text-xl font-semibold text-[#041A44] truncate">
+                      <span className="md:hidden">Violation Details</span>
+                      <span className="hidden md:inline">Violation Records - {selectedUser.firstName} {selectedUser.lastName}</span>
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-0.5 truncate">
+                      <span className="md:hidden">View violation information</span>
+                      <span className="hidden md:inline">{selectedUser.studentId ? `Student ID: ${selectedUser.studentId}` : `Email: ${selectedUser.email}`}</span>
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-base md:text-xl font-semibold text-[#041A44]">
-                    <span className="md:hidden">Violation Details</span>
-                    <span className="hidden md:inline">Violation Records - {selectedUser.firstName} {selectedUser.lastName}</span>
-                  </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    <span className="md:hidden">View violation information</span>
-                    <span className="hidden md:inline">{selectedUser.studentId ? `Student ID: ${selectedUser.studentId}` : `Email: ${selectedUser.email}`}</span>
-                  </p>
-                </div>
+                <button
+                  onClick={() => {
+                    setShowViewViolations(false)
+                    setSelectedUser(null)
+                    setUserViolations([])
+                    setUserViolationSearchQuery("")
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition flex-shrink-0"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <button
-                onClick={() => {
-                  setShowViewViolations(false)
-                  setSelectedUser(null)
-                  setUserViolations([])
-                }}
-                className="text-gray-400 hover:text-gray-600 transition"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              {/* Search Bar */}
+              {userViolations.length > 0 && (
+                <div className="relative mt-3 md:mt-0 w-full md:w-64 md:absolute md:right-16 md:top-1/2 md:-translate-y-1/2">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={userViolationSearchQuery}
+                    onChange={(e) => setUserViolationSearchQuery(e.target.value)}
+                    placeholder="Search violations..."
+                    className="w-full pl-10 pr-4 py-2 text-xs md:text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Content */}
@@ -3271,9 +3369,29 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                 </div>
               ) : (
                 <div className="space-y-4">
+                  {(() => {
+                    // Filter violations based on search query
+                    const filteredUserViolations = userViolations.filter((violation) => {
+                      const searchLower = userViolationSearchQuery.toLowerCase()
+                      return (
+                        (violation.violationType || violation.violation || "").toLowerCase().includes(searchLower) ||
+                        (violation.status || "").toLowerCase().includes(searchLower) ||
+                        (violation.notes || "").toLowerCase().includes(searchLower)
+                      )
+                    })
+
+                    return (
+                      <>
                   {/* Mobile View - Card Layout */}
                   <div className="md:hidden space-y-4">
-                    {userViolations.map((violation) => (
+                    {filteredUserViolations.length === 0 && userViolationSearchQuery ? (
+                      <div className="text-center py-12">
+                        <AlertCircle className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+                        <p className="text-sm font-medium text-gray-600">No violations match your search</p>
+                      </div>
+                    ) : (
+                      <>
+                        {filteredUserViolations.map((violation) => (
                       <div key={violation.id} className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
                         {/* Student Name */}
                         <div>
@@ -3312,11 +3430,12 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                               >
                                 {formatStatusLabel(violation.status).toUpperCase()}
                               </span>
-                              {violation.statusUpdatedDate && violation.statusUpdatedTime && (
-                                <div className="text-[9px] text-gray-500 mt-2">
-                                  Updated: {violation.statusUpdatedDate}, {violation.statusUpdatedTime}
-                                </div>
-                              )}
+                              {(() => {
+                                const timestamp = violation.statusUpdatedAt || violation.createdAt || null
+                                if (!timestamp) return null
+                                const { date, time } = formatTimestampWithTimezone(timestamp)
+                                return <div className="text-[9px] text-gray-500 mt-2">{`Updated: ${date}, ${time}`}</div>
+                              })()}
                             </div>
                           </div>
                         </div>
@@ -3378,6 +3497,8 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                         </div>
                       </div>
                     ))}
+                      </>
+                    )}
                   </div>
 
                   {/* Desktop View - Table Layout */}
@@ -3429,7 +3550,7 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 bg-white">
-                        {userViolations.map((violation) => (
+                        {filteredUserViolations.map((violation) => (
                           <tr key={violation.id} className="hover:bg-gray-50/60 transition">
                             <td className="px-6 py-5">
                               <div className="flex items-center gap-2">
@@ -3472,11 +3593,12 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                                 >
                                   {formatStatusLabel(violation.status).toUpperCase()}
                                 </span>
-                                {violation.statusUpdatedDate && violation.statusUpdatedTime && (
-                                  <div className="text-[9px] text-gray-500 mt-1.5">
-                                    Updated: {violation.statusUpdatedDate}, {violation.statusUpdatedTime}
-                                  </div>
-                                )}
+                                {(() => {
+                                  const timestamp = violation.statusUpdatedAt || violation.createdAt || null
+                                  if (!timestamp) return null
+                                  const { date, time } = formatTimestampWithTimezone(timestamp)
+                                  return <div className="text-[9px] text-gray-500 mt-1.5">{`Updated: ${date}, ${time}`}</div>
+                                })()}
                               </div>
                             </td>
                             <td className="px-6 py-5 text-center">
@@ -3498,8 +3620,11 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
                       </tbody>
                     </table>
                   </div>
-                </div>
-              )}
+                  </>
+                )
+                })()}
+              </div>
+            )}
             </div>
           </div>
         </div>

@@ -120,20 +120,8 @@ export async function PATCH(
             hour12: true,
           }),
       statusUpdatedAt: updatedViolation.statusUpdatedAt ? new Date(updatedViolation.statusUpdatedAt).toISOString() : null,
-      statusUpdatedDate: updatedViolation.statusUpdatedAt
-        ? new Date(updatedViolation.statusUpdatedAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })
-        : null,
-      statusUpdatedTime: updatedViolation.statusUpdatedAt
-        ? new Date(updatedViolation.statusUpdatedAt).toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-          })
-        : null,
+      statusUpdatedDate: null,
+      statusUpdatedTime: null,
     }
 
     invalidateAnalyticsCache()
