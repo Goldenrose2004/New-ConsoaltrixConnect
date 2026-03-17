@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
       .limit(limit)
       .toArray()
 
-    // Format announcements for frontend
     const formattedAnnouncements = announcements.map((ann) => ({
       id: ann._id.toString(),
       title: ann.title,
@@ -111,7 +110,6 @@ export async function POST(request: NextRequest) {
     // Insert announcements
     const result = await db.collection("announcements").insertMany(validAnnouncements)
 
-    // Fetch the created announcements
     const createdIds = Object.values(result.insertedIds).map((id) => new ObjectId(id))
     const createdAnnouncements = await db
       .collection("announcements")
@@ -159,7 +157,6 @@ export async function POST(request: NextRequest) {
     // Fire-and-forget so the API response can return immediately
     void queueNotificationCreation()
 
-    // Format for response
     const formattedAnnouncements = createdAnnouncements.map((ann) => ({
       id: ann._id.toString(),
       title: ann.title,

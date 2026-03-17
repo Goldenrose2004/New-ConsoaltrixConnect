@@ -4,7 +4,6 @@ export function usePresence() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    // Get current user from localStorage
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       return
@@ -12,14 +11,12 @@ export function usePresence() {
 
     try {
       const userData = JSON.parse(currentUser)
-      // Handle both string and ObjectId formats
       const userId = userData.id || userData._id
 
       if (!userId) {
         return
       }
 
-      // Convert to string if it's an ObjectId
       const userIdString = typeof userId === 'object' ? userId.toString() : String(userId)
 
       // Send initial presence update
@@ -33,7 +30,6 @@ export function usePresence() {
             body: JSON.stringify({ userId: userIdString }),
           })
           
-          // Check if response is ok before processing
           if (!response.ok) {
             // Silently fail for non-critical presence updates
             return

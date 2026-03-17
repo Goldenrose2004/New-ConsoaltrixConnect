@@ -25,7 +25,6 @@ export default function LoginPage() {
       const offline = !navigator.onLine
       setIsOffline(offline)
       
-      // If offline and not authenticated, show offline mode option
       if (offline && !isOfflineAuthenticated()) {
         setShowOfflineMode(true)
       } else if (!offline) {
@@ -43,7 +42,6 @@ export default function LoginPage() {
     }
   }, [])
 
-  // Check if user is already authenticated (both online and offline) on mount
   useEffect(() => {
     // Small delay to ensure localStorage is accessible
     const timeoutId = setTimeout(() => {
@@ -74,7 +72,6 @@ export default function LoginPage() {
         }
       }
 
-      // If offline and not authenticated, show offline mode option immediately
       if (!navigator.onLine && !isOfflineAuthenticated()) {
         setShowOfflineMode(true)
       }
@@ -94,9 +91,7 @@ export default function LoginPage() {
     e.preventDefault()
     setError("")
 
-    // Check if offline - if so, check for stored credentials first
     if (!isOnline()) {
-      // Check if user is already authenticated offline
       if (isOfflineAuthenticated()) {
         const user = getOfflineUser()
         if (user) {
@@ -133,7 +128,6 @@ export default function LoginPage() {
         body: JSON.stringify({ email: email.trim(), password }),
       })
 
-      // Handle network errors or service unavailable
       if (!response.ok && response.status >= 500) {
         setError("Login service temporarily unavailable. Please try again later.")
         finishLoading()
@@ -200,10 +194,8 @@ export default function LoginPage() {
       // Save offline auth using the utility function (ensures proper storage)
       saveOfflineAuth(userWithToken, data.token || localStorage.getItem("pwa_auth_token") || undefined)
       
-      // Create persistent session for auto-login on app restart
       createPersistentSession(userWithToken, data.token || localStorage.getItem("pwa_auth_token") || undefined)
 
-      // Determine redirect path based on role/department
       let redirectPath = "/basic-education-dashboard" // Default to basic education dashboard
       if (userData.role === "admin") {
         redirectPath = "/admin"
@@ -220,7 +212,6 @@ export default function LoginPage() {
       finishLoading()
     } catch (err) {
       console.error("Login error:", err)
-      // Check if it's a network error
       if (err instanceof TypeError && err.message.includes("fetch")) {
         setError("Login service temporarily unavailable. Please try again later.")
       } else {
@@ -230,7 +221,6 @@ export default function LoginPage() {
     }
   }
 
-  // Check if both fields are filled to enable/disable button
   const isFormValid = email.trim().length > 0 && password.trim().length > 0
 
   return (

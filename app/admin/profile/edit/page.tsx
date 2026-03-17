@@ -53,7 +53,6 @@ export default function AdminEditProfilePage() {
     confirmPassword: "",
   })
 
-  // Fetch notifications
   const fetchNotifications = async (adminId: string) => {
     try {
       const response = await fetch(`/api/notifications?userId=${adminId}`)
@@ -92,11 +91,9 @@ export default function AdminEditProfilePage() {
     setIsLoading(false)
   }, [router])
 
-  // Poll for new notifications every 5 seconds
   useEffect(() => {
     if (!user?.id) return
 
-    // Fetch immediately
     fetchNotifications(user.id)
 
     const interval = setInterval(() => {
@@ -130,7 +127,6 @@ export default function AdminEditProfilePage() {
   }
 
   const handleSaveChanges = () => {
-    // Update user data in localStorage
     if (user) {
       const updatedUser = {
         ...user,
@@ -142,7 +138,6 @@ export default function AdminEditProfilePage() {
       setUser(updatedUser)
     }
     
-    // Handle password change if provided
     if (formData.newPassword && formData.newPassword === formData.confirmPassword) {
       // Password change logic would go here
       console.log("Password changed")

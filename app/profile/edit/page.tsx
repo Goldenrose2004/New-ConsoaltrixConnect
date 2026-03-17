@@ -58,13 +58,11 @@ export default function EditProfilePage() {
   }
 
   useEffect(() => {
-    // Check if offline - edit profile requires online connection
     if (!navigator.onLine) {
       router.push("/profile")
       return
     }
 
-    // Check if user is logged in
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
@@ -73,7 +71,6 @@ export default function EditProfilePage() {
 
     const userData = JSON.parse(currentUser)
     
-    // Fetch fresh user data from database to ensure we have the latest profile
     const fetchFreshUserData = async () => {
       if (!navigator.onLine) {
         router.push("/profile")
@@ -85,7 +82,6 @@ export default function EditProfilePage() {
         const data = await response.json()
         
         if (data.ok && data.user) {
-          // Update localStorage with fresh data
           localStorage.setItem("currentUser", JSON.stringify(data.user))
           setUser(data.user)
           setFormData({
@@ -158,7 +154,6 @@ export default function EditProfilePage() {
     setIsUploading(true)
 
     try {
-      // Convert file to base64
       const reader = new FileReader()
       const fileData = await new Promise<string>((resolve, reject) => {
         reader.onload = (e) => resolve(e.target?.result as string)
@@ -170,7 +165,6 @@ export default function EditProfilePage() {
       const base64Data = fileData.split(',')[1]
       const mimeType = selectedFile.type
 
-      // Update profile picture via API
       const response = await fetch(`/api/users/${user.id}/profile-picture`, {
         method: "PATCH",
         headers: {
@@ -185,15 +179,12 @@ export default function EditProfilePage() {
       const data = await response.json()
 
       if (data.ok && data.user) {
-        // Update user in localStorage
         const updatedUser = { ...user, profilePicture: data.user.profilePicture }
         localStorage.setItem("currentUser", JSON.stringify(updatedUser))
         setUser(updatedUser)
         
-        // Dispatch event to update profile picture in chats
         window.dispatchEvent(new CustomEvent("profilePictureUpdated", { detail: updatedUser }))
         
-        // Clear selection
         setSelectedFile(null)
         setFileName("No file chosen")
         
@@ -232,12 +223,10 @@ export default function EditProfilePage() {
 
       const data = await response.json()
       if (data.ok && data.user) {
-        // Update user in localStorage
         const updatedUser = { ...user, profilePicture: null }
         localStorage.setItem("currentUser", JSON.stringify(updatedUser))
         setUser(updatedUser)
         
-        // Dispatch event to update profile picture in chats
         window.dispatchEvent(new CustomEvent("profilePictureUpdated", { detail: updatedUser }))
         
         setSuccessDialog({

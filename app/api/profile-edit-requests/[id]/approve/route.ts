@@ -8,7 +8,6 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    // Handle both Promise and direct params (for Next.js 13+ compatibility)
     const resolvedParams = params instanceof Promise ? await params : params
     const { id } = resolvedParams
     
@@ -51,7 +50,6 @@ export async function PATCH(
       )
     }
 
-    // Update the request status
     await db.collection("profileEditRequests").updateOne(
       { _id: new ObjectId(id) },
       {
@@ -63,13 +61,10 @@ export async function PATCH(
       }
     )
 
-    // Update the user's profile with the edited profile data
-    // Handle userId as either ObjectId or string
     let userQuery: any = {}
     if (ObjectId.isValid(requestDoc.userId)) {
       userQuery._id = new ObjectId(requestDoc.userId)
     } else {
-      // If not a valid ObjectId, try to find by studentId
       userQuery.studentId = requestDoc.studentId
     }
 
@@ -97,7 +92,6 @@ export async function PATCH(
 
     invalidateAnalyticsCache()
 
-    // Fetch the updated user to return to frontend
     const updatedUser = await db.collection("users").findOne(userQuery, { projection: { password: 0 } })
 
     if (!updatedUser) {
@@ -107,7 +101,6 @@ export async function PATCH(
       )
     }
 
-    // Format updated user data for frontend
     const userData = {
       id: updatedUser._id.toString(),
       firstName: updatedUser.firstName,
@@ -124,7 +117,6 @@ export async function PATCH(
       profilePictureName: updatedUser.profilePictureName || null,
     }
 
-    // Create notification for the user whose profile was approved
     try {
       const userId = requestDoc.userId
       await db.collection("notifications").insertOne({

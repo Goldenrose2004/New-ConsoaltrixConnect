@@ -65,13 +65,11 @@ const ONLINE_ONLY_PAGES = [
   '/announcements'
 ]
 
-// Install event - cache offline pages
 self.addEventListener('install', (event) => {
   console.log('[Service Worker] Installing...')
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[Service Worker] Pre-caching offline pages')
-      // Pre-cache all offline pages so they're available immediately
       const pagesToCache = OFFLINE_PAGES.map(page => {
         // For root path, just use it as is
         if (page === '/') return page
@@ -90,7 +88,6 @@ self.addEventListener('install', (event) => {
   self.skipWaiting() // Activate immediately
 })
 
-// Activate event - clean up old caches and notify clients
 self.addEventListener('activate', (event) => {
   console.log('[Service Worker] Activating...')
   event.waitUntil(
@@ -119,12 +116,10 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim() // Take control of all pages immediately
 })
 
-// Fetch event - serve from cache when offline
 self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Skip non-GET requests
   if (request.method !== 'GET') {
     return
   }

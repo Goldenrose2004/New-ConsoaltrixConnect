@@ -24,7 +24,6 @@ export function PWAUpdateBanner() {
       return
     }
 
-    // Listen for update available message from service worker
     const handleServiceWorkerMessage = (event: MessageEvent) => {
       if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
         console.log('[PWA Update] New version available')
@@ -32,7 +31,6 @@ export function PWAUpdateBanner() {
       }
     }
 
-    // Use BroadcastChannel for cross-tab communication
     if (typeof BroadcastChannel !== 'undefined') {
       try {
         const channel = new BroadcastChannel('pwa-updates')
@@ -65,18 +63,15 @@ export function PWAUpdateBanner() {
     setIsUpdating(true)
 
     try {
-      // Get all service worker registrations
       const registrations = await navigator.serviceWorker.getRegistrations()
 
       for (const registration of registrations) {
         // Check for updates
         await registration.update()
 
-        // If there's a waiting service worker, activate it
         if (registration.waiting) {
           registration.waiting.postMessage({ type: 'SKIP_WAITING' })
 
-          // Listen for controller change
           const onControllerChange = () => {
             console.log('[PWA Update] Controller changed, reloading...')
             window.location.reload()

@@ -17,14 +17,12 @@ export default function HistoricalBackgroundPage() {
     const isOffline = !navigator.onLine
     const currentUser = localStorage.getItem("currentUser")
 
-    // Check if anonymous offline mode is enabled
     const anonymousMode = localStorage.getItem('anonymousOfflineMode')
     if (isOffline && anonymousMode === 'true') {
       setIsLoading(false)
       return
     }
 
-    // If offline, allow access even without currentUser (page is cached)
     if (isOffline) {
       if (currentUser) {
         setUser(JSON.parse(currentUser))
@@ -33,7 +31,6 @@ export default function HistoricalBackgroundPage() {
       return
     }
 
-    // If online, require authentication
     if (!currentUser) {
       router.push("/login")
       return

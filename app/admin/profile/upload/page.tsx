@@ -59,7 +59,6 @@ export default function AdminUploadProfilePage() {
     })
   }
 
-  // Fetch notifications
   const fetchNotifications = async (adminId: string) => {
     try {
       const response = await fetch(`/api/notifications?userId=${adminId}`)
@@ -89,7 +88,6 @@ export default function AdminUploadProfilePage() {
     setIsLoading(false)
   }, [router])
 
-  // Poll for new notifications every 5 seconds
   useEffect(() => {
     if (!user?.id) return
 
@@ -119,7 +117,6 @@ export default function AdminUploadProfilePage() {
       setSelectedFile(file)
       setFileName(file.name)
       
-      // Create preview
       const reader = new FileReader()
       reader.onload = (e) => {
         setFilePreview(e.target?.result as string)
@@ -134,7 +131,6 @@ export default function AdminUploadProfilePage() {
     setIsUploading(true)
 
     try {
-      // Convert file to base64
       const reader = new FileReader()
       const fileData = await new Promise<string>((resolve, reject) => {
         reader.onload = (e) => resolve(e.target?.result as string)
@@ -146,7 +142,6 @@ export default function AdminUploadProfilePage() {
       const base64Data = fileData.split(',')[1]
       const mimeType = selectedFile.type
 
-      // Update profile picture via API
       const response = await fetch(`/api/users/${user.id}/profile-picture`, {
         method: "PATCH",
         headers: {
@@ -161,15 +156,12 @@ export default function AdminUploadProfilePage() {
       const data = await response.json()
 
       if (data.ok && data.user) {
-        // Update user in localStorage
         const updatedUser = { ...user, profilePicture: data.user.profilePicture }
         localStorage.setItem("currentUser", JSON.stringify(updatedUser))
         setUser(updatedUser)
         
-        // Dispatch event to update profile picture in chats
         window.dispatchEvent(new CustomEvent("profilePictureUpdated", { detail: updatedUser }))
         
-        // Clear selection
         setSelectedFile(null)
         setFileName("No file chosen")
         setFilePreview(null)
@@ -210,12 +202,10 @@ export default function AdminUploadProfilePage() {
       const data = await response.json()
 
       if (data.ok && data.user) {
-        // Update user in localStorage
         const updatedUser = { ...user, profilePicture: null }
         localStorage.setItem("currentUser", JSON.stringify(updatedUser))
         setUser(updatedUser)
         
-        // Dispatch event to update profile picture in chats
         window.dispatchEvent(new CustomEvent("profilePictureUpdated", { detail: updatedUser }))
         
         setSuccessDialog({

@@ -15,14 +15,12 @@ export default function BasicEducationDepartmentPage() {
     setIsMounted(true)
     const isOffline = !navigator.onLine
 
-    // Check if anonymous offline mode is enabled
     const anonymousMode = localStorage.getItem('anonymousOfflineMode')
     if (isOffline && anonymousMode === 'true') {
       setIsLoading(false)
       return
     }
 
-    // If offline, allow access even without currentUser (page is cached)
     if (isOffline) {
       const currentUser = localStorage.getItem("currentUser")
       if (currentUser) {
@@ -32,7 +30,6 @@ export default function BasicEducationDepartmentPage() {
       return
     }
 
-    // If online, require authentication
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
@@ -50,7 +47,6 @@ export default function BasicEducationDepartmentPage() {
 
   const userInitials = user ? ((user.firstName?.[0] || "U") + (user.lastName?.[0] || "")) : "U"
   
-  // Determine home href based on department
   const isBasicEducation = 
     user?.department === "Elementary" ||
     user?.department === "Junior High School" ||

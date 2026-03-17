@@ -27,7 +27,6 @@ export function checkRateLimit(
   const entry = rateLimitStore.get(identifier)
 
   if (!entry || entry.resetTime < now) {
-    // Create new entry or reset expired entry
     rateLimitStore.set(identifier, {
       count: 1,
       resetTime: now + windowMs,

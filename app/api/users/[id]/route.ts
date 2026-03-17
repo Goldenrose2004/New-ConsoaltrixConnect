@@ -8,7 +8,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    // Handle both Promise and direct params (for Next.js 13+ compatibility)
     const resolvedParams = params instanceof Promise ? await params : params
     const { id } = resolvedParams
 
@@ -21,12 +20,10 @@ export async function GET(
 
     const db = await connectToDatabase().then((r) => r.db)
 
-    // Handle userId as either ObjectId or string
     let userQuery: any = {}
     if (ObjectId.isValid(id)) {
       userQuery._id = new ObjectId(id)
     } else {
-      // If not a valid ObjectId, try to find by email or studentId
       userQuery = {
         $or: [
           { email: id },
@@ -46,7 +43,6 @@ export async function GET(
       )
     }
 
-    // Format user data for frontend
     const userData = {
       id: user._id.toString(),
       firstName: user.firstName,

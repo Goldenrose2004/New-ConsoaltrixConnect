@@ -9,7 +9,6 @@ export async function GET(request: NextRequest) {
 
     const db = await connectToDatabase().then((r) => r.db)
 
-    // Get latest message for each user conversation
     const latestMessages = await db
       .collection("messages")
       .aggregate([
@@ -39,7 +38,6 @@ export async function GET(request: NextRequest) {
       ])
       .toArray()
 
-    // Format response
     const timestamps: Record<string, string> = {}
     latestMessages.forEach((item) => {
       const userId = item._id

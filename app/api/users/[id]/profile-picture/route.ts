@@ -9,7 +9,6 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    // Handle both Promise and direct params (for Next.js 13+ compatibility)
     const resolvedParams = params instanceof Promise ? await params : params
     const { id } = resolvedParams
 
@@ -32,13 +31,11 @@ export async function PATCH(
 
     const db = await connectToDatabase().then((r) => r.db)
 
-    // Handle userId as either ObjectId or string
     let userQuery: any = {}
     let isAdmin = false
     if (ObjectId.isValid(id)) {
       userQuery._id = new ObjectId(id)
     } else {
-      // If not a valid ObjectId, try to find by email or studentId
       userQuery = {
         $or: [
           { email: id },
@@ -47,7 +44,6 @@ export async function PATCH(
       }
     }
 
-    // Check if it's an admin first
     const admin = await db.collection("admins").findOne(userQuery)
     if (admin) {
       isAdmin = true
@@ -68,7 +64,6 @@ export async function PATCH(
     const uploadName = profilePictureName || `avatar-${id}-${Date.now()}`
     const imageMeta = await uploadImageToImgDB(base64Payload, uploadName)
 
-    // Update profile picture in appropriate collection
     const collection = isAdmin ? db.collection("admins") : db.collection("users")
     const updateResult = await collection.updateOne(
       userQuery,
@@ -91,7 +86,6 @@ export async function PATCH(
       )
     }
 
-    // Fetch the updated user
     const updatedUser = await collection.findOne(userQuery, { projection: { password: 0 } })
 
     if (!updatedUser) {
@@ -101,7 +95,6 @@ export async function PATCH(
       )
     }
 
-    // Format updated user data for frontend
     const userData = {
       id: updatedUser._id.toString(),
       firstName: updatedUser.firstName,
@@ -141,7 +134,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    // Handle both Promise and direct params (for Next.js 13+ compatibility)
     const resolvedParams = params instanceof Promise ? await params : params
     const { id } = resolvedParams
 
@@ -154,13 +146,11 @@ export async function DELETE(
 
     const db = await connectToDatabase().then((r) => r.db)
 
-    // Handle userId as either ObjectId or string
     let userQuery: any = {}
     let isAdmin = false
     if (ObjectId.isValid(id)) {
       userQuery._id = new ObjectId(id)
     } else {
-      // If not a valid ObjectId, try to find by email or studentId
       userQuery = {
         $or: [
           { email: id },
@@ -169,13 +159,11 @@ export async function DELETE(
       }
     }
 
-    // Check if it's an admin first
     const admin = await db.collection("admins").findOne(userQuery)
     if (admin) {
       isAdmin = true
     }
 
-    // Remove profile picture from appropriate collection
     const collection = isAdmin ? db.collection("admins") : db.collection("users")
 
     const existingDocument = await collection.findOne(userQuery, {
@@ -213,7 +201,6 @@ export async function DELETE(
       )
     }
 
-    // Fetch the updated user
     const updatedUser = await collection.findOne(userQuery, { projection: { password: 0 } })
 
     if (!updatedUser) {
@@ -223,7 +210,6 @@ export async function DELETE(
       )
     }
 
-    // Format updated user data for frontend
     const userData = {
       id: updatedUser._id.toString(),
       firstName: updatedUser.firstName,

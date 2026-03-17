@@ -27,7 +27,6 @@ export default function AnnouncementsPage() {
   const [isLoadingAnnouncements, setIsLoadingAnnouncements] = useState(true)
 
   useEffect(() => {
-    // Check if user is logged in
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
@@ -41,7 +40,6 @@ export default function AnnouncementsPage() {
 
   const userInitials = (user?.firstName?.[0] || "U") + (user?.lastName?.[0] || "")
 
-  // Fetch announcements from database
   const fetchAnnouncements = useCallback(async () => {
     try {
       const response = await fetch("/api/announcements?sort=desc")
@@ -64,7 +62,6 @@ export default function AnnouncementsPage() {
   useEffect(() => {
     fetchAnnouncements()
 
-    // Poll for new announcements every 5 seconds
     const interval = setInterval(fetchAnnouncements, 5000)
     return () => clearInterval(interval)
   }, [fetchAnnouncements])
@@ -93,7 +90,6 @@ export default function AnnouncementsPage() {
     setAnnouncements((prev) => prev.filter((ann) => ann.id !== id))
   }, [])
 
-  // Listen for new announcement events
   useEffect(() => {
     const handleCreated = (event: Event) => {
       const detail = (event as CustomEvent<AnnouncementData[] | undefined>).detail

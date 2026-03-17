@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get the message
     const message = await db.collection("messages").findOne({
       _id: new ObjectId(messageId),
     })
@@ -49,12 +48,10 @@ export async function POST(request: NextRequest) {
     // Initialize reactions array if it doesn't exist
     const reactions = message.reactions || []
 
-    // Remove any existing reaction from this user (user can only have one reaction at a time)
     const reactionsWithoutUser = reactions.filter(
       (r: any) => r.userId !== userId
     )
 
-    // Check if user is clicking the same emoji they already have (toggle off)
     const existingSameReaction = reactions.find(
       (r: any) => r.userId === userId && r.emoji === emoji
     )
@@ -71,7 +68,6 @@ export async function POST(request: NextRequest) {
       isAddingReaction = true
     }
 
-    // Update the message with new reactions
     const result = await db.collection("messages").updateOne(
       { _id: new ObjectId(messageId) },
       {
@@ -88,10 +84,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create notification for the message sender when someone reacts (only when adding, not removing)
     if (isAddingReaction && message.senderId !== userId) {
       try {
-        // Get the reactor's name
         let reactorName = "Someone"
         if (userId === "admin") {
           reactorName = "Admin"
@@ -114,6 +108,7 @@ export async function POST(request: NextRequest) {
           readAt: null,
           relatedId: messageId,
           badgeColor: "#F59E0B",
+          conversationUserId: userId,
         })
       } catch (notifError) {
         // Log error but don't fail the reaction update

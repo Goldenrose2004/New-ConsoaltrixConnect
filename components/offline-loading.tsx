@@ -12,7 +12,6 @@ export function OfflineLoading() {
   const [timeLeft, setTimeLeft] = useState(10)
 
   useEffect(() => {
-    // Check if we should show loading
     const checkOfflineLoading = () => {
       const isOfflineLoading = sessionStorage.getItem('offlineLoading') === 'true'
       setIsVisible(isOfflineLoading)

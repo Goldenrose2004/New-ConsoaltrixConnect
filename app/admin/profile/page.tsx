@@ -42,7 +42,6 @@ export default function AdminProfilePage() {
   const [lastLogin, setLastLogin] = useState<string>("")
   const [notifications, setNotifications] = useState<any[]>([])
 
-  // Fetch notifications
   const fetchNotifications = async (adminId: string) => {
     try {
       const response = await fetch(`/api/notifications?userId=${adminId}`)
@@ -116,11 +115,9 @@ export default function AdminProfilePage() {
     setIsLoading(false)
   }, [router])
 
-  // Poll for new notifications every 5 seconds
   useEffect(() => {
     if (!user?.id) return
 
-    // Fetch immediately
     fetchNotifications(user.id)
 
     const interval = setInterval(() => {

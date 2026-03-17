@@ -52,7 +52,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user already exists
     let existingUser
     try {
       existingUser = await db.collection("users").findOne({
@@ -77,7 +76,6 @@ export async function POST(request: NextRequest) {
     const saltRounds = 10
     const hashedPassword = await bcrypt.hash(normalized.password, saltRounds)
 
-    // Create new user
     const newUser = {
       firstName: normalized.firstName,
       lastName: normalized.lastName,

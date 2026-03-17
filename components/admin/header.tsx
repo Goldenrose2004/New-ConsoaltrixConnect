@@ -99,16 +99,28 @@ export function AdminHeader({
               })}
             </nav>
 
-            {/* User Actions */}
+          {/* User Actions */}
             <div className="flex items-center gap-3 ml-auto mr-12 md:mr-32 lg:mr-40">
-              <NotificationMenu notifications={notifications} align="end" userId={userId} onNotificationUpdate={onNotificationUpdate} />
+              <NotificationMenu
+                notifications={notifications}
+                align="end"
+                userId={userId}
+                onNotificationUpdateAction={onNotificationUpdate}
+                variant="admin"
+              />
               <ProfileBadge name={userName} onClick={onProfileClick} />
             </div>
           </div>
 
           {/* Mobile Actions - Notification and Menu */}
           <div className="flex items-center gap-2 md:hidden">
-            <NotificationMenu notifications={notifications} align="end" userId={userId} onNotificationUpdate={onNotificationUpdate} />
+            <NotificationMenu
+              notifications={notifications}
+              align="end"
+              userId={userId}
+              onNotificationUpdateAction={onNotificationUpdate}
+              variant="admin"
+            />
             <button onClick={() => setIsOpen(!isOpen)} className="text-white p-2 z-10" aria-label="Toggle menu">
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -180,7 +192,6 @@ function ProfileBadge({ name, onClick }: { name: string; onClick?: () => void })
   const [profilePicture, setProfilePicture] = useState<string | null>(null)
 
   useEffect(() => {
-    // Get profile picture from localStorage
     const currentUser = localStorage.getItem("currentUser")
     if (currentUser) {
       try {
@@ -193,7 +204,6 @@ function ProfileBadge({ name, onClick }: { name: string; onClick?: () => void })
       }
     }
 
-    // Listen for profile picture updates
     const handleProfilePictureUpdate = (event: CustomEvent) => {
       const updatedUser = event.detail
       if (updatedUser?.profilePicture) {
@@ -201,7 +211,6 @@ function ProfileBadge({ name, onClick }: { name: string; onClick?: () => void })
       } else {
         setProfilePicture(null)
       }
-      // Update localStorage
       if (currentUser) {
         try {
           const user = JSON.parse(currentUser)
@@ -213,7 +222,6 @@ function ProfileBadge({ name, onClick }: { name: string; onClick?: () => void })
       }
     }
 
-    // Listen for storage changes (cross-tab updates)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "currentUser" && e.newValue) {
         try {

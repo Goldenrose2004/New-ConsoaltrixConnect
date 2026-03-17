@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Bell, RefreshCcw, X, Trash2 } from "lucide-react"
 import {
   DropdownMenu,
@@ -15,17 +16,31 @@ type NotificationItem = {
   time: string
   isNew?: boolean
   badgeColor?: string
+  type?: string
+  relatedId?: string | null
+  conversationUserId?: string | null
 }
+
+type NotificationMenuVariant = "admin" | "user"
 
 type NotificationMenuProps = {
   notifications: NotificationItem[]
   align?: "start" | "center" | "end"
   userId?: string | null
-  onNotificationUpdate?: () => void
+  onNotificationUpdateAction?: () => void
+  variant?: NotificationMenuVariant
 }
 
-export function NotificationMenu({ notifications, align = "end", userId, onNotificationUpdate }: NotificationMenuProps) {
+export function NotificationMenu({
+  notifications,
+  align = "end",
+  userId,
+  onNotificationUpdateAction,
+  variant = "user",
+}: NotificationMenuProps) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const newCount = useMemo(
     () => notifications.filter((notification) => notification.isNew).length,
     [notifications],
@@ -47,21 +62,17 @@ export function NotificationMenu({ notifications, align = "end", userId, onNotif
       })
 
       const data = await response.json()
-      if (data.ok && onNotificationUpdate) {
-        onNotificationUpdate()
+      if (data.ok && onNotificationUpdateAction) {
+        onNotificationUpdateAction()
       }
     } catch (error) {
       console.error("Error marking notifications as read:", error)
     }
   }
 
-  const handleDeleteAll = async () => {
+  const handleDeleteAllConfirmed = async () => {
     if (!userId) return
     
-    if (!confirm("Are you sure you want to delete all notifications?")) {
-      return
-    }
-
     try {
       const response = await fetch("/api/notifications", {
         method: "DELETE",
@@ -75,18 +86,18 @@ export function NotificationMenu({ notifications, align = "end", userId, onNotif
       })
 
       const data = await response.json()
-      if (data.ok && onNotificationUpdate) {
-        onNotificationUpdate()
+      if (data.ok && onNotificationUpdateAction) {
+        onNotificationUpdateAction()
       }
+      setShowDeleteConfirm(false)
     } catch (error) {
       console.error("Error deleting notifications:", error)
     }
   }
 
-  const handleNotificationClick = async (notificationId: string) => {
+  const handleNotificationClick = async (notification: NotificationItem) => {
     if (!userId) return
 
-    // Mark notification as read when clicked
     try {
       const response = await fetch("/api/notifications", {
         method: "PATCH",
@@ -95,20 +106,80 @@ export function NotificationMenu({ notifications, align = "end", userId, onNotif
         },
         body: JSON.stringify({
           userId,
-          notificationIds: [notificationId],
+          notificationIds: [notification.id],
         }),
       })
 
       const data = await response.json()
-      if (data.ok && onNotificationUpdate) {
-        onNotificationUpdate()
+      if (data.ok && onNotificationUpdateAction) {
+        onNotificationUpdateAction()
       }
+
+      // After marking as read, navigate based on notification type
+      if (notification.type === "message") {
+        if (variant === "admin") {
+          // Admin: go to chat tab for the specific user if available
+          const params = new URLSearchParams()
+          params.set("tab", "chat")
+          if (notification.conversationUserId) {
+            params.set("userId", String(notification.conversationUserId))
+          }
+          if (notification.relatedId) {
+            params.set("messageId", String(notification.relatedId))
+          }
+          router.push(`/admin?${params.toString()}`)
+        } else {
+          // User: go to chats, optionally highlight specific message
+          if (notification.relatedId) {
+            router.push(`/chats?messageId=${encodeURIComponent(notification.relatedId)}`)
+          } else {
+            router.push("/chats")
+          }
+        }
+      } else if (notification.type === "announcement") {
+        // Announcements page is shared for admin and users
+        router.push("/announcements")
+      } else if (
+        notification.type === "profile_approval" ||
+        notification.type === "profile_rejection"
+      ) {
+        // User’s own profile page
+        router.push("/profile")
+      } else if (notification.type === "other" && notification.relatedId) {
+        if (variant === "admin") {
+          // Admin-specific "other" notifications, like New Profile Edit Request
+          const params = new URLSearchParams()
+          params.set("tab", "overview")
+          params.set("requestId", String(notification.relatedId))
+          router.push(`/admin?${params.toString()}`)
+        } else {
+          // User-side "other" notifications:
+          const desc = (notification.description || "").toLowerCase()
+          if (desc.includes("violation")) {
+            const timestamp = Date.now()
+            if (notification.relatedId) {
+              router.push(
+                `/records?violationId=${encodeURIComponent(
+                  notification.relatedId,
+                )}&t=${timestamp}`,
+              )
+            } else {
+              router.push(`/records?t=${timestamp}`)
+            }
+          } else {
+            router.push("/profile/edit")
+          }
+        }
+      }
+
+      setOpen(false)
     } catch (error) {
       console.error("Error marking notification as read:", error)
     }
   }
 
   return (
+    <>
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button
@@ -151,7 +222,7 @@ export function NotificationMenu({ notifications, align = "end", userId, onNotif
                 className={`flex gap-2.5 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 cursor-pointer hover:bg-slate-50 transition-colors ${
                   notification.isNew ? "bg-blue-50/50" : ""
                 }`}
-                onClick={() => handleNotificationClick(notification.id)}
+                onClick={() => handleNotificationClick(notification)}
               >
                 <div
                   className="mt-0.5 h-7 w-7 sm:h-10 sm:w-10 flex-shrink-0 rounded-full bg-blue-100 text-blue-600"
@@ -186,7 +257,11 @@ export function NotificationMenu({ notifications, align = "end", userId, onNotif
         <div className="flex items-center justify-between bg-slate-50 px-4 py-3">
           <button
             type="button"
-            onClick={handleDeleteAll}
+            onClick={() => {
+              if (!userId) return
+              setOpen(false)
+              setShowDeleteConfirm(true)
+            }}
             className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-semibold text-red-600 tracking-wide transition hover:text-red-700"
           >
             <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
@@ -203,6 +278,38 @@ export function NotificationMenu({ notifications, align = "end", userId, onNotif
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
+    {showDeleteConfirm && (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[210] flex items-center justify-center px-4 py-6">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[420px] p-6">
+          <div className="flex flex-col items-center text-center">
+            <div className="h-14 w-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center mb-4">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-1 text-center">Delete All Notifications</h3>
+            <p className="text-sm text-gray-600 mb-6 max-w-[360px] mx-auto px-4 text-center leading-relaxed break-words whitespace-normal">
+              Are you sure you want to delete all notifications? This action cannot be undone.
+            </p>
+            <div className="flex items-center gap-3 w-full">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="w-full rounded-xl border border-gray-200 bg-white py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAllConfirmed}
+                className="w-full rounded-xl bg-red-600 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 

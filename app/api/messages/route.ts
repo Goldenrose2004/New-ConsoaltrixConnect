@@ -27,13 +27,11 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // If adminId is provided, use it; otherwise, find any admin
     let actualAdminId = adminId
     if (!actualAdminId || actualAdminId === "admin") {
       actualAdminId = await getAdminId(db)
     }
 
-    // Fetch messages between user and admin (bidirectional)
     const messages = await db
       .collection("messages")
       .find({
@@ -48,11 +46,9 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: 1 }) // Sort by creation time ascending (oldest first)
       .toArray()
 
-    // Get unique sender IDs to fetch their profile pictures
     const senderIds = [...new Set(messages.map(msg => msg.senderId))]
     const userProfiles: Record<string, { profilePicture?: string | null }> = {}
     
-    // Fetch admin profile picture once
     const adminUser = await findAdmin(db)
     if (adminUser) {
       const adminId = adminUser._id.toString()
@@ -65,7 +61,6 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    // Fetch profile pictures for all senders
     for (const senderId of senderIds) {
       if (senderId && senderId !== "admin") {
         try {
@@ -89,7 +84,6 @@ export async function GET(request: NextRequest) {
             userProfiles[senderId] = {
               profilePicture: user.profilePicture || null,
             }
-            // If this is an admin user, also map to "admin" string
             if (user.role === "admin") {
               userProfiles["admin"] = {
                 profilePicture: user.profilePicture || null,
@@ -104,7 +98,6 @@ export async function GET(request: NextRequest) {
 
     // Transform messages to match ChatMessage type
     const formattedMessages = messages.map((msg) => {
-      // Determine if message is outgoing based on perspective
       const isAdminMessage = msg.senderId === actualAdminId || msg.senderId === "admin"
       const isOutgoing = perspective === "admin" ? isAdminMessage : !isAdminMessage
 
@@ -181,16 +174,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify that this is a user-to-admin conversation
-    // Get sender and receiver to check their roles
     let sender: any = null
     let receiver: any = null
 
-    // Check if senderId is "admin" or find the actual admin
     if (senderId === "admin") {
       // Admin is sending - find any admin user
       sender = await findAdmin(db)
       if (!sender) {
-        // If no admin found, allow "admin" as a special identifier
         sender = { role: "admin", _id: "admin" }
       }
     } else {
@@ -204,12 +194,10 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Check if receiverId is "admin" or find the actual admin
     if (receiverId === "admin") {
       // Admin is receiving - find any admin user
       receiver = await findAdmin(db)
       if (!receiver) {
-        // If no admin found, allow "admin" as a special identifier
         receiver = { role: "admin", _id: "admin" }
       }
     } else {
@@ -227,7 +215,6 @@ export async function POST(request: NextRequest) {
     const isSenderAdmin = senderId === "admin" || sender?.role === "admin"
     const isReceiverAdmin = receiverId === "admin" || receiver?.role === "admin"
 
-    // If sender is not admin, they can only send to admin
     if (!isSenderAdmin) {
       if (!sender || sender.role === "admin") {
         return NextResponse.json({ ok: false, error: "Invalid sender" }, { status: 400 })
@@ -241,7 +228,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // If sender is admin, they can send to any user
     if (isSenderAdmin && !isReceiverAdmin && !receiver) {
       return NextResponse.json({ ok: false, error: "Invalid receiver" }, { status: 400 })
     }
@@ -255,7 +241,6 @@ export async function POST(request: NextRequest) {
       ? receiver._id.toString()
       : (isReceiverAdmin ? "admin" : receiverId)
 
-    // Create message
     const message: any = {
       senderId: normalizedSenderId,
       receiverId: normalizedReceiverId,
@@ -285,12 +270,10 @@ export async function POST(request: NextRequest) {
 
     const result = await db.collection("messages").insertOne(message)
 
-    // Create notification for the receiver
     try {
       const receiverUserId = normalizedReceiverId
       const senderName = message.senderName || "Admin"
       
-      // Only create notification if receiver is not the sender
       if (receiverUserId !== normalizedSenderId) {
         await db.collection("notifications").insertOne({
           userId: receiverUserId,
@@ -302,10 +285,10 @@ export async function POST(request: NextRequest) {
           readAt: null,
           relatedId: result.insertedId.toString(),
           badgeColor: "#10B981",
+          conversationUserId: isReceiverAdmin ? String(normalizedSenderId) : null,
         })
       }
 
-      // If this is a reply, also notify the original message sender
       if (repliedTo && ObjectId.isValid(repliedTo)) {
         try {
           const originalMessage = await db.collection("messages").findOne({
@@ -317,7 +300,6 @@ export async function POST(request: NextRequest) {
             let normalizedOriginalSenderId = String(originalMessage.senderId)
             let normalizedCurrentSenderId = String(normalizedSenderId)
             
-            // If original sender is admin (ObjectId), normalize it
             if (ObjectId.isValid(originalMessage.senderId)) {
               const originalSenderUser = await db.collection("users").findOne({ 
                 _id: new ObjectId(originalMessage.senderId) 
@@ -325,7 +307,6 @@ export async function POST(request: NextRequest) {
               if (originalSenderUser && originalSenderUser.role === "admin") {
                 normalizedOriginalSenderId = originalSenderUser._id.toString()
               } else {
-                // Check if it's an admin from admins collection
                 const adminFromAdmins = await findAdmin(db, { _id: originalMessage.senderId })
                 if (adminFromAdmins) {
                   normalizedOriginalSenderId = adminFromAdmins._id.toString()
@@ -335,7 +316,6 @@ export async function POST(request: NextRequest) {
               }
             }
             
-            // If current sender is admin, normalize it
             if (normalizedSenderId === "admin" || normalizedSenderId === "Admin") {
               const adminUser = await findAdmin(db)
               if (adminUser) {
@@ -348,7 +328,6 @@ export async function POST(request: NextRequest) {
               if (currentSenderUser && currentSenderUser.role === "admin") {
                 normalizedCurrentSenderId = currentSenderUser._id.toString()
               } else {
-                // Check if it's an admin from admins collection
                 const adminFromAdmins = await findAdmin(db, { _id: normalizedSenderId })
                 if (adminFromAdmins) {
                   normalizedCurrentSenderId = adminFromAdmins._id.toString()
@@ -358,9 +337,7 @@ export async function POST(request: NextRequest) {
               }
             }
             
-            // Only notify if the original sender is different from the current sender
             if (normalizedOriginalSenderId !== normalizedCurrentSenderId) {
-              // Get the sender's name for the notification
               let senderDisplayName = senderName
               if (normalizedSenderId === "admin" || normalizedSenderId === "Admin") {
                 senderDisplayName = "Admin"
@@ -378,6 +355,7 @@ export async function POST(request: NextRequest) {
                 readAt: null,
                 relatedId: result.insertedId.toString(),
                 badgeColor: "#8B5CF6",
+                conversationUserId: normalizedCurrentSenderId,
               })
             }
           }
@@ -458,7 +436,6 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Get the original message before updating to know sender and receiver
     const originalMessage = await db.collection("messages").findOne({
       _id: new ObjectId(messageId),
     })
@@ -470,7 +447,6 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Update the message
     const result = await db.collection("messages").updateOne(
       { _id: new ObjectId(messageId) },
       {
@@ -488,7 +464,6 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Fetch the updated message
     const updatedMessage = await db.collection("messages").findOne({
       _id: new ObjectId(messageId),
     })
@@ -500,7 +475,6 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Create notification for the receiver when message is edited
     try {
       const messageSenderId = originalMessage.senderId
       const messageReceiverId = originalMessage.receiverId
@@ -522,7 +496,6 @@ export async function PUT(request: NextRequest) {
         if (senderUser && senderUser.role === "admin") {
           normalizedSenderId = senderUser._id.toString()
         } else {
-          // Check if it's an admin from admins collection
           const adminFromAdmins = await findAdmin(db, { _id: messageSenderId })
           if (adminFromAdmins) {
             normalizedSenderId = adminFromAdmins._id.toString()
@@ -545,7 +518,6 @@ export async function PUT(request: NextRequest) {
         if (receiverUser && receiverUser.role === "admin") {
           normalizedReceiverId = receiverUser._id.toString()
         } else {
-          // Check if it's an admin from admins collection
           const adminFromAdmins = await findAdmin(db, { _id: messageReceiverId })
           if (adminFromAdmins) {
             normalizedReceiverId = adminFromAdmins._id.toString()
@@ -555,7 +527,6 @@ export async function PUT(request: NextRequest) {
         }
       }
       
-      // Get the editor's name (the sender, since users can only edit their own messages)
       let editorName = "Someone"
       if (messageSenderId === "admin" || messageSenderId === "Admin") {
         editorName = "Admin"
@@ -638,7 +609,6 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Get the message before deleting to notify the sender
     const message = await db.collection("messages").findOne({
       _id: new ObjectId(messageId),
     })
@@ -650,7 +620,6 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Mark the message as deleted instead of actually deleting it
     const result = await db.collection("messages").updateOne(
       { _id: new ObjectId(messageId) },
       {
@@ -670,7 +639,6 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Create notification for the message sender if they're not the one who deleted it
     try {
       const messageSenderId = message.senderId
       const deleterName = deletedByName || "Someone"
@@ -679,7 +647,6 @@ export async function DELETE(request: NextRequest) {
       let normalizedSenderId = String(messageSenderId)
       let normalizedDeleterId = String(deletedBy)
       
-      // If deleter is "admin", check if sender is also an admin
       if (deletedBy === "admin" || deletedBy === "Admin") {
         const adminUser = await findAdmin(db)
         if (adminUser) {
@@ -687,13 +654,11 @@ export async function DELETE(request: NextRequest) {
         }
       }
       
-      // If sender is admin (ObjectId), normalize it
       if (ObjectId.isValid(messageSenderId)) {
         const senderUser = await db.collection("users").findOne({ _id: new ObjectId(messageSenderId) })
         if (senderUser && senderUser.role === "admin") {
           normalizedSenderId = senderUser._id.toString()
         } else {
-          // Check if it's an admin from admins collection
           const adminFromAdmins = await findAdmin(db, { _id: messageSenderId })
           if (adminFromAdmins) {
             normalizedSenderId = adminFromAdmins._id.toString()
@@ -703,7 +668,6 @@ export async function DELETE(request: NextRequest) {
         }
       }
       
-      // Only notify if the deleter is not the sender (after normalization)
       if (normalizedSenderId !== normalizedDeleterId) {
         await db.collection("notifications").insertOne({
           userId: messageSenderId,
@@ -759,7 +723,6 @@ export async function PATCH(request: NextRequest) {
       actualAdminId = await getAdminId(db)
     }
 
-    // Mark all unread messages from this user to admin as read
     const result = await db.collection("messages").updateMany(
       {
         $or: [
@@ -772,7 +735,6 @@ export async function PATCH(request: NextRequest) {
       }
     )
 
-    // Mark related notifications as read
     try {
       const updatedMessages = await db.collection("messages").find({
         $or: [

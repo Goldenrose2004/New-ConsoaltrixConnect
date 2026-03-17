@@ -47,7 +47,6 @@ export function OfflineDetector() {
   const [bannerDismissed, setBannerDismissed] = useState(false)
   const redirectHandledRef = useRef<string | null>(null)
 
-  // Only run after hydration
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -59,14 +58,11 @@ export function OfflineDetector() {
     const online = isOnline()
     setIsOffline(!online)
 
-    // If offline on app startup, check for authenticated user and auto-redirect
     if (!online) {
-      // Check if user is authenticated offline
       if (isOfflineAuthenticated()) {
         const user = getOfflineUser()
         if (user) {
           const dashboardUrl = getDashboardUrl(user)
-          // If not already on dashboard or allowed offline page, redirect
           if (pathname === '/' || pathname === '/login' || pathname === '/signup' || 
               ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
             // Small delay to prevent flickering
@@ -86,7 +82,6 @@ export function OfflineDetector() {
     // Reset redirect handler when pathname changes
     redirectHandledRef.current = null
 
-    // If offline, check if we need to redirect
     if (isOffline) {
       const timeoutId = setTimeout(() => {
         // Prevent multiple redirects for the same pathname
@@ -95,17 +90,14 @@ export function OfflineDetector() {
         }
         redirectHandledRef.current = pathname
 
-        // If user is authenticated offline, allow access to offline pages
         if (isOfflineAuthenticated()) {
           const user = getOfflineUser()
           if (user) {
-            // If on home, login, or signup page, redirect to dashboard
             if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
               const dashboardUrl = getDashboardUrl(user)
               router.push(dashboardUrl)
               return
             }
-            // If on an online-only route, redirect to dashboard
             if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
               const dashboardUrl = getDashboardUrl(user)
               router.push(dashboardUrl)
@@ -116,24 +108,19 @@ export function OfflineDetector() {
           }
         }
 
-        // If on an online-only route while offline and NOT authenticated, redirect to fallback
         if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
           router.push('/offline-fallback')
           return
         }
 
-        // If user is not authenticated and trying to access offline pages
         if (!isOfflineAuthenticated() && pathname !== '/offline-fallback') {
-          // Check if anonymous offline mode is enabled
           const anonymousMode = isAnonymousMode()
           
-          // If anonymous mode is enabled, allow access to offline-allowed routes and dashboards
           if (anonymousMode) {
             // Allow access to dashboards and static pages
             if (OFFLINE_ALLOWED_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
               return // Allow access
             }
-            // If trying to access online-only route, redirect to fallback
             if (ONLINE_ONLY_ROUTES.some(route => pathname.startsWith(route))) {
               router.push('/offline-fallback')
               return
@@ -144,7 +131,6 @@ export function OfflineDetector() {
             }
           }
           
-          // Check if they have currentUser in localStorage
           const currentUser = localStorage.getItem('currentUser')
           if (currentUser) {
             // They have stored user data - allow access to offline pages
@@ -166,14 +152,12 @@ export function OfflineDetector() {
   useEffect(() => {
     if (!mounted) return
 
-    // Handle online/offline status changes
     const updateOnlineStatus = () => {
       const online = isOnline()
       setIsOffline(!online)
       redirectHandledRef.current = null
     }
 
-    // Listen for online/offline events
     window.addEventListener('online', updateOnlineStatus)
     window.addEventListener('offline', updateOnlineStatus)
 

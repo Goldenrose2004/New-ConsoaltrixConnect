@@ -41,7 +41,6 @@ export function OfflineFeatureGuard({ feature, children, fallback }: OfflineFeat
     return <>{children}</>
   }
 
-  // Check if this feature requires internet and we're offline in anonymous mode
   const featureRequiresInternet = isFeatureOnlineOnly(feature)
   const shouldBlockFeature = isOffline && isAnonymous && featureRequiresInternet
 

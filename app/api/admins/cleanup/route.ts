@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
     const deleteResultUsers = await usersCollection.deleteMany({ role: "admin" })
     const totalDeleted = deleteResultAdmins.deletedCount + deleteResultUsers.deletedCount
     
-    // Create the single admin account with lowercase email
     const hashedPassword = await bcrypt.hash(targetAdmin.password, 10)
     await adminsCollection.insertOne({
       ...targetAdmin,

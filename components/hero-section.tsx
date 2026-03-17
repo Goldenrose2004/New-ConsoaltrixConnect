@@ -15,11 +15,9 @@ export function HeroSection() {
   const [showIOSInstructions, setShowIOSInstructions] = useState(false)
 
   useEffect(() => {
-    // Check if iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
     setIsIOS(isIOSDevice)
 
-    // Listen for the beforeinstallprompt event (Chrome, Edge, etc.)
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent the mini-infobar from appearing
       e.preventDefault()
@@ -28,7 +26,6 @@ export function HeroSection() {
       setIsInstallable(true)
     }
 
-    // Listen for app installed event
     const handleAppInstalled = () => {
       console.log('PWA was installed')
       setDeferredPrompt(null)
@@ -55,7 +52,6 @@ export function HeroSection() {
       return
     }
 
-    // Check if already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
     if (isStandalone) {
       // Already installed - show message or do nothing
@@ -64,7 +60,6 @@ export function HeroSection() {
     }
 
     if (!deferredPrompt) {
-      // If no prompt available, the button is still visible
       // User can try installing manually via browser menu
       return
     }
@@ -81,7 +76,6 @@ export function HeroSection() {
       console.log('User dismissed the install prompt')
     }
 
-    // Clear the deferredPrompt but keep button visible
     setDeferredPrompt(null)
     setIsInstallable(false)
   }

@@ -13,16 +13,13 @@ export function OfflineAuthCheck() {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Only check on home page when offline
     if (pathname !== '/') {
       return
     }
 
-    // Check if offline
     if (!isOnline()) {
       // Small delay to ensure localStorage is accessible
       const timeoutId = setTimeout(() => {
-        // Check if user is authenticated offline
         if (isOfflineAuthenticated()) {
           const user = getOfflineUser()
           if (user) {

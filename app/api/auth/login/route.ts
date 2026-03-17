@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
     const normalizedEmail = String(email).trim().toLowerCase()
     const normalizedPassword = String(password).trim()
 
-    // Get IP address for rate limiting and logging
     const ipAddress = request.headers.get("x-forwarded-for") || 
                      request.headers.get("x-real-ip") || 
                      "unknown"
@@ -61,7 +60,6 @@ export async function POST(request: NextRequest) {
       console.error("Database query error:", queryError)
     }
 
-    // If not found in admins, check users collection (for backward compatibility)
     let user = null
     if (!admin) {
       try {
@@ -112,7 +110,6 @@ export async function POST(request: NextRequest) {
     // Reset rate limit on successful login
     resetRateLimit(rateLimitKey)
 
-    // Update lastActive on login
     if (admin) {
       await db.collection("admins").updateOne(
         { _id: admin._id },

@@ -6,7 +6,6 @@ const MONGODB_DB = process.env.MONGODB_DB || "consolatrix_db"
 let cachedClient: MongoClient | null = null
 let cachedDb: Db | null = null
 
-// Get admin credentials from environment variables (fallback to defaults for development)
 const getDefaultAdminAccount = () => ({
   firstName: "System",
   lastName: "Administrator",
@@ -26,7 +25,6 @@ async function ensureDefaultAdmins(db: Db) {
   const existingAdminsInUsers = await usersCollection.find({ role: "admin" }).toArray()
   if (existingAdminsInUsers.length > 0) {
     for (const admin of existingAdminsInUsers) {
-      // Check if admin already exists in admins collection
       const existing = await adminsCollection.findOne({ email: admin.email?.toLowerCase() })
       if (!existing) {
         await adminsCollection.insertOne({
@@ -44,7 +42,6 @@ async function ensureDefaultAdmins(db: Db) {
         })
       }
     }
-    // Remove admins from users collection
     await usersCollection.deleteMany({ role: "admin" })
   }
 
@@ -52,7 +49,6 @@ async function ensureDefaultAdmins(db: Db) {
   const admin = getDefaultAdminAccount()
   const normalizedEmail = admin.email.toLowerCase()
   
-  // Use case-insensitive lookup to find existing admin
   const existing = await adminsCollection.findOne({ 
     email: { $regex: new RegExp(`^${admin.email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
   })
@@ -65,7 +61,6 @@ async function ensureDefaultAdmins(db: Db) {
       _id: { $ne: existing._id }
     })
     
-    // Update the existing admin account to use lowercase email and correct password
     await adminsCollection.updateOne(
       { _id: existing._id },
       { 
@@ -83,10 +78,8 @@ async function ensureDefaultAdmins(db: Db) {
     return
   }
 
-  // If no existing admin found, delete all admins and create the new one
   await adminsCollection.deleteMany({})
   
-  // Create the admin account
   await adminsCollection.insertOne({
     ...admin,
     email: normalizedEmail,
@@ -115,7 +108,6 @@ export async function connectToDatabase() {
     const collections = await db.listCollections({}, { nameOnly: true }).toArray()
     const existingNames = new Set(collections.map((c) => c.name))
 
-    // Create departmentYearSelections collection with a simple validator and indexes
     if (!existingNames.has("departmentYearSelections")) {
       await db.createCollection("departmentYearSelections", {
         validator: {
@@ -161,7 +153,6 @@ export async function connectToDatabase() {
         },
       })
     }
-    // Create indexes (idempotent; duplicates are ignored)
     await db.collection("users").createIndexes([
       { key: { email: 1 }, name: "email_1", unique: true },
       { key: { studentId: 1 }, name: "studentId_1", unique: true },
@@ -171,7 +162,6 @@ export async function connectToDatabase() {
       { key: { department: 1, role: 1 }, name: "department_role_1" },
     ])
 
-    // Create messages collection for chat system (user to admin only)
     if (!existingNames.has("messages")) {
       await db.createCollection("messages", {
         validator: {
@@ -197,7 +187,6 @@ export async function connectToDatabase() {
       ])
     }
 
-    // Create profileEditRequests collection for profile edit approval system
     if (!existingNames.has("profileEditRequests")) {
       await db.createCollection("profileEditRequests", {
         validator: {
@@ -227,7 +216,6 @@ export async function connectToDatabase() {
       ])
     }
 
-    // Create announcements collection
     if (!existingNames.has("announcements")) {
       await db.createCollection("announcements", {
         validator: {
@@ -251,7 +239,6 @@ export async function connectToDatabase() {
       ])
     }
 
-    // Create violations collection
     if (!existingNames.has("violations")) {
       await db.createCollection("violations", {
         validator: {
@@ -287,7 +274,6 @@ export async function connectToDatabase() {
       ])
     }
 
-    // Create notifications collection
     if (!existingNames.has("notifications")) {
       await db.createCollection("notifications", {
         validator: {
@@ -304,6 +290,7 @@ export async function connectToDatabase() {
               readAt: { bsonType: ["date", "null"] },
               relatedId: { bsonType: ["string", "null"] },
               badgeColor: { bsonType: ["string", "null"] },
+              conversationUserId: { bsonType: ["string", "null"] },
             },
           },
         },
@@ -318,7 +305,6 @@ export async function connectToDatabase() {
 
     await ensureDefaultAdmins(db)
   } catch (e) {
-    // If ensuring collections fails, continue; application can still operate,
     // and MongoDB will create the collection on first insert.
     // Consider logging if you have a logger configured.
   }

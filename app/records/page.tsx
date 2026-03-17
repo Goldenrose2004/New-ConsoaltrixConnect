@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { AuthenticatedHeader } from "@/components/authenticated-header"
 import { Footer } from "@/components/footer"
 import { User, BookOpen, Building, Briefcase, AlertTriangle, Check, RefreshCw, Calendar, Tag, FileText, List, CircleCheck, Eye, X } from "lucide-react"
@@ -9,14 +9,16 @@ import { formatTimestampWithTimezone } from "@/lib/utils"
 
 export default function RecordsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [violations, setViolations] = useState<any[]>([])
   const [isLoadingViolations, setIsLoadingViolations] = useState(true)
   const [selectedViolation, setSelectedViolation] = useState<any>(null)
+  const [highlightViolationId, setHighlightViolationId] = useState<string | null>(null)
+  const lastHighlightKeyRef = useRef<string | null>(null)
   const violationsChannelRef = useRef<BroadcastChannel | null>(null)
 
-  // Fetch violations for the logged-in user
   const fetchViolations = useCallback(async () => {
     if (!user?.id) return
 
@@ -39,7 +41,6 @@ export default function RecordsPage() {
   }, [user?.id])
 
   useEffect(() => {
-    // Check if anonymous offline mode is enabled
     const anonymousMode = localStorage.getItem('anonymousOfflineMode')
     const isOffline = !navigator.onLine
     
@@ -49,7 +50,6 @@ export default function RecordsPage() {
       return
     }
 
-    // Check if user is logged in
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
@@ -64,13 +64,46 @@ export default function RecordsPage() {
   useEffect(() => {
     if (user?.id) {
       fetchViolations()
-      // Poll for new violations every 10 seconds
       const interval = setInterval(fetchViolations, 10000)
       return () => clearInterval(interval)
     }
   }, [user?.id, fetchViolations])
 
-  // Listen for violation events
+  useEffect(() => {
+    const targetViolationId = searchParams.get("violationId")
+    const triggerKey = `${targetViolationId || ""}-${searchParams.get("t") || ""}`
+
+    if (!targetViolationId || violations.length === 0) {
+      return
+    }
+
+    // Ensure we only auto-highlight once per unique navigation (violationId + timestamp)
+    if (lastHighlightKeyRef.current === triggerKey) {
+      return
+    }
+
+    const target = violations.find((v) => v.id === targetViolationId)
+    if (!target) return
+
+    lastHighlightKeyRef.current = triggerKey
+
+    setSelectedViolation(target)
+    setHighlightViolationId(targetViolationId)
+
+    const row = document.getElementById(`violation-${targetViolationId}`)
+    if (row) {
+      row.scrollIntoView({ behavior: "smooth", block: "center" })
+    }
+  }, [searchParams, violations])
+
+  useEffect(() => {
+    if (!highlightViolationId) return
+    const timeout = setTimeout(() => {
+      setHighlightViolationId(null)
+    }, 2000)
+    return () => clearTimeout(timeout)
+  }, [highlightViolationId])
+
   useEffect(() => {
     const handleViolationUpdate = () => {
       fetchViolations()
@@ -463,9 +496,18 @@ export default function RecordsPage() {
                         }
 
                         const statusMeta = getStatusMeta(violation.status)
+                        const isSelected = selectedViolation?.id === violation.id
+                        const isHighlighted = highlightViolationId === violation.id
 
                         return (
-                          <tr key={violation.id} className="hover:bg-gray-50 transition-colors duration-200">
+                          <tr
+                            key={violation.id}
+                            id={`violation-${violation.id}`}
+                            className={`hover:bg-gray-50 transition-colors duration-200 cursor-pointer ${
+                              isSelected ? "bg-blue-50" : ""
+                            } ${isHighlighted ? "ring-2 ring-red-500 bg-red-50" : ""}`}
+                            onClick={() => setSelectedViolation(violation)}
+                          >
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: "#041A44" }}></div>

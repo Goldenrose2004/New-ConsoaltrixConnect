@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { AuthenticatedHeader } from "@/components/authenticated-header"
 import Image from "next/image"
 import { Reply, Smile, MoreVertical, Edit, Trash2, X, Copy } from "lucide-react"
@@ -34,6 +34,7 @@ type ChatMessage = {
 
 export default function ChatsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [user, setUser] = useState<any>(null)
   const [adminProfilePicture, setAdminProfilePicture] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -56,14 +57,13 @@ export default function ChatsPage() {
   const shouldAutoScrollRef = useRef(true)
   const lastMessageCountRef = useRef(0)
   const userScrolledRef = useRef(false)
+  const hasScrolledToNotificationMessageRef = useRef(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const reactRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Fetch admin profile picture
   const fetchAdminProfilePicture = async () => {
     try {
-      // Find admin user - typically admin has role "admin" or we can search for a specific admin
       const response = await fetch("/api/users/find?role=admin")
       const data = await response.json()
       if (data.ok && data.users && data.users.length > 0) {
@@ -78,7 +78,6 @@ export default function ChatsPage() {
   }
 
   useEffect(() => {
-    // Check if user is logged in
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
@@ -89,24 +88,19 @@ export default function ChatsPage() {
     setUser(userData)
     setIsLoading(false)
 
-    // Fetch admin profile picture
     fetchAdminProfilePicture()
 
-    // Listen for profile picture updates
     const handleProfilePictureUpdate = (event: CustomEvent) => {
       const updatedUser = event.detail
-      // If the updated user is admin, update admin profile picture
       if (updatedUser?.role === "admin") {
         setAdminProfilePicture(updatedUser.profilePicture || null)
       }
-      // If it's the current user, update their data
       if (updatedUser?.id === userData?.id) {
         setUser(updatedUser)
         localStorage.setItem("currentUser", JSON.stringify(updatedUser))
       }
     }
 
-    // Listen for storage changes (cross-tab updates)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "currentUser" && e.newValue) {
         try {
@@ -129,12 +123,10 @@ export default function ChatsPage() {
     }
   }, [router])
 
-  // Fetch messages from database (user perspective)
   const fetchMessages = async () => {
     if (!user) return
 
     try {
-      // Get user ID (handle both id and _id formats)
       const userId = user.id || user._id
       const userIdString = typeof userId === 'object' ? userId.toString() : String(userId)
 
@@ -142,19 +134,15 @@ export default function ChatsPage() {
       const data = await response.json()
       
       if (data.ok && data.messages) {
-        // Update admin profile picture if found in messages
         const adminMessage = data.messages.find((msg: ChatMessage) => !msg.isOutgoing && msg.senderProfilePicture)
         if (adminMessage?.senderProfilePicture) {
           setAdminProfilePicture(adminMessage.senderProfilePicture)
         }
         
-        // Check if new messages were added by comparing with last known count
         const previousCount = lastMessageCountRef.current
         const newCount = data.messages.length
         
-        // Only auto-scroll if new messages were added AND user hasn't manually scrolled up
         if (newCount > previousCount && !userScrolledRef.current) {
-          // Check if user is near bottom (within 150px) - if not, don't auto-scroll
           const container = messagesContainerRef.current
           if (container) {
             const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150
@@ -186,7 +174,6 @@ export default function ChatsPage() {
     }
   }
   
-  // Track scroll position to determine if user scrolled up
   const handleScroll = () => {
     const container = messagesContainerRef.current
     if (!container) return
@@ -196,12 +183,10 @@ export default function ChatsPage() {
     const clientHeight = container.clientHeight
     const isNearBottom = scrollHeight - scrollTop - clientHeight < 150
     
-    // If user scrolls up significantly, mark that they manually scrolled
     if (scrollTop < scrollHeight - clientHeight - 200) {
       userScrolledRef.current = true
     }
     
-    // If user scrolls back near bottom, reset the flag
     if (isNearBottom) {
       userScrolledRef.current = false
       shouldAutoScrollRef.current = true
@@ -218,7 +203,6 @@ export default function ChatsPage() {
       lastMessageCountRef.current = 0
       fetchMessages()
       
-      // Poll for new messages every 5 seconds
       const interval = setInterval(() => {
         fetchMessages()
       }, 5000)
@@ -230,14 +214,24 @@ export default function ChatsPage() {
   // Scroll to bottom when messages change (only if shouldAutoScroll is true)
   useEffect(() => {
     if (shouldAutoScrollRef.current && messagesEndRef.current) {
-      // Use setTimeout to ensure DOM is updated
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
       }, 100)
     }
   }, [messages])
 
-  // Handle file selection
+  // Scroll to a specific message when opened from a notification (once only)
+  useEffect(() => {
+    const targetMessageId = searchParams.get("messageId")
+    if (!targetMessageId || hasScrolledToNotificationMessageRef.current || messages.length === 0) {
+      return
+    }
+    scrollToMessage(targetMessageId)
+    hasScrolledToNotificationMessageRef.current = true
+    // Clean up the query parameter so it doesn't retrigger
+    router.replace("/chats")
+  }, [searchParams, messages, router])
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
@@ -256,7 +250,6 @@ export default function ChatsPage() {
       }
       validFiles.push(file)
 
-      // Create preview for images and videos
       if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
         const reader = new FileReader()
         reader.onload = (e) => {
@@ -275,7 +268,6 @@ export default function ChatsPage() {
     }
   }
 
-  // Remove file from selection
   const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index))
     setFilePreviews(prev => prev.filter((_, i) => i !== index))
@@ -284,7 +276,6 @@ export default function ChatsPage() {
     }
   }
 
-  // Convert files to base64 attachments
   const convertFilesToAttachments = async (files: File[]): Promise<Attachment[]> => {
     const attachments: Attachment[] = []
     
@@ -313,12 +304,10 @@ export default function ChatsPage() {
     if ((!message.trim() && selectedFiles.length === 0) || !user) return
 
     try {
-      // Get user ID (handle both id and _id formats)
       const userId = user.id || user._id
       const userIdString = typeof userId === 'object' ? userId.toString() : String(userId)
       const userInitials = (user?.firstName?.[0] || "U") + (user?.lastName?.[0] || "")
 
-      // Convert files to attachments
       const attachments = selectedFiles.length > 0 
         ? await convertFilesToAttachments(selectedFiles)
         : []
@@ -342,9 +331,7 @@ export default function ChatsPage() {
       const data = await response.json()
 
       if (data.ok && data.message) {
-        // Update isOutgoing to true for user perspective (user's own messages appear on right)
         const userMessage = { ...data.message, isOutgoing: true }
-        // Add the new message to the list
         shouldAutoScrollRef.current = true // Always scroll when sending a message
         userScrolledRef.current = false // Reset scroll flag when sending
         lastMessageCountRef.current = messages.length + 1
@@ -367,13 +354,11 @@ export default function ChatsPage() {
   const scrollToMessage = (messageId: string) => {
     const messageElement = document.getElementById(`message-${messageId}`)
     if (messageElement && messagesContainerRef.current) {
-      // Highlight the message
       setHighlightedMessageId(messageId)
       
       // Scroll to the message
       messageElement.scrollIntoView({ behavior: "smooth", block: "center" })
       
-      // Remove highlight after 2 seconds
       setTimeout(() => {
         setHighlightedMessageId(null)
       }, 2000)
@@ -418,7 +403,6 @@ export default function ChatsPage() {
     if (!user) return
 
     try {
-      // Get user ID (handle both id and _id formats)
       const userId = user.id || user._id
       const userIdString = typeof userId === 'object' ? userId.toString() : String(userId)
       const userName = `${user.firstName} ${user.lastName}`
@@ -438,7 +422,6 @@ export default function ChatsPage() {
       const data = await response.json()
 
       if (data.ok) {
-        // Update the message to show as deleted instead of removing it
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === messageId
@@ -493,7 +476,6 @@ export default function ChatsPage() {
     }
   }
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (messageMenuRef.current && !messageMenuRef.current.contains(event.target as Node)) {
@@ -516,7 +498,6 @@ export default function ChatsPage() {
     if (!user) return
 
     try {
-      // Get user ID (handle both id and _id formats)
       const userId = user.id || user._id
       const userIdString = typeof userId === 'object' ? userId.toString() : String(userId)
 
@@ -535,7 +516,6 @@ export default function ChatsPage() {
       const data = await response.json()
 
       if (data.ok) {
-        // Update the message with new reactions
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === messageId ? { ...msg, reactions: data.reactions || [] } : msg
@@ -553,7 +533,6 @@ export default function ChatsPage() {
     }
   }
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {

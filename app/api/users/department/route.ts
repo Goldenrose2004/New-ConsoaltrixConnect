@@ -47,7 +47,6 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .toArray()
 
-    // Format users for frontend
     const formattedUsers = users.map((user) => ({
       id: user._id.toString(),
       firstName: user.firstName || "",

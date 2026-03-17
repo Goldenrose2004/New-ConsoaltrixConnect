@@ -16,7 +16,6 @@ export default function InstitutionalObjectivesPage() {
     setIsMounted(true)
     const isOffline = !navigator.onLine
     
-    // Check if anonymous offline mode is enabled
     const anonymousMode = localStorage.getItem('anonymousOfflineMode')
     if (isOffline && anonymousMode === 'true') {
       setIsLoading(false)
@@ -25,7 +24,6 @@ export default function InstitutionalObjectivesPage() {
 
     const currentUser = localStorage.getItem("currentUser")
     
-    // If offline, allow access even without currentUser (page is cached)
     if (isOffline) {
       if (currentUser) {
         setUser(JSON.parse(currentUser))
@@ -34,7 +32,6 @@ export default function InstitutionalObjectivesPage() {
       return
     }
     
-    // If online, require authentication
     if (!currentUser) {
       router.push("/login")
       return

@@ -177,7 +177,6 @@ export default function CollegeDashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [announcementCount, setAnnouncementCount] = useState(0)
 
-  // Fetch announcement notification count
   const fetchAnnouncementCount = useCallback(async () => {
     try {
       const response = await fetch(`/api/announcements?sort=desc`)
@@ -194,7 +193,6 @@ export default function CollegeDashboardPage() {
   }, [])
 
   useEffect(() => {
-    // Check if user is logged in (online or offline)
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
@@ -206,7 +204,6 @@ export default function CollegeDashboardPage() {
       setUser(userData)
       setIsLoading(false)
 
-      // Only fetch announcement count if online
       if (navigator.onLine) {
         fetchAnnouncementCount()
       }
@@ -216,7 +213,6 @@ export default function CollegeDashboardPage() {
     }
   }, [router, fetchAnnouncementCount])
 
-  // Poll for new announcement notifications every 5 seconds (only when online)
   useEffect(() => {
     if (!navigator.onLine) return
 
@@ -226,7 +222,6 @@ export default function CollegeDashboardPage() {
       }
     }, 5000)
 
-    // Listen for custom events
     const handleAnnouncementChange = () => {
       if (navigator.onLine) {
         fetchAnnouncementCount()

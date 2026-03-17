@@ -15,14 +15,12 @@ export default function CollegeDepartmentPage() {
     setIsMounted(true)
     const isOffline = !navigator.onLine
 
-    // Check if anonymous offline mode is enabled
     const anonymousMode = localStorage.getItem('anonymousOfflineMode')
     if (isOffline && anonymousMode === 'true') {
       setIsLoading(false)
       return
     }
 
-    // If offline, allow access even without currentUser (page is cached)
     if (isOffline) {
       const currentUser = localStorage.getItem("currentUser")
       if (currentUser) {
@@ -32,7 +30,6 @@ export default function CollegeDepartmentPage() {
       return
     }
 
-    // If online, require authentication
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")

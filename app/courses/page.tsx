@@ -12,7 +12,6 @@ export default function CoursesPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Check if anonymous offline mode is enabled
     const anonymousMode = localStorage.getItem('anonymousOfflineMode')
     const isOffline = !navigator.onLine
     

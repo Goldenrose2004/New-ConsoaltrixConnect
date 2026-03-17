@@ -16,7 +16,6 @@ export async function GET(request: NextRequest) {
       .sort({ submittedAt: -1 })
       .toArray()
 
-    // Convert MongoDB _id to string id for frontend
     const formattedRequests = requests.map((req) => ({
       id: req._id.toString(),
       userId: req.userId,
@@ -64,12 +63,10 @@ export async function POST(request: NextRequest) {
 
     const db = await connectToDatabase().then((r) => r.db)
 
-    // Get user information - handle userId as either ObjectId or string
     let userQuery: any = {}
     if (ObjectId.isValid(userId)) {
       userQuery._id = new ObjectId(userId)
     } else {
-      // If not a valid ObjectId, try to find by email or studentId
       userQuery = {
         $or: [
           { email: userId },
@@ -86,14 +83,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if there's already a pending request for this user
     const existingRequest = await db.collection("profileEditRequests").findOne({
       userId: user._id.toString(),
       status: "pending",
     })
 
     if (existingRequest) {
-      // Update existing pending request
       await db.collection("profileEditRequests").updateOne(
         { _id: existingRequest._id },
         {
@@ -105,9 +100,7 @@ export async function POST(request: NextRequest) {
         }
       )
 
-      // Create notifications for all admins about the updated profile edit request
       try {
-        // Get admins from both collections
         const adminsFromAdmins = await db.collection("admins").find({}).toArray()
         const adminsFromUsers = await db.collection("users").find({ role: "admin" }).toArray()
         const allAdmins = [...adminsFromAdmins, ...adminsFromUsers]
@@ -142,7 +135,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create new request
     const newRequest = {
       userId: user._id.toString(),
       studentId: user.studentId,
@@ -159,7 +151,6 @@ export async function POST(request: NextRequest) {
 
     const result = await db.collection("profileEditRequests").insertOne(newRequest)
 
-    // Create notifications for all admins about the new profile edit request
     try {
       const adminsFromAdmins = await db.collection("admins").find({}).toArray()
       const adminsFromUsers = await db.collection("users").find({ role: "admin" }).toArray()

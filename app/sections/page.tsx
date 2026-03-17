@@ -19,14 +19,12 @@ export default function SectionsPage() {
     const isOffline = !navigator.onLine
     const currentUser = localStorage.getItem("currentUser")
 
-    // Check if anonymous offline mode is enabled
     const anonymousMode = localStorage.getItem('anonymousOfflineMode')
     if (isOffline && anonymousMode === 'true') {
       setIsLoading(false)
       return
     }
 
-    // If offline, allow access even without currentUser (page is cached)
     if (isOffline) {
       if (currentUser) {
         setUser(JSON.parse(currentUser))
@@ -35,7 +33,6 @@ export default function SectionsPage() {
       return
     }
 
-    // If online, require authentication
     if (!currentUser) {
       router.push("/login")
       return
@@ -57,7 +54,6 @@ export default function SectionsPage() {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>
   }
 
-  // Determine home href based on department
   const isBasicEducation = 
     user?.department === "Elementary" ||
     user?.department === "Junior High School" ||
@@ -142,7 +138,6 @@ export default function SectionsPage() {
               const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5
               
               // Always prevent page scroll when scrolling inside the container
-              // Only allow page scroll if we're at the boundaries and trying to scroll further
               if (!((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom))) {
                 e.stopPropagation()
               }
@@ -229,7 +224,6 @@ export default function SectionsPage() {
                   const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5
                   
                   // Always prevent page scroll when scrolling inside the container
-                  // Only allow page scroll if we're at the boundaries and trying to scroll further
                   if (!((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom))) {
                     e.stopPropagation()
                   }

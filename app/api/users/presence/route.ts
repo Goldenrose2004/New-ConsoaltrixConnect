@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 
-// Update user's last active timestamp
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await request.json()
@@ -18,7 +17,6 @@ export async function POST(request: NextRequest) {
     if (ObjectId.isValid(userId)) {
       query._id = new ObjectId(userId)
     } else {
-      // If not a valid ObjectId, try email or studentId
       query = {
         $or: [
           { email: userId },
@@ -27,7 +25,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Update user's lastActive timestamp
     const result = await db.collection("users").updateOne(
       query,
       {

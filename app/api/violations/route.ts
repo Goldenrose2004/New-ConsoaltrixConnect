@@ -38,7 +38,6 @@ export async function GET(request: NextRequest) {
       // Build a comprehensive list of all possible department name variations
       const allPossibleDepartments: string[] = []
       
-      // Add the department code itself
       allPossibleDepartments.push(department)
       
       // Add mapped values from departmentMapping
@@ -61,7 +60,6 @@ export async function GET(request: NextRequest) {
         allPossibleDepartments.push("College", "college", "COLLEGE")
       }
       
-      // Remove duplicates
       const uniqueDepartments = [...new Set(allPossibleDepartments)]
       
       query.studentDepartment = { $in: uniqueDepartments }
@@ -157,7 +155,6 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Format violations for frontend
     const formattedViolations = violations.map((violation) => ({
       id: violation._id.toString(),
       userId: violation.userId,
@@ -260,7 +257,6 @@ export async function POST(request: NextRequest) {
     // Ensure analytics dashboard refreshes quickly
     invalidateAnalyticsCache()
 
-    // Fetch the created violation
     const createdViolation = await db.collection("violations").findOne({
       _id: result.insertedId,
     })
@@ -272,7 +268,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Format for response
     const formattedViolation = {
       id: createdViolation._id.toString(),
       userId: createdViolation.userId,

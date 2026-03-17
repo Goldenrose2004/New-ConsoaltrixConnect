@@ -26,10 +26,8 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
   const [userId, setUserId] = useState<string | null>(null)
   const [isMounted, setIsMounted] = useState(false)
   
-  // Track user presence/activity
   usePresence()
 
-  // Fetch notifications
   const fetchNotifications = useCallback(async (currentUserId: string) => {
     try {
       const response = await fetch(`/api/notifications?userId=${currentUserId}`)
@@ -52,7 +50,6 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
         
         if (currentUserId) {
           setUserId(currentUserId)
-          // Fetch notifications immediately
           fetchNotifications(currentUserId)
         }
         
@@ -85,7 +82,6 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
       setHomeHref("/basic-education-dashboard")
     }
     
-    // Listen for storage changes to update profile picture when it's changed
     const handleStorageChange = () => {
       try {
         const raw = localStorage.getItem("currentUser")
@@ -102,7 +98,6 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
       }
     }
     
-    // Listen for custom event when profile picture is updated
     window.addEventListener("storage", handleStorageChange)
     window.addEventListener("profilePictureUpdated", handleStorageChange)
     
@@ -112,7 +107,6 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
     }
   }, [fetchNotifications])
 
-  // Poll for new notifications every 5 seconds
   useEffect(() => {
     if (!userId) return
 
@@ -225,7 +219,13 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
 
           {/* User Actions */}
           <div className="hidden flex-shrink-0 items-center gap-3 lg:gap-4 whitespace-nowrap md:flex">
-            <NotificationMenu notifications={notifications} align="end" userId={userId} onNotificationUpdate={() => userId && fetchNotifications(userId)} />
+            <NotificationMenu
+              notifications={notifications}
+              align="end"
+              userId={userId}
+              onNotificationUpdateAction={() => userId && fetchNotifications(userId)}
+              variant="user"
+            />
             <Link
               href="/profile"
               className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold hover:opacity-80 transition cursor-pointer border border-white overflow-hidden"
@@ -247,7 +247,13 @@ export function AuthenticatedHeader({ userName = "User", userInitials = "U", hid
 
           {/* Mobile Actions - Notification and Menu */}
           <div className="flex items-center gap-2 md:hidden">
-            <NotificationMenu notifications={notifications} align="end" userId={userId} onNotificationUpdate={() => userId && fetchNotifications(userId)} />
+            <NotificationMenu
+              notifications={notifications}
+              align="end"
+              userId={userId}
+              onNotificationUpdateAction={() => userId && fetchNotifications(userId)}
+              variant="user"
+            />
             <button onClick={() => setIsOpen(!isOpen)} className="text-white p-2 z-10" aria-label="Toggle menu">
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>

@@ -14,7 +14,6 @@ export function AutoLoginCheck() {
   const hasCheckedRef = useRef(false)
   const [mounted, setMounted] = useState(false)
 
-  // Only run after hydration
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -22,7 +21,6 @@ export function AutoLoginCheck() {
   useEffect(() => {
     if (!mounted) return
     
-    // Only check once on mount
     if (hasCheckedRef.current) {
       return
     }
@@ -41,11 +39,9 @@ export function AutoLoginCheck() {
       if (hasValidSession()) {
         const session = getPersistentSession()
         if (session) {
-          // Check if user data exists
           if (isOfflineAuthenticated()) {
             const user = getOfflineUser()
             if (user) {
-              // If on home page, login page, or signup page, redirect to dashboard
               if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
                 const dashboardUrl = getDashboardUrl(user)
                 router.push(dashboardUrl)
@@ -60,7 +56,6 @@ export function AutoLoginCheck() {
       if (isOfflineAuthenticated()) {
         const user = getOfflineUser()
         if (user) {
-          // If on home page, login page, or signup page, redirect to dashboard
           if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
             const dashboardUrl = getDashboardUrl(user)
             router.push(dashboardUrl)
@@ -83,7 +78,6 @@ export function AutoLoginCheck() {
               const newToken = btoa(`${user.id}:${Date.now()}`).replace(/[^a-zA-Z0-9]/g, '')
               localStorage.setItem('pwa_auth_token', newToken)
               
-              // Update user data
               const updatedUser = {
                 ...user,
                 loginToken: newToken,
@@ -92,7 +86,6 @@ export function AutoLoginCheck() {
               localStorage.setItem('currentUser', JSON.stringify(updatedUser))
             }
 
-            // If on home page, login page, or signup page, redirect to dashboard
             if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
               const dashboardUrl = getDashboardUrl(user)
               router.push(dashboardUrl)

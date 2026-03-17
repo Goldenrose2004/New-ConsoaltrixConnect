@@ -15,7 +15,6 @@ export default function ProfilePage() {
   const [lastLogin, setLastLogin] = useState<string>("")
 
   useEffect(() => {
-    // Check if user is logged in (online or offline)
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
@@ -31,10 +30,8 @@ export default function ProfilePage() {
       return
     }
     
-    // Fetch fresh user data from database to ensure we have the latest profile (only if online)
     const fetchFreshUserData = async () => {
       if (!navigator.onLine) {
-        // Offline mode - use cached data only
         setUser(userData)
         setIsLoading(false)
         return
@@ -45,7 +42,6 @@ export default function ProfilePage() {
         const data = await response.json()
         
         if (data.ok && data.user) {
-          // Update localStorage with fresh data
           localStorage.setItem("currentUser", JSON.stringify(data.user))
           setUser(data.user)
         } else {
@@ -66,13 +62,11 @@ export default function ProfilePage() {
       const updatedUser = event.detail
       if (updatedUser && updatedUser.id === userData.id) {
         console.log("Profile updated via event, refreshing...")
-        // Update localStorage and state
         localStorage.setItem("currentUser", JSON.stringify(updatedUser))
         setUser(updatedUser)
       }
     }
 
-    // Listen for profile update events (when admin approves profile changes)
     window.addEventListener("userProfileUpdated", handleProfileUpdate as EventListener)
 
     // Set up periodic polling to check for profile updates (every 5 seconds, only when online)
@@ -87,7 +81,6 @@ export default function ProfilePage() {
           const currentUser = localStorage.getItem("currentUser")
           if (currentUser) {
             const currentUserData = JSON.parse(currentUser)
-            // Check if any profile fields have changed
             const hasChanges = 
               currentUserData.firstName !== data.user.firstName ||
               currentUserData.lastName !== data.user.lastName ||
@@ -101,7 +94,6 @@ export default function ProfilePage() {
               console.log("Profile changes detected, updating...")
               localStorage.setItem("currentUser", JSON.stringify(data.user))
               setUser(data.user)
-              // Dispatch event for other tabs/components
               window.dispatchEvent(new CustomEvent("userProfileUpdated", { detail: data.user }))
             }
           }
@@ -111,7 +103,6 @@ export default function ProfilePage() {
       }
     }, 5000) // Poll every 5 seconds
 
-    // Listen for storage changes (cross-tab communication)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "currentUser" && e.newValue) {
         try {
@@ -160,7 +151,6 @@ export default function ProfilePage() {
       handleProfileUpdateTrigger()
     }, 1000) // Check every second for triggers
 
-    // Get join date from localStorage or set default
     const storedJoinDate = localStorage.getItem(`joinDate_${userData.id}`)
     if (storedJoinDate) {
       setJoinDate(storedJoinDate)
@@ -176,7 +166,6 @@ export default function ProfilePage() {
       localStorage.setItem(`joinDate_${userData.id}`, formattedDate)
     }
 
-    // Get last login from localStorage or set default
     const storedLastLogin = localStorage.getItem(`lastLogin_${userData.id}`)
     if (storedLastLogin) {
       setLastLogin(storedLastLogin)
@@ -195,7 +184,6 @@ export default function ProfilePage() {
       localStorage.setItem(`lastLogin_${userData.id}`, formattedDateTime)
     }
 
-    // Update last login on page visit
     const date = new Date()
     const formattedDateTime = date.toLocaleString("en-US", {
       year: "numeric",
@@ -240,20 +228,17 @@ export default function ProfilePage() {
   const userInitials = (user?.firstName?.[0] || "U") + (user?.lastName?.[0] || "")
   const fullName = `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "N/A"
 
-  // Format year level
   const formatYearLevel = () => {
     const yearLevel = user?.yearLevel
     
     if (!yearLevel) return "N/A"
     
-    // If yearLevel is already a formatted string (e.g., "Grade 1", "1st Year"), remove "Grade" if present
     if (typeof yearLevel === "string") {
       return yearLevel.replace(/^Grade\s+/i, "")
     }
     
     // Legacy support for numeric year levels
     if (typeof yearLevel === "number") {
-      // For College (year levels 13-16)
       if (yearLevel >= 13 && yearLevel <= 16) {
         const yearNum = yearLevel - 12
         let suffix = "th"
@@ -269,7 +254,6 @@ export default function ProfilePage() {
     return "N/A"
   }
 
-  // Format department and year level display
   const formatDepartmentYear = () => {
     const department = user?.department || "N/A"
     const yearLevel = user?.yearLevel
@@ -284,7 +268,6 @@ export default function ProfilePage() {
       else if (yearNum === 3) suffix = "rd"
       return `${department} • ${yearNum}${suffix} Year`
     } else {
-      // Handle both string and number year levels
       let yearDisplay = ""
       if (typeof yearLevel === "string") {
         yearDisplay = yearLevel.replace(/^Grade\s+/i, "")
@@ -295,7 +278,6 @@ export default function ProfilePage() {
     }
   }
 
-  // Format member since date
   const formatMemberSince = () => {
     if (!joinDate) return "Oct 2025"
     const date = new Date(joinDate)

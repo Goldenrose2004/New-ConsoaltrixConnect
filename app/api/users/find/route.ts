@@ -11,12 +11,10 @@ export async function GET(request: Request) {
 
     const db = await connectToDatabase().then((r) => r.db)
     
-    // If role is provided, find users by role
     if (role) {
       let users = []
       
       if (role === "admin") {
-        // For admin role, check admins collection first, then users collection
         const admins = await db
           .collection("admins")
           .find({}, { projection: { password: 0 } })

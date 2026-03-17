@@ -16,7 +16,6 @@ export async function GET(request: NextRequest) {
       actualAdminId = await getAdminId(db)
     }
 
-    // Get unread message counts for each user
     // Unread messages are those sent by users to admin that haven't been read
     const unreadCounts = await db
       .collection("messages")
@@ -98,7 +97,6 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Convert to the format expected by the frontend
     const result: Record<string, number> = {}
     Object.keys(countsMap).forEach((userId) => {
       result[userId] = countsMap[userId].count

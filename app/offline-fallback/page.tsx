@@ -10,7 +10,6 @@ export default function OfflineFallbackPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if user is authenticated offline
     if (isOfflineAuthenticated()) {
       const user = getOfflineUser()
       if (user) {
@@ -19,7 +18,6 @@ export default function OfflineFallbackPage() {
       }
     }
 
-    // Listen for online event
     const handleOnline = () => {
       // Reload page when back online
       window.location.reload()
@@ -33,7 +31,6 @@ export default function OfflineFallbackPage() {
     if (isOnline()) {
       window.location.reload()
     } else {
-      // If authenticated, try to go to dashboard
       if (isOfflineAuthenticated()) {
         const user = getOfflineUser()
         if (user) {

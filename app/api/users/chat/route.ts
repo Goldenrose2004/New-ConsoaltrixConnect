@@ -5,7 +5,6 @@ export async function GET() {
   try {
     const db = await connectToDatabase().then((r) => r.db)
     
-    // Fetch all users except admins (only regular users can be chatted with)
     const users = await db
       .collection("users")
       .find(

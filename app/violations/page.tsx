@@ -15,7 +15,6 @@ export default function ViolationsPage() {
   const violationsChannelRef = useRef<BroadcastChannel | null>(null)
 
   useEffect(() => {
-    // Check if user is logged in
     const currentUser = localStorage.getItem("currentUser")
     if (!currentUser) {
       router.push("/login")
@@ -27,7 +26,6 @@ export default function ViolationsPage() {
     setIsLoading(false)
   }, [router])
 
-  // Fetch violations for the logged-in user
   const fetchViolations = useCallback(async () => {
     if (!user?.id) return
 
@@ -52,13 +50,11 @@ export default function ViolationsPage() {
   useEffect(() => {
     if (user?.id) {
       fetchViolations()
-      // Poll for new violations every 10 seconds
       const interval = setInterval(fetchViolations, 10000)
       return () => clearInterval(interval)
     }
   }, [user?.id, fetchViolations])
 
-  // Listen for violation events
   useEffect(() => {
     const handleViolationUpdate = () => {
       fetchViolations()

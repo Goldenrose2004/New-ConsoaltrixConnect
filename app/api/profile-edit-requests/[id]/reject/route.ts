@@ -7,7 +7,6 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    // Handle both Promise and direct params (for Next.js 13+ compatibility)
     const resolvedParams = params instanceof Promise ? await params : params
     const { id } = resolvedParams
     
@@ -50,7 +49,6 @@ export async function PATCH(
       )
     }
 
-    // Update the request status to rejected
     await db.collection("profileEditRequests").updateOne(
       { _id: new ObjectId(id) },
       {
@@ -62,7 +60,6 @@ export async function PATCH(
       }
     )
 
-    // Create notification for the user whose profile edit request was rejected
     try {
       const userId = requestDoc.userId
       await db.collection("notifications").insertOne({

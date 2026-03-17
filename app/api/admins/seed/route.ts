@@ -7,7 +7,6 @@ type SeedResult = {
   created: boolean
 }
 
-// Get admin credentials from environment variables (fallback to defaults for development)
 const getAdminSeedData = () => [
   {
     firstName: "System",
@@ -43,7 +42,6 @@ export async function POST(request: NextRequest) {
     const usersCollection = db.collection("users")
     const results: SeedResult[] = []
 
-    // Remove all existing admin accounts from both collections
     await adminsCollection.deleteMany({})
     await usersCollection.deleteMany({ role: "admin" })
 

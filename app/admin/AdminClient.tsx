@@ -120,7 +120,6 @@ function CollegeFilledIcon({ size = 20, className = "" }: { size?: number; class
   )
 }
 
-// FontAwesome fa-book-reader icon - exact match (person's head above open book)
 function BookReaderIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
   return (
     <svg
@@ -136,7 +135,6 @@ function BookReaderIcon({ size = 20, className = "" }: { size?: number; classNam
   )
 }
 
-// user-graduate icon -(person's head with graduation cap)
 function UserGraduateIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
   return (
     <svg
@@ -235,17 +233,13 @@ export default function AdminPage() {
     })
   }
   
-  // Track admin presence/activity
   usePresence()
 
-  // Fetch notifications
   const fetchNotifications = async (adminId: string) => {
     try {
       const response = await fetch(`/api/notifications?userId=${adminId}`)
       
-      // Check if response is ok before parsing JSON
       if (!response.ok) {
-        // Silently fail - don't interrupt user experience
         return
       }
       
@@ -254,18 +248,15 @@ export default function AdminPage() {
         setNotifications(data.notifications)
       }
     } catch (error) {
-      // Silently fail - network errors are expected if server is temporarily unavailable
-      // Don't log to console to avoid cluttering the console
+      // Fail silently
     }
   }
 
-  // Poll for new notifications every 5 seconds
   useEffect(() => {
     if (!currentUser?.id) return
 
     const userId = currentUser.id
 
-    // Fetch immediately
     fetchNotifications(userId)
 
     const interval = setInterval(() => {
@@ -274,7 +265,6 @@ export default function AdminPage() {
       }
     }, 5000)
 
-    // Also listen for custom events that might trigger notification updates
     const handleNotificationUpdate = () => {
       if (userId) {
         fetchNotifications(userId)
@@ -350,7 +340,6 @@ export default function AdminPage() {
       setSelectedDepartment(null)
     } else {
       params.set("tab", tabId)
-      // When switching to a non-records tab, clear department but keep tab param
       if (tabId !== "records") {
         params.delete("department")
         setSelectedDepartment(null)
@@ -443,6 +432,7 @@ const OverviewSection = memo(function OverviewSection({
 }: {
   onShowSuccess?: (dialog: SuccessDialogState) => void
 }) {
+  const searchParams = useSearchParams()
   const [pendingEdits, setPendingEdits] = useState<PendingProfileEdit[]>([])
   const [selectedEditId, setSelectedEditId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -509,10 +499,17 @@ const OverviewSection = memo(function OverviewSection({
       setSelectedEditId(null)
       return
     }
+
+    const targetRequestId = searchParams.get("requestId")
+    if (targetRequestId && pendingEdits.some((edit) => edit.id === targetRequestId)) {
+      setSelectedEditId(targetRequestId)
+      return
+    }
+
     if (!selectedEditId || !pendingEdits.some((edit) => edit.id === selectedEditId)) {
       setSelectedEditId(pendingEdits[0].id)
     }
-  }, [pendingEdits, selectedEditId])
+  }, [pendingEdits, selectedEditId, searchParams])
 
   const buildProfileFieldList = (edit: PendingProfileEdit | null) => {
     if (!edit) return []
@@ -566,18 +563,14 @@ const OverviewSection = memo(function OverviewSection({
       console.log("Approve response:", data)
 
       if (data.ok) {
-        // Remove the approved request from the list
         setPendingEdits((prev) => prev.filter((edit) => edit.id !== id))
         
-        // If updatedUser is returned, update localStorage for that user (if they're currently logged in)
         if (data.updatedUser) {
           const currentUser = localStorage.getItem("currentUser")
           if (currentUser) {
             const currentUserData = JSON.parse(currentUser)
-            // Only update if it's the same user
             if (currentUserData.id === data.updatedUser.id) {
               localStorage.setItem("currentUser", JSON.stringify(data.updatedUser))
-              // Dispatch a custom event to notify other components in the same window
               window.dispatchEvent(new CustomEvent("userProfileUpdated", { detail: data.updatedUser }))
               
               // Also trigger a storage event for cross-tab communication
@@ -586,7 +579,6 @@ const OverviewSection = memo(function OverviewSection({
                 userId: data.updatedUser.id, 
                 timestamp: Date.now() 
               }))
-              // Remove it immediately so it can trigger again next time
               setTimeout(() => {
                 localStorage.removeItem("profileUpdateTrigger")
               }, 100)
@@ -594,7 +586,6 @@ const OverviewSection = memo(function OverviewSection({
           }
         }
         
-        // Dispatch event to refresh chat user list
         window.dispatchEvent(new CustomEvent("profileUpdateTrigger"))
         
         onShowSuccess?.({
@@ -636,7 +627,6 @@ const OverviewSection = memo(function OverviewSection({
       console.log("Reject response:", data)
 
       if (data.ok) {
-        // Remove the rejected request from the list
         setPendingEdits((prev) => prev.filter((edit) => edit.id !== id))
         onShowSuccess?.({
           title: "Profile Rejected",
@@ -989,7 +979,6 @@ function AnnouncementsSection() {
     })
   }
 
-  // Fetch announcements from database
   const fetchAnnouncements = useCallback(async () => {
     try {
       const response = await fetch("/api/announcements?sort=desc")
@@ -1018,12 +1007,10 @@ function AnnouncementsSection() {
   useEffect(() => {
     fetchAnnouncements()
 
-    // Poll for new announcements every 5 seconds
     const interval = setInterval(fetchAnnouncements, 5000)
     return () => clearInterval(interval)
   }, [fetchAnnouncements])
 
-  // Listen for new announcement events
   useEffect(() => {
     const handleNewAnnouncement = () => {
       fetchAnnouncements()
@@ -1065,7 +1052,6 @@ function AnnouncementsSection() {
     }
 
     try {
-      // Get current admin user
       const currentUser = localStorage.getItem("currentUser")
       const userData = currentUser ? JSON.parse(currentUser) : null
 
@@ -1725,11 +1711,9 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
   const [violationSearchQuery, setViolationSearchQuery] = useState("")
   const [selectedViolation, setSelectedViolation] = useState<any>(null)
   const [showViolationDetails, setShowViolationDetails] = useState(false)
-  // Long-press state for Academic Records
   const [longPressUserId, setLongPressUserId] = useState<string | null>(null)
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null)
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  // Long-press state for Recent Violations
   const [longPressViolationId, setLongPressViolationId] = useState<string | null>(null)
   const [hoveredViolationId, setHoveredViolationId] = useState<string | null>(null)
   const longPressViolationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -1770,7 +1754,6 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
     }
   }
 
-  // Long-press handlers for Academic Records
   const handleLongPressStart = (userId: string, e: React.TouchEvent) => {
     e.preventDefault()
     const timer = setTimeout(() => {
@@ -1789,7 +1772,6 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
     }
   }
 
-  // Long-press handlers for Recent Violations
   const handleViolationLongPressStart = (violationId: string, e: React.TouchEvent) => {
     e.preventDefault()
     const timer = setTimeout(() => {
@@ -1925,7 +1907,6 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
         const data = await response.json()
         if (data.ok) {
           const updatedViolation = data.violation
-          // Update local state with server response (includes statusUpdatedAt/Date/Time)
           setViolations((prev) =>
             prev.map((violation) => (violation.id === violationId ? updatedViolation : violation)),
           )
@@ -2001,19 +1982,16 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
     // Initial fetch
     console.log(`[DepartmentRecordsSection] Initial fetch for department: ${department}`)
     fetchViolations()
-    
-    // Poll every 10 seconds to ensure we have the latest data
+
     const interval = setInterval(() => {
       console.log(`[DepartmentRecordsSection] Polling violations for department: ${department}`)
       fetchViolations()
     }, 10000)
     
-    // Listen for violation events
     const handleViolationEvent = (event: any) => {
       console.log(`[DepartmentRecordsSection] Violation event received (${department}):`, event.type)
       const eventDepartment = event.detail?.department
       
-      // Only refresh if the violation is for this department (or no department specified, meaning refresh all)
       if (!eventDepartment || eventDepartment === department) {
         console.log(`[DepartmentRecordsSection] Refreshing violations for department ${department} due to ${event.type} event`)
         // Small delay to ensure database is updated
@@ -2121,13 +2099,11 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
         console.log("Department used when creating:", getDepartmentName(department))
         console.log("Department code:", department)
         
-        // Close modal and reset form
         setShowAddViolation(false)
         setSelectedUser(null)
         setViolationForm({ violation: "", violationType: "", status: "pending", notes: "", approverName: "", approverTitle: "" })
         
         // CRITICAL: Immediately fetch violations to update the Recent Violations section
-        // Use a small delay to ensure database write is complete
         setTimeout(async () => {
           console.log("Refreshing violations list for department:", department)
           await fetchViolations()
@@ -2601,7 +2577,6 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
           ) : (
             <>
               {(() => {
-                // Filter violations based on search query
                 const filteredViolations = violations.filter((violation) => {
                   const profile = violation.userProfile
                   const profileName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim()
@@ -3370,7 +3345,6 @@ function DepartmentRecordsSection({ department, departmentLabel }: { department:
               ) : (
                 <div className="space-y-4">
                   {(() => {
-                    // Filter violations based on search query
                     const filteredUserViolations = userViolations.filter((violation) => {
                       const searchLower = userViolationSearchQuery.toLowerCase()
                       return (
@@ -3661,7 +3635,6 @@ function RecordsSection({
     }
   }, [initialDepartment])
 
-  // Fetch user counts per department
   useEffect(() => {
     const fetchDepartmentCounts = async () => {
       try {
@@ -3704,7 +3677,6 @@ function RecordsSection({
   const handleDepartmentSelect = (dept: string) => {
     setSelectedDepartment(dept)
     onDepartmentChange(dept)
-    // Update URL without page reload
     const params = new URLSearchParams(window.location.search)
     params.set("department", dept)
     window.history.pushState({}, "", `?${params.toString()}`)
@@ -3909,7 +3881,6 @@ function DashboardSection({ onDepartmentClick }: { onDepartmentClick: (departmen
     fetchDashboardData()
     const interval = setInterval(fetchDashboardData, 30000) // Refresh every 30 seconds
     
-    // Listen for violation events to refresh charts
     const handleViolationEvent = () => {
       fetchDashboardData()
     }
@@ -4171,7 +4142,6 @@ function DashboardSection({ onDepartmentClick }: { onDepartmentClick: (departmen
                 {topViolators.map((violator, index) => {
                   const rank = index + 1
                   const violationText = violator.count === 1 ? "violation" : "violations"
-                  // Get department from user data if available
                   const department = violator.department || "College"
                   
                   return (
@@ -4218,7 +4188,6 @@ function DashboardCard({
   children: React.ReactNode
   mobileTitleClassName?: string
 }) {
-  // Determine icon background color based on title
   const getIconBgColor = () => {
     if (title.includes("Registered Students")) return "bg-blue-50"
     if (title.includes("Students with Violations")) return "bg-red-50"
@@ -4282,6 +4251,7 @@ type ChatMessage = {
 }
 
 function ChatSection() {
+  const searchParams = useSearchParams()
   const [selectedUser, setSelectedUser] = useState<AdminUserSummary | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -4312,8 +4282,8 @@ function ChatSection() {
   const userScrolledRef = useRef(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const reactRef = useRef<HTMLDivElement>(null)
+  const hasScrolledToNotificationMessageRef = useRef(false)
 
-  // Fetch users from database
   const fetchUsers = async (isInitialLoad = false) => {
     try {
       if (isInitialLoad) {
@@ -4341,12 +4311,10 @@ function ChatSection() {
   useEffect(() => {
     fetchUsers(true) // Initial load with loading state
     
-    // Poll for online status updates every 10 seconds (silent updates)
     const interval = setInterval(() => {
       fetchUsers(false) // Silent updates without loading state
     }, 10000) // Update every 10 seconds
 
-    // Listen for profile update events (when profile edits are approved)
     const handleProfileUpdate = () => {
       console.log("Profile update detected, refreshing user list...")
       fetchUsers(false) // Refresh user list silently
@@ -4362,23 +4330,18 @@ function ChatSection() {
     }
   }, [])
 
-  // Fetch messages from database (admin perspective)
   const fetchMessages = useCallback(async (userId: string, isInitialLoad = false) => {
     try {
       const response = await fetch(`/api/messages?userId=${userId}&perspective=admin`)
       const data = await response.json()
       
       if (data.ok && data.messages) {
-        // Check if new messages were added by comparing with last known count
         const previousCount = lastMessageCountRef.current
         const newCount = data.messages.length
         
-        // Check if user sent a new message (not from admin)
         const hasNewMessage = !isInitialLoad && newCount > previousCount && previousCount > 0
         
-        // If user sent a new message, mark them as recently opened (move to top of list)
         if (hasNewMessage) {
-          // Check if the latest message is from the user (not admin)
           const latestMessage = data.messages[data.messages.length - 1]
           if (latestMessage && !latestMessage.isOutgoing) {
             // User sent a new message - mark as recently opened
@@ -4389,12 +4352,10 @@ function ChatSection() {
           }
         }
         
-        // Only auto-scroll if:
         // 1. This is NOT the initial load (user clicked a user)
         // 2. New messages were added (count increased)
         // 3. User hasn't manually scrolled up
         if (hasNewMessage && !userScrolledRef.current) {
-          // Check if user is near bottom (within 150px) - if not, don't auto-scroll
           const container = messagesContainerRef.current
           if (container) {
             const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150
@@ -4429,8 +4390,17 @@ function ChatSection() {
     }
   }, [])
 
-  // Update selectedUser when chatUsers updates (for online status and profile changes)
-  // Use a string representation of user data to create a stable dependency
+  useEffect(() => {
+    const targetUserId = searchParams.get("userId")
+    if (!targetUserId || chatUsers.length === 0) return
+
+    const targetUser = chatUsers.find((u) => String(u.id) === String(targetUserId))
+    if (targetUser && (!selectedUser || selectedUser.id !== targetUser.id)) {
+      setSelectedUser(targetUser)
+      fetchMessages(targetUser.id, true)
+    }
+  }, [searchParams, chatUsers, selectedUser, fetchMessages])
+
   const userDataString = chatUsers.map(u => `${u.id}:${u.isOnline}:${u.firstName}:${u.lastName}:${u.profilePicture || ''}`).join(',')
   
   useEffect(() => {
@@ -4438,7 +4408,6 @@ function ChatSection() {
     
     const updatedUser = chatUsers.find((u) => u.id === selectedUser.id)
     if (updatedUser) {
-      // Update if online status changed OR if name changed (profile update)
       const hasChanges = 
         updatedUser.isOnline !== selectedUser.isOnline ||
         updatedUser.firstName !== selectedUser.firstName ||
@@ -4455,7 +4424,6 @@ function ChatSection() {
     }
   }, [userDataString, selectedUser?.id, fetchMessages])
 
-  // Mark messages as read when admin opens a conversation
   const markMessagesAsRead = useCallback(async (userId: string) => {
     try {
       await fetch("/api/messages", {
@@ -4468,7 +4436,6 @@ function ChatSection() {
           adminId: "admin",
         }),
       })
-      // Update local unread counts
       setUnreadCounts((prev) => {
         const updated = { ...prev }
         delete updated[userId]
@@ -4479,12 +4446,10 @@ function ChatSection() {
     }
   }, [])
 
-  // Helper functions for user data
   const getUnreadCount = (userId: string) => {
     return unreadCounts[userId] || 0
   }
   
-  // Track scroll position to determine if user scrolled up
   const handleScroll = () => {
     const container = messagesContainerRef.current
     if (!container) return
@@ -4494,12 +4459,10 @@ function ChatSection() {
     const clientHeight = container.clientHeight
     const isNearBottom = scrollHeight - scrollTop - clientHeight < 150
     
-    // If user scrolls up significantly, mark that they manually scrolled
     if (scrollTop < scrollHeight - clientHeight - 200) {
       userScrolledRef.current = true
     }
     
-    // If user scrolls back near bottom, reset the flag
     if (isNearBottom) {
       userScrolledRef.current = false
       shouldAutoScrollRef.current = true
@@ -4515,11 +4478,9 @@ function ChatSection() {
       userScrolledRef.current = false
       lastMessageCountRef.current = 0
       fetchMessages(selectedUser.id, true) // Pass true to indicate this is initial load
-      // Mark messages as read when admin opens the conversation
       markMessagesAsRead(selectedUser.id)
       // Don't mark user as recently opened when clicked - only when they send a new message
       
-      // Poll for new messages every 5 seconds
       const interval = setInterval(() => {
         fetchMessages(selectedUser.id, false) // Pass false for subsequent fetches
       }, 5000)
@@ -4531,17 +4492,14 @@ function ChatSection() {
     }
   }, [selectedUser?.id, markMessagesAsRead])
 
-  // Scroll to bottom when messages change (only if shouldAutoScroll is true)
   useEffect(() => {
     if (shouldAutoScrollRef.current && messagesEndRef.current) {
-      // Use setTimeout to ensure DOM is updated
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
       }, 100)
     }
   }, [messages])
 
-  // Handle file selection
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
@@ -4560,7 +4518,6 @@ function ChatSection() {
       }
       validFiles.push(file)
 
-      // Create preview for images and videos
       if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
         const reader = new FileReader()
         reader.onload = (e) => {
@@ -4579,7 +4536,6 @@ function ChatSection() {
     }
   }
 
-  // Remove file from selection
   const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index))
     setFilePreviews(prev => prev.filter((_, i) => i !== index))
@@ -4588,7 +4544,6 @@ function ChatSection() {
     }
   }
 
-  // Convert files to base64 attachments
   const convertFilesToAttachments = async (files: File[]): Promise<Attachment[]> => {
     const attachments: Attachment[] = []
     
@@ -4616,7 +4571,6 @@ function ChatSection() {
     if ((!newMessage.trim() && selectedFiles.length === 0) || !selectedUser) return
 
     try {
-      // Convert files to attachments
       const attachments = selectedFiles.length > 0 
         ? await convertFilesToAttachments(selectedFiles)
         : []
@@ -4640,9 +4594,7 @@ function ChatSection() {
       const data = await response.json()
 
       if (data.ok && data.message) {
-        // Update isOutgoing to true for admin perspective
         const adminMessage = { ...data.message, isOutgoing: true }
-        // Add the new message to the list
         shouldAutoScrollRef.current = true // Always scroll when sending a message
         userScrolledRef.current = false // Reset scroll flag when sending
         lastMessageCountRef.current = messages.length + 1
@@ -4665,18 +4617,25 @@ function ChatSection() {
   const scrollToMessage = (messageId: string) => {
     const messageElement = document.getElementById(`message-${messageId}`)
     if (messageElement && messagesContainerRef.current) {
-      // Highlight the message
       setHighlightedMessageId(messageId)
       
       // Scroll to the message
       messageElement.scrollIntoView({ behavior: "smooth", block: "center" })
       
-      // Remove highlight after 2 seconds
       setTimeout(() => {
         setHighlightedMessageId(null)
       }, 2000)
     }
   }
+
+  useEffect(() => {
+    const targetMessageId = searchParams.get("messageId")
+    if (!targetMessageId || hasScrolledToNotificationMessageRef.current || messages.length === 0) {
+      return
+    }
+    scrollToMessage(targetMessageId)
+    hasScrolledToNotificationMessageRef.current = true
+  }, [searchParams, messages])
 
   const handleEditMessage = async (messageId: string) => {
     if (!editMessageText.trim() || !selectedUser) return
@@ -4733,7 +4692,6 @@ function ChatSection() {
       const data = await response.json()
 
       if (data.ok) {
-        // Update the message to show as deleted instead of removing it
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === messageId
@@ -4791,7 +4749,6 @@ function ChatSection() {
     }
   }
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (messageMenuRef.current && !messageMenuRef.current.contains(event.target as Node)) {
@@ -4827,7 +4784,6 @@ function ChatSection() {
       const data = await response.json()
 
       if (data.ok) {
-        // Update the message with new reactions
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === messageId ? { ...msg, reactions: data.reactions || [] } : msg
@@ -4847,7 +4803,6 @@ function ChatSection() {
     }
   }
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -4864,7 +4819,6 @@ function ChatSection() {
     }
   }, [openMenuId, openReactId])
 
-  // Filter and sort users: those with unread messages first, then recently opened, then alphabetically
   const filteredUsers = chatUsers
     .filter(
       (user) =>
@@ -4881,12 +4835,10 @@ function ChatSection() {
       if (aUnread > 0 && bUnread === 0) return -1
       if (aUnread === 0 && bUnread > 0) return 1
       
-      // If both have unread, sort by unread count (descending), then by most recently opened
       if (aUnread > 0 && bUnread > 0) {
         if (aUnread !== bUnread) {
           return bUnread - aUnread
         }
-        // If same unread count, sort by most recently opened
         if (aRecentlyOpened !== bRecentlyOpened) {
           return bRecentlyOpened - aRecentlyOpened
         }
@@ -4906,7 +4858,6 @@ function ChatSection() {
       return aName.localeCompare(bName)
     })
 
-  // Get user timestamp from latest messages
   const [messageTimestamps, setMessageTimestamps] = useState<Record<string, string>>({})
 
   useEffect(() => {
@@ -4925,12 +4876,10 @@ function ChatSection() {
 
     fetchTimestamps()
     
-    // Update timestamps every 10 seconds
     const interval = setInterval(fetchTimestamps, 10000)
     return () => clearInterval(interval)
   }, [])
 
-  // Fetch unread message counts
   useEffect(() => {
     const fetchUnreadCounts = async () => {
       try {
@@ -4941,12 +4890,10 @@ function ChatSection() {
           const previousCounts = previousUnreadCountsRef.current
           const newCounts = data.unreadCounts
           
-          // Check if any user's unread count increased (they sent a new message)
           Object.keys(newCounts).forEach((userId) => {
             const previousCount = previousCounts[userId] || 0
             const newCount = newCounts[userId] || 0
             
-            // If unread count increased, user sent a new message - mark as recently opened
             if (newCount > previousCount) {
               setRecentlyOpenedUsers((prev) => ({
                 ...prev,
@@ -4955,7 +4902,6 @@ function ChatSection() {
             }
           })
           
-          // Update previous counts for next comparison
           previousUnreadCountsRef.current = { ...newCounts }
           setUnreadCounts(newCounts)
         }
@@ -4966,7 +4912,6 @@ function ChatSection() {
 
     fetchUnreadCounts()
     
-    // Update unread counts every 5 seconds
     const interval = setInterval(fetchUnreadCounts, 5000)
     return () => clearInterval(interval)
   }, [])
@@ -5021,7 +4966,6 @@ function ChatSection() {
               const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5
               
               // Always prevent page scroll when scrolling inside the container
-              // Only allow page scroll if we're at the boundaries and trying to scroll further
               if (!((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom))) {
                 e.stopPropagation()
               }

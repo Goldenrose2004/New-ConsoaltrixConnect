@@ -25,7 +25,6 @@ const SESSION_KEY = 'pwa_session_token'
 const TOKEN_EXPIRY_DAYS = 30 // Token valid for 30 days
 const SESSION_EXPIRY_DAYS = 365 // Session valid for 1 year (persistent login)
 
-// Features that require internet connection
 export const ONLINE_ONLY_FEATURES = [
   'violations',
   'chats',
@@ -36,7 +35,6 @@ export const ONLINE_ONLY_FEATURES = [
   'signup'
 ]
 
-// Features accessible offline
 export const OFFLINE_ACCESSIBLE_FEATURES = [
   'basic-education-dashboard',
   'college-dashboard',
@@ -75,7 +73,7 @@ export function saveOfflineAuth(user: StoredUser, token?: string): void {
       loginTimestamp: Date.now()
     }))
 
-    // Store token separately for quick access
+
     if (token) {
       localStorage.setItem(TOKEN_KEY, token)
     } else {
@@ -106,7 +104,6 @@ export function isOfflineAuthenticated(): boolean {
       return false
     }
 
-    // If we have currentUser but no token, create one (for existing users)
     if (!token && userData) {
       try {
         const user = JSON.parse(userData) as StoredUser
@@ -114,7 +111,6 @@ export function isOfflineAuthenticated(): boolean {
           // Generate token for existing user
           const newToken = generateSimpleToken(user.id)
           localStorage.setItem(TOKEN_KEY, newToken)
-          // Update user data with token info
           const updatedUser = {
             ...user,
             loginToken: newToken,
@@ -128,7 +124,6 @@ export function isOfflineAuthenticated(): boolean {
       }
     }
 
-    // Check if token is expired (using SESSION_EXPIRY_DAYS for persistent login)
     const user = JSON.parse(userData) as StoredUser
     if (user.loginTimestamp) {
       const daysSinceLogin = (Date.now() - user.loginTimestamp) / (1000 * 60 * 60 * 24)
@@ -184,7 +179,6 @@ export function clearOfflineAuth(): void {
   try {
     localStorage.removeItem(TOKEN_KEY)
     // Note: We don't remove currentUser here as it might be used by online mode
-    // Only remove it on explicit logout
   } catch (error) {
     console.error('Error clearing offline auth:', error)
   }
@@ -305,7 +299,6 @@ export function getPersistentSession(): { userId: string; email: string; session
 
     const session = JSON.parse(sessionData)
     
-    // Check if session is expired
     if (session.expiresAt && Date.now() > session.expiresAt) {
       clearPersistentSession()
       return null

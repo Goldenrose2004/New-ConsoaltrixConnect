@@ -8,7 +8,6 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    // Handle both Promise and direct params (for Next.js 13+ compatibility)
     const resolvedParams = params instanceof Promise ? await params : params
     const { id } = resolvedParams
 
@@ -38,7 +37,6 @@ export async function PATCH(
 
     const db = await connectToDatabase().then((r) => r.db)
 
-    // Update the announcement
     const updateResult = await db.collection("announcements").updateOne(
       { _id: new ObjectId(id) },
       {
@@ -58,7 +56,6 @@ export async function PATCH(
       )
     }
 
-    // Fetch the updated announcement
     const updatedAnnouncement = await db.collection("announcements").findOne({
       _id: new ObjectId(id),
     })
@@ -70,7 +67,6 @@ export async function PATCH(
       )
     }
 
-    // Format for response
     const formattedAnnouncement = {
       id: updatedAnnouncement._id.toString(),
       title: updatedAnnouncement.title,
@@ -133,7 +129,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    // Handle both Promise and direct params (for Next.js 13+ compatibility)
     const resolvedParams = params instanceof Promise ? await params : params
     const { id } = resolvedParams
 

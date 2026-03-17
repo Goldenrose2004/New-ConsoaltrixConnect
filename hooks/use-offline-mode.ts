@@ -33,13 +33,10 @@ export function useOfflineMode(): OfflineModeState {
         isAnonymous,
         isAuthenticated,
         canAccessFeature: (feature: string) => {
-          // If online, all features are accessible
           if (!isOffline) return true
           
-          // If authenticated (not anonymous), all offline-accessible features are available
           if (isAuthenticated && !isAnonymous) return true
           
-          // If anonymous and offline, only offline-accessible features are available
           if (isAnonymous && isOffline) {
             const offlineFeatures = [
               'basic-education-dashboard',

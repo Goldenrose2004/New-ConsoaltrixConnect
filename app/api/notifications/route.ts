@@ -25,7 +25,6 @@ export async function GET(request: NextRequest) {
       .limit(limit)
       .toArray()
 
-    // Format notifications for frontend
     const formattedNotifications = notifications.map((notif) => {
       const createdAt = notif.createdAt ? new Date(notif.createdAt) : new Date()
       const timeAgo = getTimeAgo(createdAt)
@@ -39,6 +38,7 @@ export async function GET(request: NextRequest) {
         badgeColor: notif.badgeColor || "#3B82F6",
         type: notif.type,
         relatedId: notif.relatedId || null,
+        conversationUserId: notif.conversationUserId || null,
         createdAt: createdAt.toISOString(),
       }
     })
@@ -113,7 +113,6 @@ export async function PATCH(request: NextRequest) {
     const db = await connectToDatabase().then((r) => r.db)
 
     if (markAll) {
-      // Mark all notifications as read for this user
       const result = await db.collection("notifications").updateMany(
         { userId, read: false },
         {
@@ -129,7 +128,6 @@ export async function PATCH(request: NextRequest) {
         { status: 200 }
       )
     } else if (notificationIds && Array.isArray(notificationIds) && notificationIds.length > 0) {
-      // Mark specific notifications as read
       const objectIds = notificationIds
         .filter((id: string) => ObjectId.isValid(id))
         .map((id: string) => new ObjectId(id))
@@ -230,7 +228,6 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// Helper function to calculate time ago
 function getTimeAgo(date: Date): string {
   const now = new Date()
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
