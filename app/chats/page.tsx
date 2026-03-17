@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { AuthenticatedHeader } from "@/components/authenticated-header"
 import Image from "next/image"
 import { Reply, Smile, MoreVertical, Edit, Trash2, X, Copy } from "lucide-react"
@@ -34,7 +34,6 @@ type ChatMessage = {
 
 export default function ChatsPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [user, setUser] = useState<any>(null)
   const [adminProfilePicture, setAdminProfilePicture] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -222,15 +221,16 @@ export default function ChatsPage() {
 
   // Scroll to a specific message when opened from a notification (once only)
   useEffect(() => {
-    const targetMessageId = searchParams.get("messageId")
+    const params = new URLSearchParams(window.location.search)
+    const targetMessageId = params.get("messageId")
     if (!targetMessageId || hasScrolledToNotificationMessageRef.current || messages.length === 0) {
       return
     }
     scrollToMessage(targetMessageId)
     hasScrolledToNotificationMessageRef.current = true
     // Clean up the query parameter so it doesn't retrigger
-    router.replace("/chats")
-  }, [searchParams, messages, router])
+    router.replace(window.location.pathname)
+  }, [messages, router])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files

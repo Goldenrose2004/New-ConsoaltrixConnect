@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { AuthenticatedHeader } from "@/components/authenticated-header"
 import { Footer } from "@/components/footer"
 import { User, BookOpen, Building, Briefcase, AlertTriangle, Check, RefreshCw, Calendar, Tag, FileText, List, CircleCheck, Eye, X } from "lucide-react"
@@ -9,7 +9,6 @@ import { formatTimestampWithTimezone } from "@/lib/utils"
 
 export default function RecordsPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [violations, setViolations] = useState<any[]>([])
@@ -70,8 +69,9 @@ export default function RecordsPage() {
   }, [user?.id, fetchViolations])
 
   useEffect(() => {
-    const targetViolationId = searchParams.get("violationId")
-    const triggerKey = `${targetViolationId || ""}-${searchParams.get("t") || ""}`
+    const params = new URLSearchParams(window.location.search)
+    const targetViolationId = params.get("violationId")
+    const triggerKey = `${targetViolationId || ""}-${params.get("t") || ""}`
 
     if (!targetViolationId || violations.length === 0) {
       return
@@ -94,7 +94,7 @@ export default function RecordsPage() {
     if (row) {
       row.scrollIntoView({ behavior: "smooth", block: "center" })
     }
-  }, [searchParams, violations])
+  }, [violations])
 
   useEffect(() => {
     if (!highlightViolationId) return
